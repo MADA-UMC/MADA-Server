@@ -18,8 +18,8 @@ public class Category {
     @Column(name = "color", nullable = false, length = 45)
     private String color; // 카테고리 색상
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "icon_id", nullable = false)
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "icon_id", nullable = false)
     private int icon_id; // 아이콘 ID (외래키)
 
     @Column(name = "create_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
