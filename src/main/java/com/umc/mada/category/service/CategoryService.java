@@ -1,12 +1,12 @@
 package com.umc.mada.category.service;
 
-
 import com.umc.mada.category.domain.Category;
 import com.umc.mada.category.dto.CategoryRequestDto;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.umc.mada.global.BaseResponseStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +18,7 @@ public class CategoryService {
 
     @Autowired
     public CategoryService(CategoryRepository categoryRepository) {
+
         this.categoryRepository = categoryRepository;
     }
 
@@ -29,19 +30,17 @@ public class CategoryService {
      */
     public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
         // 카테고리 이름이 없거나 길이를 초과한 경우 예외 처리
-        validateCategoryName(categoryRequestDto.getCategoryName());
+        validateCategoryName(categoryRequestDto.getCategory_name());
 
         // 존재하지 않는 아이콘인 경우 예외 처리
-        if (!isValidIconId(categoryRequestDto.getIconId())) {
-            throw new IllegalArgumentException("존재하지 않는 아이콘입니다.");
-        }
+        validateIconId(categoryRequestDto.getIcon_id());
 
         // Category 엔티티 생성
-        Category category = new Category(categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), categoryRequestDto.getIconId());
+        Category category = new Category(categoryRequestDto.getCategory_name(), categoryRequestDto.getColor(), categoryRequestDto.getIcon_id());
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
-        return new CategoryResponseDto(savedCategory.getCategoryName(), savedCategory.getColor(), savedCategory.getId());
+        return new CategoryResponseDto(savedCategory.getCategory_name(), savedCategory.getColor(), savedCategory.getId());
     }
 
     /**
@@ -58,18 +57,18 @@ public class CategoryService {
             Category category = optionalCategory.get();
 
             // 카테고리 이름이 없거나 길이를 초과한 경우 예외 처리
-            validateCategoryName(categoryRequestDto.getCategoryName());
+            validateCategoryName(categoryRequestDto.getCategory_name());
 
             // 요청 데이터로 카테고리 엔티티 수정
-            category.setCategoryName(categoryRequestDto.getCategoryName());
+            category.setCategory_name(categoryRequestDto.getCategory_name());
             category.setColor(categoryRequestDto.getColor());
             // 수정된 카테고리를 저장하고 저장된 카테고리 엔티티 반환
             Category updatedCategory = categoryRepository.save(category);
             // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
-            return new CategoryResponseDto(updatedCategory.getCategoryName(), updatedCategory.getColor(), updatedCategory.getId());
+            return new CategoryResponseDto(updatedCategory.getCategory_name(), updatedCategory.getColor(), updatedCategory.getId());
         }
         // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
-        throw new IllegalArgumentException("존재하지 않는 카테고리입니다.");
+        throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage()); // *표시
     }
 
     /**
@@ -85,7 +84,7 @@ public class CategoryService {
             categoryRepository.deleteById(category_id);
         } else {
             // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
-            throw new IllegalArgumentException("존재하지 않는 카테고리입니다.");
+            throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage()); // *표시
         }
     }
 
@@ -99,7 +98,7 @@ public class CategoryService {
         List<Category> categories = categoryRepository.findAll();
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
         return categories.stream()
-                .map(category -> new CategoryResponseDto(category.getCategoryName(), category.getColor(), category.getId()))
+                .map(category -> new CategoryResponseDto(category.getCategory_name(), category.getColor(), category.getId()))
                 .collect(Collectors.toList());
     }
 
@@ -115,10 +114,10 @@ public class CategoryService {
         if (optionalCategory.isPresent()) {
             Category category = optionalCategory.get();
             // 카테고리 엔티티 정보를 기반으로 CategoryResponseDto 생성하여 반환
-            return new CategoryResponseDto(category.getCategoryName(), category.getColor(), category.getId());
+            return new CategoryResponseDto(category.getCategory_name(), category.getColor(), category.getId());
         }
         // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
-        throw new IllegalArgumentException("존재하지 않는 카테고리입니다.");
+        throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
     }
 
     // 카테고리 이름 유효성 검사 메서드
@@ -129,9 +128,12 @@ public class CategoryService {
     }
 
     // 아이콘 ID 유효성 검사 메서드
-    private boolean isValidIconId(int iconId) {
+    private void  validateIconId(int iconId) {
         // 아이콘 ID가 유효한지 여부를 확인하는 로직을 추가하여 해당 아이콘 ID가 존재하는지 체크
+        // 실제로는 데이터베이스나 다른 서비스와 연동하여 처리
         // 여기서는 아이콘 ID가 1부터 1000까지의 범위라고 가정
-        return iconId >= 1 && iconId <= 1000;
+        if (iconId < 1 || iconId > 1000) {
+            throw new IllegalArgumentException(BaseResponseStatus.REQUEST_ERROR.getMessage());
+        }
     }
 }
