@@ -6,8 +6,8 @@ import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.umc.mada.global.BaseResponse;
-import com.umc.mada.global.BaseResponseStatus;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -23,45 +23,45 @@ public class CategoryController {
     }
 
     @PostMapping
-    public BaseResponse<String> createCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<String> createCategory(@RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 생성 API
         categoryService.createCategory(categoryRequestDto);
-        return new BaseResponse<>("카테고리 생성 완료");
+        return new ResponseEntity<>("카테고리 생성 완료", HttpStatus.CREATED);
     }
 
     @PatchMapping("/{category_id}")
-    public BaseResponse<CategoryResponseDto> updateCategory(@PathVariable int category_id, @RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable int category_id, @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 수정 API
         CategoryResponseDto updatedCategory = categoryService.updateCategory(category_id, categoryRequestDto);
         if (updatedCategory != null) {
-            return new BaseResponse<>(updatedCategory);
+            return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
         } else {
-            return new BaseResponse<>(BaseResponseStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
     @DeleteMapping("/{category_id}")
-    public BaseResponse<String> deleteCategory(@PathVariable int category_id) {
+    public ResponseEntity<String> deleteCategory(@PathVariable int category_id) {
         // 카테고리 삭제 API
         categoryService.deleteCategory(category_id);
-        return new BaseResponse<>("카테고리 삭제 완료");
+        return new ResponseEntity<>("카테고리 삭제 완료", HttpStatus.OK);
     }
 
     @GetMapping
-    public BaseResponse<List<CategoryResponseDto>> getAllCategories() {
+    public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
         // 모든 카테고리 목록 조회 API
         List<CategoryResponseDto> categories = categoryService.getAllCategories();
-        return new BaseResponse<>(categories);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @GetMapping("/{category_id}")
-    public BaseResponse<CategoryResponseDto> getCategoryById(@PathVariable int category_id) {
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable int category_id) {
         // 특정 카테고리 조회 API
         try {
             CategoryResponseDto category = categoryService.getCategoryById(category_id);
-            return new BaseResponse<>(category);
+            return new ResponseEntity<>(category, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new BaseResponse<>(BaseResponseStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

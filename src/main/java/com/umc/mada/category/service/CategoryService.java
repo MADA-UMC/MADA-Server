@@ -128,12 +128,10 @@ public class CategoryService {
     }
 
     // 아이콘 ID 유효성 검사 메서드
-    private void  validateIconId(int iconId) {
-        // 아이콘 ID가 유효한지 여부를 확인하는 로직을 추가하여 해당 아이콘 ID가 존재하는지 체크
-        // 실제로는 데이터베이스나 다른 서비스와 연동하여 처리
-        // 여기서는 아이콘 ID가 1부터 1000까지의 범위라고 가정
-        if (iconId < 1 || iconId > 1000) {
-            throw new IllegalArgumentException(BaseResponseStatus.REQUEST_ERROR.getMessage());
+    private void validateIconId(int iconId) {
+        Optional<Category> optionalCategory = categoryRepository.findById(iconId);
+        if (optionalCategory.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 아이콘 ID입니다.");
         }
     }
 }

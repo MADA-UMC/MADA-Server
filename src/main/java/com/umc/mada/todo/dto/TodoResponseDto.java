@@ -1,5 +1,7 @@
 package com.umc.mada.todo.dto;
 
+import com.umc.mada.todo.domain.Todo.Repeat;
+import com.umc.mada.todo.domain.Todo.RepeatWeek;
 import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -8,22 +10,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
 public class TodoResponseDto {
-    private int id; // Todo ID
-    private long user_id; // 유저 ID
-    private int category_id; // 카테고리 ID
-    private String todo_name; // Todo 이름
-    private char complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
+    private int id; // 투두 ID
+    private long userId; // 유저 ID
+    private int categoryId; // 카테고리 ID
+    private String todoName; // 투두 이름
+    private boolean complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
+    private Repeat repeat; // 반복 설정 (N: 반복 안함, day: 매일 반복, week: 매주 반복, month: 매월 반복)
+    private RepeatWeek repeatWeek; // 매주 반복 요일 ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
     private LocalDate startRepeatDate; // 반복 시작일자
     private LocalDate endRepeatDate; // 반복 종료일자
-    private boolean isRepeatMon; // 월요일 반복 여부
-    private boolean isRepeatTue; // 화요일 반복 여부
-    private boolean isRepeatWed; // 수요일 반복 여부
-    private boolean isRepeatThu; // 목요일 반복 여부
-    private boolean isRepeatFri; // 금요일 반복 여부
-    private boolean isRepeatSat; // 토요일 반복 여부
-    private boolean isRepeatSun; // 일요일 반복 여부
-    private List<Integer> monthlyRepeatDates; // 매월 반복하는 날짜 목록
+//    private List<Integer> monthlyRepeatDates; // 매월 반복하는 날짜 목록
 }
