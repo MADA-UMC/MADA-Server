@@ -4,11 +4,14 @@ import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.service.TodoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/home/todo")
@@ -21,32 +24,28 @@ public class TodoController {
     }
 
     @PostMapping
-    public ResponseEntity<TodoResponseDto> createTodo(@RequestBody TodoRequestDto todoRequestDto) {
+    public ResponseEntity<String> createTodo(@RequestBody TodoRequestDto todoRequestDto) {
         // 투두 생성 API
-        TodoResponseDto createdTodo = todoService.createTodo(todoRequestDto);
-        return new ResponseEntity<>(createdTodo, HttpStatus.CREATED);
+        todoService.createTodo(todoRequestDto);
+        return new ResponseEntity<>("투두 생성 완료", HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{todo_id}")
-    public ResponseEntity<String> deleteTodo(@PathVariable("todo_id") Integer id) {
-        // 투두 삭제 API
-        todoService.deleteTodo(id);
-        return new ResponseEntity<>("Todo 삭제 완료", HttpStatus.OK);
-    }
-
-
-    @PutMapping("/{todo_id}")
-    public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable("todo_id") Integer id, @RequestBody TodoRequestDto todoRequestDto) {
+    @PatchMapping("/{todoId}")
+    public ResponseEntity<TodoResponseDto> updateTodo(@PathVariable int todoId, @RequestBody TodoRequestDto todoRequestDto){
         // 투두 수정 API
-        TodoResponseDto updatedTodo = todoService.updateTodo(id, todoRequestDto);
-        return new ResponseEntity<>(updatedTodo, HttpStatus.OK);
+        TodoResponseDto updatedTodo = todoService.updateTodo(todoId, todoRequestDto);
+        if (updatedTodo != null){
+            return new ResponseEntity<>(updatedTodo, HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/{todo_id}")
-    public ResponseEntity<TodoResponseDto> getTodoById(@PathVariable("todo_id") Integer id) {
-        // 특정 투두 조회 API
-        TodoResponseDto todoDto = todoService.getTodoById(id);
-        return new ResponseEntity<>(todoDto, HttpStatus.OK);
+    @DeleteMapping("/{todoId}")
+    public ResponseEntity<String> deleteTodo(@PathVariable int todoId) {
+        // 투두 삭제 API
+        todoService.deleteTodo(todoId);
+        return new ResponseEntity<>("Todo 삭제 완료", HttpStatus.OK);
     }
 
     @GetMapping
@@ -54,5 +53,25 @@ public class TodoController {
         // 모든 투두 목록 조회 API
         List<TodoResponseDto> todos = todoService.getAllTodos();
         return new ResponseEntity<>(todos, HttpStatus.OK);
+    }
+    @GetMapping("/{userId}/{date}")
+    public ResponseEntity<List<TodoResponseDto>> getUserTodo(@PathVariable Long userId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        // 특정 유저 투두 목록 조회 API
+        try{
+            List<TodoResponseDto> userTodos = todoService.getUserTodo(userId, date);
+            return new ResponseEntity<>(userTodos, HttpStatus.OK);
+        } catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping("/{todoId}")
+    public ResponseEntity<TodoResponseDto> getTodoById(@PathVariable int todoId) {
+        // 특정 투두 조회 API
+        try{
+            TodoResponseDto todoDto = todoService.getTodoById(todoId);
+            return new ResponseEntity<>(todoDto, HttpStatus.OK);
+        } catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

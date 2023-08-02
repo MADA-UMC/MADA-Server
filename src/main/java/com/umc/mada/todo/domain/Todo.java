@@ -1,34 +1,42 @@
 package com.umc.mada.todo.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.umc.mada.category.domain.Category;
+import com.umc.mada.user.domain.User;
 import lombok.*;
 import javax.persistence.*;
-import com.umc.mada.global.BaseEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
 @Builder
 @Table(name = "TODO")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @NoArgsConstructor
 @AllArgsConstructor
-public class Todo extends BaseEntity{
+public class Todo{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; // 투두 ID (인조키)
 
-    @Column(name = "user_id", nullable = false)
-    private long userId; // 유저 ID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User userId; // 유저 ID
 
-    //@ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "category_id", nullable = false)
-    private int categoryId; // 카테고리 ID
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    private Category categoryId; // 카테고리 ID
 
-    @Column(name = "todo_name", nullable = false, length = 100)
+    @Column(name = "todo_name", nullable = false)
     private String todoName; // 투두 이름
 
     @Enumerated(EnumType.STRING)
@@ -48,13 +56,16 @@ public class Todo extends BaseEntity{
     @Column(name = "end_repeat_date")
     private LocalDate endRepeatDate; // 반복 종료 일자
 
+    @Column(name = "date")
+    private LocalDate date; // 투두 일자
+
     @CreationTimestamp
-    @Column(name="create_at",insertable=false, updatable=false)
-    private Timestamp createAt;
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt; // 생성 시간
 
     @UpdateTimestamp
-    @Column(name = "update_at", insertable=false, updatable=false)
-    private Timestamp updateAt;
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt; // 수정 시간
 
     public enum Repeat {
         N,    // 반복 안함
@@ -74,8 +85,9 @@ public class Todo extends BaseEntity{
     }
 
     // 생성자 (필수 필드)
-    public Todo(long userId, int categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, LocalDate startRepeatDate, LocalDate endRepeatDate) {
+    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, LocalDate startRepeatDate, LocalDate endRepeatDate) {
         this.userId = userId;
+        this.date = date;
         this.categoryId = categoryId;
         this.todoName = todoName;
         this.complete = complete;
