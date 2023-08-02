@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sound.midi.SysexMessage;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Optional;
 
@@ -30,8 +31,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
-
-
 //        OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(provider, userNameAttributeName, oAuth2User.getAttributes());
 //        Optional<User> findUser = userRepository.findByAuthId()
 
@@ -45,8 +44,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String redirectUrl = makeRedirectUrl(accessToken);
 
 //        @Async
-        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
+        response.setHeader("Content-type", "text/plain");
+        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
         response.sendRedirect(redirectUrl);
+        PrintWriter writer = response.getWriter();
+        writer.println("ok");
         System.out.println("성공");
         System.out.println(response.getHeader(HttpHeaders.AUTHORIZATION));
     }

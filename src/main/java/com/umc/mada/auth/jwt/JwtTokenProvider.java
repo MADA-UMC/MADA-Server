@@ -61,9 +61,9 @@ public class JwtTokenProvider {
         //claim에 넣을 정보 설정하기
 //        Claims claims = Jwts.claims().setSubject(String.valueOf(user.getAuthid()));
 //        claims.put("role",user.getRole());
-
+        System.out.println(oAuth2User.getName());
 //        Claims claims = Jwts.claims().setSubject((String)attributes.get("id"));
-        Claims claims = Jwts.claims().setSubject("sfsw");
+        Claims claims = Jwts.claims().setSubject(oAuth2User.getName()); //authId 저장
         claims.put(AUTHORITIES_KEY, Role.USER);
 
         return Jwts.builder()

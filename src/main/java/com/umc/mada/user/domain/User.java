@@ -31,6 +31,7 @@ public class User {
     private Role role;
 
     private boolean account_expired;
+    private boolean is_alarm;
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
@@ -50,13 +51,20 @@ public class User {
         this.role = role;
     }
 
-    public void update(String nickname){
+    public void updateNickname(String nickname){
         this.nickname=nickname;
+    }
+
+    public User update(String authId, String email){
+        this.authId = authId;
+        this.email = email;
+        return this;
     }
 
     public User expiredUser(){
         this.account_expired = true;
         return this;
     }
+
 }
 
