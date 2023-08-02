@@ -2,41 +2,69 @@ package com.umc.mada.user.domain;
 
 import javax.persistence.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+//import com.umc.mada.BaseTimeEntity;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Builder
-@Table(name = "USER")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "USER")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String authid;
+
+    @Column(unique = true, nullable = false)
+    private String authId;
     private String nickname;
+    @Column(unique = true, nullable = false)
     private String email;
-    private String subscribe;
+    private boolean subscribe;
     private String provider;
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private Role role;
+
+    private boolean account_expired;
     private boolean is_alarm;
-    private String refreshToken;
+
+    @CreationTimestamp
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt; // 생성 시간
+
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt; //
 
     @Builder
-    public void User(String nickname, String email, String subscribe, String provider, Role role, boolean is_alarm){
+    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role){
+        this.authId = authId;
         this.nickname = nickname;
         this.email = email;
         this.subscribe = subscribe;
         this.provider = provider;
         this.role = role;
-        this.is_alarm = is_alarm;
     }
 
-    public void update(String nickname){
+    public void updateNickname(String nickname){
         this.nickname=nickname;
     }
+
+    public User update(String authId, String email){
+        this.authId = authId;
+        this.email = email;
+        return this;
+    }
+
+    public User expiredUser(){
+        this.account_expired = true;
+        return this;
+    }
+
 }
 
