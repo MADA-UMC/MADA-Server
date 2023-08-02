@@ -8,30 +8,32 @@ import lombok.*;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
+
 @Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class Calendar extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    @ManyToOne
+    @Column(name = "id")
+    private Long id;
     @Column(name = "user_id")
-    private User user_id;
-    @Column
+    private Long uid;
+    @Column(name = "calender_name")
     private String calender_name;
-    @Column
-    private Timestamp start_date;
-    @Column
-    private Timestamp end_date;
-    @Column
+    @Column(name = "color")
+    private String color;
+    @Column(name = "start_date")
+    private Timestamp startDate;
+    @Column(name = "end_date")
+    private Timestamp endDate;
+    @Column(name = "repeat")
     private String repeat;
-    @Column
-    private String d_day;
-    @Column
+    @Column(name = "d_day")
+    private Character d_day;
+    @Column(name = "memo")
     private String memo;
 }

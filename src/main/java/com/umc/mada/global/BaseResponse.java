@@ -5,13 +5,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpEntity;
 
 import static com.umc.mada.global.BaseResponseStatus.SUCCESS;
 
 @Getter
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
-public class BaseResponse<T> {  //BaseResponse 객체를 사용할 때 성공, 실패 경우
+public class BaseResponse<T>{  //BaseResponse 객체를 사용할 때 성공, 실패 경우
     @JsonProperty("isSuccess")
     private final Boolean isSuccess;
     private final String message;
