@@ -29,10 +29,10 @@ public class CategoryController {
         return new ResponseEntity<>("카테고리 생성 완료", HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{category_id}")
-    public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable int category_id, @RequestBody CategoryRequestDto categoryRequestDto) {
+    @PatchMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable int categoryId, @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 수정 API
-        CategoryResponseDto updatedCategory = categoryService.updateCategory(category_id, categoryRequestDto);
+        CategoryResponseDto updatedCategory = categoryService.updateCategory(categoryId, categoryRequestDto);
         if (updatedCategory != null) {
             return new ResponseEntity<>(updatedCategory, HttpStatus.OK);
         } else {
@@ -40,10 +40,10 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{category_id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable int category_id) {
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<String> deleteCategory(@PathVariable int categoryId) {
         // 카테고리 삭제 API
-        categoryService.deleteCategory(category_id);
+        categoryService.deleteCategory(categoryId);
         return new ResponseEntity<>("카테고리 삭제 완료", HttpStatus.OK);
     }
 
@@ -54,11 +54,11 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    @GetMapping("/{category_id}")
-    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable int category_id) {
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDto> getCategoryById(@PathVariable int categoryId) {
         // 특정 카테고리 조회 API
         try {
-            CategoryResponseDto category = categoryService.getCategoryById(category_id);
+            CategoryResponseDto category = categoryService.getCategoryById(categoryId);
             return new ResponseEntity<>(category, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
