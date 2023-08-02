@@ -2,7 +2,7 @@ package com.umc.mada.user.domain;
 
 import javax.persistence.*;
 
-import com.umc.mada.BaseTimeEntity;
+//import com.umc.mada.BaseTimeEntity;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
