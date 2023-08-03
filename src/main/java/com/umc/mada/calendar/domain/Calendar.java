@@ -4,25 +4,32 @@ package com.umc.mada.calendar.domain;
 import com.umc.mada.global.BaseEntity;
 import com.umc.mada.user.domain.User;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Entity
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "CALENDER")
 public class Calendar extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    @Column(name = "user_id")
-    private Long uid;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @Column(name = "calender_name")
     private String calenderName;
     @Column(name = "color")
@@ -31,10 +38,18 @@ public class Calendar extends BaseEntity {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
-    @Column(name = "repeat")
+    @Column(name = "`repeat`")
     private String repeat;
     @Column(name = "d_day")
     private Character d_day;
     @Column(name = "memo")
     private String memo;
+
+    @CreationTimestamp
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt; // 생성 시간
+
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt; // 수정 시간
 }

@@ -41,11 +41,13 @@ public class CalendarController {
         return ResponseEntity.ok(calendarResponseDto);
     }
     @DeleteMapping("/edit/{id}")
-    ResponseEntity<Void> calendarDelete(Authentication authentication, @PathVariable Long id){
-        if(calendarService.deleteCalendar(authentication,id)){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+    ResponseEntity<String> calendarDelete(Authentication authentication, @PathVariable Long id){
+//        if(calendarService.deleteCalendar(authentication,id)){
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
 
+//        return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        calendarService.deleteCalendar(authentication,id);
+        return ResponseEntity.status(HttpStatus.OK).body("삭제 성공했습니다.");
     }
 }

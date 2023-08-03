@@ -42,7 +42,7 @@ public class CalendarService {
         User user = userOptional.get();
         Calendar calendar = Calendar.builder()
                 //User Entity 부재
-                .uid(user.getId())
+                .user(user)
                 .calenderName(calendarRequestDto.getCalenderName())
                 .d_day(calendarRequestDto.getD_day())
                 .repeat(calendarRequestDto.getRepeat())
@@ -59,14 +59,14 @@ public class CalendarService {
         calendar.setStartDate(calendarRequestDto.getStartDate());
         calendar.setEndDate(calendarRequestDto.getEndDate());
         calendar.setCalenderName(calendarRequestDto.getCalenderName());
-        calendar.setColor(calendar.getColor());
+        calendar.setColor(calendarRequestDto.getColor());
         calendarRepository.save(calendar);
         return new CalendarResponseDto(calendarRequestDto.getCalenderName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
     }
     public List<CalendarResponseDto> readCalendars(Authentication authentication, int month) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        List<Calendar> calendarList = calendarRepository.findAllByUid(user.getId());
+        List<Calendar> calendarList = calendarRepository.findAllByUser(user);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(CalendarResponseDto.builder().
@@ -78,20 +78,20 @@ public class CalendarService {
         }
         return calendarResponseDtoList;
     }
-    public boolean deleteCalendar(Authentication authentication, Long id){
-        return calendarRepository.deleteCalendarById(id);
+    public void deleteCalendar(Authentication authentication, Long id){
+        calendarRepository.deleteCalendarById(id);
     }
     public boolean tooManyD_dayExists(Authentication authentication){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        return calendarRepository.findAllByUid(user.getId()).size() >= 3;
+        return calendarRepository.findAllByUser(user).size() >= 3;
 
     }
     public boolean calendarNameExist(Authentication authentication ,CalendarRequestDto calendarRequestDto){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        return calendarRepository.existsCalendarByUidAndEndDateBetweenAndCalenderName(
-                user.getId()
+        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalenderName(
+                user
                 , calendarRequestDto.getStartDate()
                 , calendarRequestDto.getEndDate()
                 ,calendarRequestDto.getCalenderName()
