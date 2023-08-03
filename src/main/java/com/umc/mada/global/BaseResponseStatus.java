@@ -7,7 +7,13 @@ import lombok.Getter;
  */
 @Getter
 public enum BaseResponseStatus {
-        /**
+
+    /**
+     * 400 : 임시_지울 예정(사용자 입력 오류)
+     */
+    NOT_FOUND(false, 400, "요청한 정보를 찾을 수 없습니다."),
+
+    /**
      * 1000 : 요청 성공
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),

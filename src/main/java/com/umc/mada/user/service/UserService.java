@@ -19,7 +19,7 @@ public class UserService {
 
     public User update(Long id, UserRequestDto.UpdateNickname request){
         User user = userRepository.findById(id).get();
-        user.update(request.getNickname());
+        user.updateNickname(request.getNickname());
         userRepository.save(user);
 
         return user;
