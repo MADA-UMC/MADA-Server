@@ -53,11 +53,6 @@ public class UserController {
 //
 //    }
 
-    @PatchMapping("/{id}/nickname")
-    public BaseResponse<String> UpdateNickname(@PathVariable(name = "id") Long id, @RequestBody UserRequestDto.UpdateNickname request) {
-        User user = userService.update(id, request);
-        return new BaseResponse<>("닉네임 수정 완료");
-    }
 
 //    private User findUser(Authentication authentication){
 //        return userRepository.findByAuthId(authentication.getName())
