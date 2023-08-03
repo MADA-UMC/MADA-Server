@@ -41,7 +41,6 @@ public class SecurityConfig{
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
                 .and()
-
                 .authorizeRequests()
                 //.antMatchers("/","/login").permitAll()
                 //.anyRequest().hasRole("USER")
