@@ -6,6 +6,7 @@ import javax.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -32,12 +33,14 @@ public class User {
 
     private boolean account_expired;
     private boolean is_alarm;
+    private String refreshToken;
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt; // 생성 시간
 
     @UpdateTimestamp
+//    @LastModifiedDate
     @Column(name = "update_at")
     private LocalDateTime updatedAt; //
 
@@ -61,10 +64,18 @@ public class User {
         return this;
     }
 
-    public User expiredUser(){
+    public User expiredUserUpdate(){
         this.account_expired = true;
         return this;
     }
 
+    public void setRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+
+    public User setNickname(String nickname){
+        this.nickname = nickname;
+        return this;
+    }
 }
 

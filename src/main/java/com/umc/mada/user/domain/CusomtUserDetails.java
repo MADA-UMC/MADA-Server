@@ -17,23 +17,28 @@ public class CusomtUserDetails implements UserDetails, OAuth2User {
     private String authId;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
+    private boolean newUser;
 
-
-    public CusomtUserDetails(User user, String authId, Collection<? extends GrantedAuthority> authorities){
+    public CusomtUserDetails(User user, String authId, Collection<? extends GrantedAuthority> authorities, boolean newUser){
         this.user = user;
         this.authId = authId;
         this.authorities = authorities;
+        this.newUser = newUser;
     }
 
-    public static CusomtUserDetails create(User user){
+    public static CusomtUserDetails create(User user, boolean newUser){
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getKey()));
-        return new CusomtUserDetails(user, user.getAuthId(), authorities);
+        return new CusomtUserDetails(user, user.getAuthId(), authorities, newUser);
     }
 
-    public static CusomtUserDetails create(User user, Map<String, Object> attributes){
-        CusomtUserDetails userDetails = CusomtUserDetails.create(user);
+    public static CusomtUserDetails create(User user, Map<String, Object> attributes, boolean newUser){
+        CusomtUserDetails userDetails = CusomtUserDetails.create(user, newUser);
         userDetails.attributes = attributes;
         return userDetails;
+    }
+
+    public boolean getNewUser(){
+        return newUser;
     }
 
     @Override

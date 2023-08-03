@@ -2,6 +2,7 @@ package com.umc.mada.auth.handler;
 
 import com.umc.mada.auth.dto.OAuth2Attributes;
 import com.umc.mada.auth.jwt.JwtTokenProvider;
+import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +40,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = jwtTokenProvider.createRefreshToken(oAuth2User);
 
         //refreshtoken을 DB에 저장해야함
+        Optional<User> userOptional = userRepository.findByAuthId(oAuth2User.getName());
+        User user = userOptional.get();
+        user.setRefreshToken(refreshToken);
 
 //        tokenResponse(response, accessToken);
-        String redirectUrl = makeRedirectUrl(accessToken);
+        CusomtUserDetails cusomtUserDetails = (CusomtUserDetails) authentication.getPrincipal();
+        String redirectUrl = makeRedirectUrl(accessToken, cusomtUserDetails.getNewUser());
 
 //        @Async
         response.setHeader("Content-type", "text/plain");
@@ -53,8 +58,13 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         System.out.println(response.getHeader(HttpHeaders.AUTHORIZATION));
     }
 
-    private String makeRedirectUrl(String accessToken){
-        return UriComponentsBuilder.fromUriString("http://localhost:8080/login/test") //"http://localhost:8080/login/oauth2/code/google"
+    private String makeRedirectUrl(String accessToken, boolean newUser){
+        if(newUser){ //회원가입한 유저라면 닉네임 입력받는 곳으로 리다이렉트
+            return UriComponentsBuilder.fromUriString("http://localhost:8080/user/signup") //"http://localhost:8080/login/oauth2/code/google"
+                    .queryParam("token", accessToken)
+                    .build().toUriString();
+        }
+        return UriComponentsBuilder.fromUriString("http://localhost:8080/user/test") //"http://localhost:8080/login/oauth2/code/google"
                 .queryParam("token", accessToken)
                 .build().toUriString();
     }
