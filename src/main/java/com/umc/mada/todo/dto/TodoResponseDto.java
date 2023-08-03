@@ -10,8 +10,8 @@ import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class TodoResponseDto {
     private User userId; // 유저 ID
     private LocalDate date; // 투두 일자

@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 @Table(name = "FILE")
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class File {
     @Id

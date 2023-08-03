@@ -19,8 +19,8 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "TODO")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class Todo{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,7 @@ public class Todo{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
+    //@JoinTable(name = "USER", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="id"))
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User userId; // 유저 ID
 
@@ -40,7 +41,7 @@ public class Todo{
     private String todoName; // 투두 이름
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "repeat", nullable = false, length = 10)
+    @Column(name = "`repeat`", nullable = false, length = 10)
     private Repeat repeat; // 반복 설정 (N: 반복 안함, day: 매일 반복, week: 매주 반복, month: 매월 반복)
 
     @Enumerated(EnumType.STRING)
@@ -56,7 +57,7 @@ public class Todo{
     @Column(name = "end_repeat_date")
     private LocalDate endRepeatDate; // 반복 종료 일자
 
-    @Column(name = "date")
+    @Column(name = "date", nullable = false)
     private LocalDate date; // 투두 일자
 
     @CreationTimestamp

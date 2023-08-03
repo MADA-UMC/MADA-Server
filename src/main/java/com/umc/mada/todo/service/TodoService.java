@@ -37,20 +37,15 @@ public class TodoService {
     }
 
     // 투두 생성 로직
-    public TodoResponseDto createTodo(TodoRequestDto todoRequestDto) {
+    public TodoResponseDto createTodo(User user, TodoRequestDto todoRequestDto) {
         // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
-        validateUserId(todoRequestDto.getUserId().getId());
+        validateUserId(user);
         validateCategoryId(todoRequestDto.getCategoryId().getId());
         validateTodoName(todoRequestDto.getTodoName());
 
-//        // Enum 타입으로 변환
-//        Repeat repeat = Repeat.valueOf(todoRequestDto.getRepeat().name()); // Enum 타입 변환 수정
-//        RepeatWeek repeatWeek = todoRequestDto.getRepeatWeek() != null
-//                ? RepeatWeek.valueOf(todoRequestDto.getRepeatWeek().name()) : null; // Enum 타입 변환 수정
-
-        User user = userRepository.findUserById(todoRequestDto.getUserId().getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 ID입니다."));
-        Category category = categoryRepository.findCategoryById(todoRequestDto.getCategoryId().getId())
+//        userId = todoRepository.createTodoByUserId(todoRequestDto.getUserId().getId())
+//                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자 ID입니다."));
+        Category category = categoryRepository.findById(todoRequestDto.getCategoryId().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
 
         // 투두 앤티티 생성
@@ -60,7 +55,8 @@ public class TodoService {
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
         Todo savedTodo = todoRepository.save(todo);
-        // 저장된 카테고리 정보를 기반으로 TodoResponseDto 생성하여 반환
+
+        // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
         return new TodoResponseDto(savedTodo.getUserId(), savedTodo.getDate(), savedTodo.getCategoryId(),
                 savedTodo.getTodoName(), savedTodo.isComplete(),
                 savedTodo.getRepeat(), savedTodo.getRepeatWeek(), savedTodo.getStartRepeatDate(), savedTodo.getEndRepeatDate());
@@ -68,22 +64,18 @@ public class TodoService {
 
     @Transactional
     // 투두 수정 로직
-    public TodoResponseDto updateTodo(int todoId, TodoRequestDto todoRequestDto) {
-        // 주어진 투두 Id가 유효한지 검사
-        if (todoId <= 0){
-            throw new IllegalArgumentException("유효하지 않은 투두 ID입니다.");
-        }
+    public TodoResponseDto updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
+        // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
+        validateUserId(user);
 
         // 주어진 todoId를 이용하여 카테고리 엔티티 조회
-        Todo todo = todoRepository.findById(todoId)
-                .orElseThrow(() -> new IllegalArgumentException("Todo not found with id: " + todoId));
+        Todo todo = todoRepository.findTodoByUserIdAndId(user, todoId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
 
 //        // Enum 타입으로 변환
 //        Repeat repeat = Repeat.valueOf(todoRequestDto.getRepeat().name()); // Enum 타입 변환 수정
 //        RepeatWeek repeatWeek = todoRequestDto.getRepeatWeek() != null
 //                ? RepeatWeek.valueOf(todoRequestDto.getRepeatWeek().name()) : null; // Enum 타입 변환 수정
-
-
         // 카테고리 ID 변경 처리
         if (todoRequestDto.getCategoryId() != null) {
             Category category = categoryRepository.findById(todoRequestDto.getCategoryId().getId())
@@ -118,13 +110,14 @@ public class TodoService {
                 updatedTodo.getStartRepeatDate(), updatedTodo.getEndRepeatDate());
     }
 
+    @Transactional
     // 투두 삭제 로직
-    public void deleteTodo(int todoId) {
+    public void deleteTodo(User userId, int todoId) {
         // 주어진 투두 ID를 이용하여 투두 엔티티 조회
-        Optional<Todo> optionalTodo = todoRepository.findTodoById(todoId);
+        Optional<Todo> optionalTodo = todoRepository.deleteTodoByUserIdAndId(userId, todoId);
         if (optionalTodo.isPresent()) {
             // 주어진 투두 ID에 해당하는 Todo가 존재하는 경우 삭제
-            todoRepository.deleteById(todoId);
+            todoRepository.deleteTodoByUserIdAndId(userId, todoId);
         } else {
             // 해당 ID의 Todo가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
@@ -132,60 +125,38 @@ public class TodoService {
     }
 
     // 특정 유저 투두 조회 로직
-//    public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
-//        List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
-//
-//        // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-//        return userTodos.stream().map(todo -> new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
-//                todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
-//                todo.getStartRepeatDate(), todo.getEndRepeatDate())).collect(Collectors.toList());
-//    }
-    // UserId로 User 엔티티 조회
-    public User getUserById(long userId) {
-        Optional<User> optionalUser = userRepository.findUserById(userId);
-        return optionalUser.orElse(null);
-    }
-    public List<TodoResponseDto> getUserTodo(Long userId, LocalDate date) {
-        User user = getUserById(userId);
-        if (user == null) {
-            // 유저가 존재하지 않을 때
-            throw new IllegalArgumentException("User not found");
-        }
-
-        List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(user.getId(), date);
-
+    public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
+        List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
         return userTodos.stream().map(todo -> new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
                 todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
                 todo.getStartRepeatDate(), todo.getEndRepeatDate())).collect(Collectors.toList());
     }
 
-    // 반복 투두 목록 조회
-
     // 모든 투두 목록 조회 로직
-    public List<TodoResponseDto> getAllTodos() {
-        // 모든 투두 엔티티 조회
-        List<Todo> todos = todoRepository.findAll();
-        // 각 투두 엔티티를 TodoResponseDto로 매핑하여 리스트로 반환
-        return todos.stream()
-                .map(todo -> new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
-                        todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
-                        todo.getStartRepeatDate(), todo.getEndRepeatDate())).collect(Collectors.toList());
-    }
+//    public List<TodoResponseDto> getAllTodos() {
+//        // 모든 투두 엔티티 조회
+//        List<Todo> todos = todoRepository.findAll();
+//        // 각 투두 엔티티를 TodoResponseDto로 매핑하여 리스트로 반환
+//        return todos.stream()
+//                .map(todo -> new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
+//                        todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
+//                        todo.getStartRepeatDate(), todo.getEndRepeatDate())).collect(Collectors.toList());
+//    }
 
     // 특정 투두 조회 로직
-    public TodoResponseDto getTodoById(int todoId) {
-        // 주어진 투두 ID를 이용하여 투두 엔티티 조회
-        Optional<Todo> optionalTodo = todoRepository.findTodoById(todoId);
-        if (optionalTodo.isPresent()) {
-            Todo todo = optionalTodo.get();
-            return new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
-                    todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
-                    todo.getStartRepeatDate(), todo.getEndRepeatDate());
-        }
-        // 해당 ID의 Todo가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
-        throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
-    }
+//    public TodoResponseDto getTodoById(int todoId) {
+//        // 주어진 투두 ID를 이용하여 투두 엔티티 조회
+//        Optional<Todo> optionalTodo = todoRepository.findTodoById(todoId);
+//        if (optionalTodo.isPresent()) {
+//            Todo todo = optionalTodo.get();
+//            return new TodoResponseDto(todo.getUserId(), todo.getDate(), todo.getCategoryId(), todo.getTodoName(),
+//                    todo.isComplete(), todo.getRepeat(), todo.getRepeatWeek(),
+//                    todo.getStartRepeatDate(), todo.getEndRepeatDate());
+//        }
+//        // 해당 ID의 Todo가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
+//        throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
+//    }
 
     // 투두 이름 유효성 검사 메서드
     private void validateTodoName(String todoName) {
@@ -195,8 +166,8 @@ public class TodoService {
     }
 
     // 유저 ID 유효성 검사 메서드
-    private void validateUserId(long userId) {
-        Optional<User> optionalUser = userRepository.findUserById(userId);
+    private void validateUserId(User userId) {
+        Optional<User> optionalUser = userRepository.findUserById(userId.getId());
         if (optionalUser.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 유저 ID입니다.");
         }
