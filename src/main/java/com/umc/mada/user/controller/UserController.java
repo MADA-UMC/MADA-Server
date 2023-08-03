@@ -54,7 +54,6 @@ public class UserController {
 //    }
 
 
-
 //    private User findUser(Authentication authentication){
 //        return userRepository.findByAuthId(authentication.getName())
 //                .orElseThrow()
