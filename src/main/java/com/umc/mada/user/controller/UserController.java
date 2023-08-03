@@ -13,14 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/login") //user
+@RequestMapping("/user") //user
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
@@ -32,26 +34,45 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public void test(@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails) {
+    public void test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 //        System.out.println("oAuth2User = " + oAuth2User);
 //        authentication.getPrincipal()
-//        System.out.println(authentication.getPrincipal());
-        System.out.println(cusomtUserDetails.getUser());
+        System.out.println(authentication.getName());
+//        System.out.println(cusomtUserDetails.getUser());
     }
 
-    @GetMapping("/oauth2/code/{provider}")
-    public ResponseEntity<String> login(@PathVariable String provider, HttpServletResponse response){
-        //response.getHeader(HttpHeaders.AUTHORIZATION)
-        System.out.println(response.getHeader(HttpHeaders.AUTHORIZATION));
-        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
-    }
-
-//    @Operation(description = "회원탈퇴")
-//    @DeleteMapping("")
-//    public ResponseEntity<Long> withdrawal(Authentication authentication){
-//
+//    @GetMapping("/oauth2/code/{provider}")
+//    public ResponseEntity<String> login(@PathVariable String provider, HttpServletResponse response){
+//        //response.getHeader(HttpHeaders.AUTHORIZATION)
+//        System.out.println(response.getHeader(HttpHeaders.AUTHORIZATION));
+//        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
 //    }
+
+    @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
+    @PostMapping("/singup/{nickName}")
+    public ResponseEntity<String> singupNickName(@PathVariable String nickName, Authentication authentication){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        userService.nickNameSetting(nickName, userOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
+    }
+
+//    @Operation(description = "로그아웃")
+//    @GetMapping("/logout")
+//    public ResponseEntity<String> logout(){
+//        //세션 삭제
+//        SecurityContextHolder.clearContext();
+//        return ResponseEntity.status(HttpStatus.OK).body("로그아웃 성공했습니다.");
+//    }
+
+    @Operation(description = "회원탈퇴")
+    @DeleteMapping("/withdrawal")
+    public ResponseEntity<String> withdrawal(Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+//        User user = cusomtUserDetails.getUser();
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        userService.withdrawal(userOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body("회원탈퇴에 성공했습니다.");
+    }
 
     @PatchMapping("/{id}/nickname")
     public BaseResponse<String> UpdateNickname(@PathVariable(name = "id") Long id, @RequestBody UserRequestDto.UpdateNickname request) {
@@ -59,8 +80,4 @@ public class UserController {
         return new BaseResponse<>("닉네임 수정 완료");
     }
 
-//    private User findUser(Authentication authentication){
-//        return userRepository.findByAuthId(authentication.getName())
-//                .orElseThrow()
-//    }
 }

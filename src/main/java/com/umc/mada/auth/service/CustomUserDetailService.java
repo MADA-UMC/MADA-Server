@@ -49,6 +49,7 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
         Optional<User> userOptional = userRepository.findByAuthId(oAuth2Attributes.getAuthId());
 
         User user;
+        boolean newUser=false;
         //가입되어 있는 경우
         if(userOptional.isPresent()){
             user = userOptional.get();
@@ -56,12 +57,13 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
             user = user.update(oAuth2Attributes.getAuthId(), oAuth2Attributes.getEmail());
         } else{
             //첫 로그인인 경우 사용자를 회원가입(등록)한다.
+            newUser = true;
             user = createUser(oAuth2Attributes, provider);
         }
 //
 //        return new DefaultOAuth2User(Collections.singleton(
 //                new SimpleGrantedAuthority(user.getRole().getKey())),oAuth2Attributes.getAttributes(), oAuth2Attributes.getNameAttributeKey());
-        return CusomtUserDetails.create(user, oAuth2Attributes.getAttributes());
+        return CusomtUserDetails.create(user, oAuth2Attributes.getAttributes(), newUser);
     }
 
     private User createUser(OAuth2Attributes oAuth2Attributes, String authProvider){
