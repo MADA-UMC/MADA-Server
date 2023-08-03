@@ -40,7 +40,6 @@ public class User {
     private LocalDateTime createdAt; // 생성 시간
 
     @UpdateTimestamp
-//    @LastModifiedDate
     @Column(name = "update_at")
     private LocalDateTime updatedAt; //
 

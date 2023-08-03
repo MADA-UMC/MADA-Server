@@ -15,6 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +81,28 @@ public class UserController {
     public BaseResponse<String> UpdateNickname(@PathVariable(name = "id") Long id, @RequestBody UserRequestDto.UpdateNickname request) {
         User user = userService.update(id, request);
         return new BaseResponse<>("닉네임 수정 완료");
+    }
+
+//    private User findUser(Authentication authentication){
+//        return userRepository.findByAuthId(authentication.getName())
+//                .orElseThrow()
+//    }
+
+    /**
+     * 닉네임 변경 API
+     */
+    @PatchMapping("/change/nickname")
+    public BaseResponse<NicknameResponseDto> changeNickname(Authentication authentication,
+                                                            @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto, BindingResult bindingResult) {
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        if(bindingResult.hasErrors()){
+            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
+            return BaseResponse.onFailure(400, objectError.getDefaultMessage(), null);
+        }
+
+        NicknameResponseDto result = userService.changeNickname(user, changeNicknameRequestDto);
+        return BaseResponse.onSuccess(result);
     }
 
 }
