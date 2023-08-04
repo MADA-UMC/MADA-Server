@@ -1,54 +1,106 @@
-//package com.umc.mada.calendar.service;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.fasterxml.jackson.databind.node.ObjectNode;
-//import com.umc.mada.calendar.domain.Calendar;
-//import com.umc.mada.calendar.dto.CalendarRequestDto;
-//import com.umc.mada.calendar.repository.CalendarRepository;
-//import com.umc.mada.user.repository.UserRepository;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//import java.util.List;
-//
-//@Service
-//@Slf4j //로그처리
-//@Transactional //트렌젝션 처리
-//public class CalendarService {
-//    private final CalendarRepository calendarRepository;
-//    //의존성주입 (DI)
-//    @Autowired
-//    public  CalendarService(CalendarRepository calendarRepository){
-//        this.calendarRepository = calendarRepository;
-//    }
-//    //캘린더 생성코드
-//    public ResponseEntity<ObjectNode> createCalendar(CalendarRequestDto calenderDto){
-//        try{
-//            calendarRepository.save(
-//                    //builder에서 calender_id()를 비워두어도 CalenderEntity에 IDENTITY타입 덕에 자동 생성 처리됨
-//                    Calendar.builder()
-//                            //User Entity 부재
-//                            //.user_id(userRepository.getReferenceById(calenderDto.getUser_id()))
-//                            .calender_name(calenderDto.getCalender_name())
-//                            .d_day(calenderDto.getD_day())
-//                            .repeat(calenderDto.getRepeat())
-//                            .memo(calenderDto.getMemo())
-//                            .start_date(calenderDto.getStart_date())
-//                            .end_date(calenderDto.getEnd_date())
-//                            .build());
-//
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            ObjectNode jsonObject =  objectMapper.createObjectNode();
-//            jsonObject.put("status","200");
-//            jsonObject.put("message","요청을 성공적으로 처리하였습니다.");
-//
-//            return ResponseEntity.ok(jsonObject);
-//        }catch (Exception e){
-//            e.printStackTrace();
-//            return ResponseEntity.status(400).build();
-//
-//        }
-//    }
-//}
+package com.umc.mada.calendar.service;
+
+import com.umc.mada.calendar.domain.Calendar;
+import com.umc.mada.calendar.dto.CalendarRequestDto;
+import com.umc.mada.calendar.dto.CalendarResponseDto;
+import com.umc.mada.calendar.repository.CalendarRepository;
+import com.umc.mada.user.domain.User;
+import com.umc.mada.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@Slf4j //로그처리
+@Transactional //트렌젝션 처리
+public class CalendarService {
+    private final CalendarRepository calendarRepository;
+    private final UserRepository userRepository;
+    @Autowired
+    public  CalendarService(CalendarRepository calendarRepository, UserRepository userRepository){
+        this.calendarRepository = calendarRepository;
+        this.userRepository = userRepository;
+
+    }
+    //동일 이름의 일정이 동일한 날짜에 있는지 검증
+    //캘린더 생성코드
+    public CalendarResponseDto createCalendar(Authentication authentication, CalendarRequestDto calendarRequestDto){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        Calendar calendar = Calendar.builder()
+                //User Entity 부재
+                .user(user)
+                .calenderName(calendarRequestDto.getCalenderName())
+                .d_day(calendarRequestDto.getD_day())
+                .repeat(calendarRequestDto.getRepeat())
+                .memo(calendarRequestDto.getMemo())
+                .startDate(calendarRequestDto.getStartDate())
+                .endDate(calendarRequestDto.getEndDate())
+                .build();
+        calendarRepository.save(calendar);
+        return new CalendarResponseDto(calendarRequestDto.getCalenderName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
+    }
+    public CalendarResponseDto editCalendar(Authentication authentication,Long id,CalendarRequestDto calendarRequestDto){
+        Calendar calendar = calendarRepository.findCalendarById(id);
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalenderName(calendarRequestDto.getCalenderName());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendarRepository.save(calendar);
+        return new CalendarResponseDto(calendarRequestDto.getCalenderName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
+    }
+    public List<CalendarResponseDto> readCalendars(Authentication authentication, int month) {
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        List<Calendar> calendarList = calendarRepository.findAllByUser(user);
+        List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
+        for (Calendar calendar: calendarList) {
+            calendarResponseDtoList.add(CalendarResponseDto.builder().
+                    calenderName(calendar.getCalenderName()).
+                    startDate(calendar.getStartDate()).
+                    endDate(calendar.getEndDate()).
+                    d_day(calendar.getD_day()).
+                    color(calendar.getColor()).build());
+        }
+        return calendarResponseDtoList;
+    }
+    public void deleteCalendar(Authentication authentication, Long id){
+        calendarRepository.deleteCalendarById(id);
+    }
+    public boolean tooManyD_dayExists(Authentication authentication){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        return calendarRepository.findAllByUser(user).size() >= 3;
+
+    }
+    public boolean calendarNameExist(Authentication authentication ,CalendarRequestDto calendarRequestDto){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalenderName(
+                user
+                , calendarRequestDto.getStartDate()
+                , calendarRequestDto.getEndDate()
+                ,calendarRequestDto.getCalenderName()
+                );
+    }
+        //return calendarResponseDtoList;
+    //}
+    public void deleteCalender(Long id) {
+        calendarRepository.deleteById(id);
+    }
+
+}

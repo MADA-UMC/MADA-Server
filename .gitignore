@@ -25,6 +25,9 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+application-jwt.properties
+application-oauth2.properties
+application-DB.properties
 
 ### NetBeans ###
 /nbproject/private/

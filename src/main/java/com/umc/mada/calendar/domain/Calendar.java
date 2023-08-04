@@ -1,37 +1,55 @@
-//package com.umc.mada.calendar.domain;
-//
-//
-//import com.umc.mada.global.BaseEntity;
-//import com.umc.mada.user.domain.User;
-//import lombok.*;
-//
-//import javax.persistence.*;
-//import java.sql.Timestamp;
-//
-//@Entity
-//@Getter
-//@Setter
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@RequiredArgsConstructor
-//public class Calendar extends BaseEntity {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    Long id;
-//    @ManyToOne
-//    @Column(name = "user_id")
-//    private User user_id;
-//    @Column
-//    private String calender_name;
-//    @Column
-//    private Timestamp start_date;
-//    @Column
-//    private Timestamp end_date;
-//    @Column
-//    private String repeat;
-//    @Column
-//    private String d_day;
-//    @Column
-//    private String memo;
-//}
+package com.umc.mada.calendar.domain;
+
+
+import com.umc.mada.global.BaseEntity;
+import com.umc.mada.user.domain.User;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import javax.persistence.*;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+
+@Entity
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "CALENDER")
+public class Calendar extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "calender_name")
+    private String calenderName;
+    @Column(name = "color")
+    private String color;
+    @Column(name = "start_date")
+    private Date startDate;
+    @Column(name = "end_date")
+    private Date endDate;
+    @Column(name = "`repeat`")
+    private String repeat;
+    @Column(name = "d_day")
+    private Character d_day;
+    @Column(name = "memo")
+    private String memo;
+
+    @CreationTimestamp
+    @Column(name = "create_at", updatable = false)
+    private LocalDateTime createdAt; // 생성 시간
+
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    private LocalDateTime updatedAt; // 수정 시간
+}

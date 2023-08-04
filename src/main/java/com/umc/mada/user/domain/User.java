@@ -3,12 +3,16 @@ package com.umc.mada.user.domain;
 import javax.persistence.*;
 
 //import com.umc.mada.BaseTimeEntity;
+import com.umc.mada.custom.domain.HaveItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,6 +38,7 @@ public class User {
 
     private boolean account_expired;
     private boolean is_alarm;
+    private String refreshToken;
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
@@ -42,6 +47,9 @@ public class User {
     @UpdateTimestamp
     @Column(name = "update_at")
     private LocalDateTime updatedAt; //
+
+    @OneToMany(mappedBy = "user")
+    private List<HaveItem> haveItems = new ArrayList<>();
 
     @Builder
     public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role){
@@ -63,8 +71,17 @@ public class User {
         return this;
     }
 
-    public User expiredUser(){
+    public User expiredUserUpdate(){
         this.account_expired = true;
+        return this;
+    }
+
+    public void setRefreshToken(String refreshToken){
+        this.refreshToken = refreshToken;
+    }
+
+    public User setNickname(String nickname){
+        this.nickname = nickname;
         return this;
     }
 }
