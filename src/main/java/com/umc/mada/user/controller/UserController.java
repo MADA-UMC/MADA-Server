@@ -1,28 +1,22 @@
 package com.umc.mada.user.controller;
 
-import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
-import com.umc.mada.user.dto.NicknameRequestDto;
-import com.umc.mada.user.dto.NicknameResponseDto;
-import com.umc.mada.user.dto.UserRequestDto;
+import com.umc.mada.user.dto.nickname.NicknameRequestDto;
+import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.global.BaseResponse;
 import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 

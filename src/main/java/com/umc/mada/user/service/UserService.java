@@ -1,12 +1,10 @@
 package com.umc.mada.user.service;
 
 import com.umc.mada.user.domain.User;
-import com.umc.mada.user.dto.NicknameRequestDto;
-import com.umc.mada.user.dto.NicknameResponseDto;
-import com.umc.mada.user.dto.UserRequestDto;
-import com.umc.mada.user.dto.UserResponseDto;
+import com.umc.mada.user.dto.nickname.NicknameRequestDto;
+import com.umc.mada.user.dto.nickname.NicknameResponseDto;
+import com.umc.mada.user.dto.user.UserRequestDto;
 import com.umc.mada.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

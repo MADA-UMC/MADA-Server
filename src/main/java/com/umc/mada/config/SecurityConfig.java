@@ -122,7 +122,6 @@ public class SecurityConfig{
                         .and()
                         .successHandler(oAuth2LoginSuccessHandler)
                 )
-
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
