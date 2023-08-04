@@ -67,6 +67,5 @@ public class User {
         this.account_expired = true;
         return this;
     }
-
 }
 
