@@ -2,6 +2,8 @@ package com.umc.mada.user.controller;
 
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
+import com.umc.mada.user.dto.NicknameRequestDto;
+import com.umc.mada.user.dto.NicknameResponseDto;
 import com.umc.mada.user.dto.UserRequestDto;
 import com.umc.mada.global.BaseResponse;
 import com.umc.mada.user.repository.UserRepository;
@@ -37,12 +39,13 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public void test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public ResponseEntity<String> test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 //        System.out.println("oAuth2User = " + oAuth2User);
 //        authentication.getPrincipal()
         System.out.println(authentication.getName());
 //        System.out.println(cusomtUserDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName());
     }
 
 //    @GetMapping("/oauth2/code/{provider}")
@@ -75,12 +78,6 @@ public class UserController {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         userService.withdrawal(userOptional.get());
         return ResponseEntity.status(HttpStatus.OK).body("회원탈퇴에 성공했습니다.");
-    }
-
-    @PatchMapping("/{id}/nickname")
-    public BaseResponse<String> UpdateNickname(@PathVariable(name = "id") Long id, @RequestBody UserRequestDto.UpdateNickname request) {
-        User user = userService.update(id, request);
-        return new BaseResponse<>("닉네임 수정 완료");
     }
 
 //    private User findUser(Authentication authentication){

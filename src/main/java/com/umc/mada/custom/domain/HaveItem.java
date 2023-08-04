@@ -23,6 +23,7 @@ public class HaveItem {
     @JoinColumn(name = "item_id")
     private CustomItem customItem;
 
+    @Column(name = "wearing")
     private boolean wearing;
 
     @Builder
@@ -32,6 +33,8 @@ public class HaveItem {
         this.wearing = wearing;
     }
 
-
+    public void updateHaveItemWearing(boolean wearing){
+        this.wearing = wearing;
+    }
 
 }
