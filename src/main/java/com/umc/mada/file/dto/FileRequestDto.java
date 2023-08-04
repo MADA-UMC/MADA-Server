@@ -4,8 +4,8 @@ import lombok.*;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class FileRequestDto {
     private String name; // 파일 이름
 }
