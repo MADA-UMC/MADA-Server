@@ -29,6 +29,10 @@ public class CalendarController {
         this.calendarService = calendarService;
     }
 
+    @GetMapping("/")
+    ResponseEntity<List<CalendarResponseDto>> calendarRead(Authentication authentication){
+        return ResponseEntity.ok(calendarService.readCalendars(authentication));
+    }
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
     ResponseEntity<CalendarResponseDto> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calenderDto){
@@ -41,11 +45,12 @@ public class CalendarController {
         return ResponseEntity.ok(calendarResponseDto);
     }
     @DeleteMapping("/edit/{id}")
-    ResponseEntity<Void> calendarDelete(Authentication authentication, @PathVariable Long id){
-        if(calendarService.deleteCalendar(authentication,id)){
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
-
+    ResponseEntity<String> calendarDelete(Authentication authentication, @PathVariable Long id){
+//        if(calendarService.deleteCalendar(authentication,id)){
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        }
+//        return new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED);
+        calendarService.deleteCalendar(authentication,id);
+        return ResponseEntity.status(HttpStatus.OK).body("삭제 성공했습니다.");
     }
 }
