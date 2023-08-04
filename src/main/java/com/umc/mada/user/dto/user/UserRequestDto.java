@@ -1,4 +1,4 @@
-package com.umc.mada.user.dto;
+package com.umc.mada.user.dto.user;
 
 import lombok.*;
 
