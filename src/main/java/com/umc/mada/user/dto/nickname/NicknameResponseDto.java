@@ -1,4 +1,4 @@
-package com.umc.mada.user.dto;
+package com.umc.mada.user.dto.nickname;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

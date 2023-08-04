@@ -1,10 +1,9 @@
-package com.umc.mada.user.dto;
+package com.umc.mada.user.dto.nickname;
 
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.NotNull;
 
 
 @Getter
