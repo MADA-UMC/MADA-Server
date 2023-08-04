@@ -44,6 +44,7 @@ public class CalendarService {
                 //User Entity 부재
                 .user(user)
                 .calendarName(calendarRequestDto.getCalendarName())
+                .color(calendarRequestDto.getColor())
                 .d_day(calendarRequestDto.getD_day())
                 .repeat(calendarRequestDto.getRepeat())
                 .memo(calendarRequestDto.getMemo())
