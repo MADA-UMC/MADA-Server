@@ -32,7 +32,7 @@ public class Calendar {
     private User user;
 
     @Column(name = "calender_name")
-    private String calenderName;
+    private String calendarName;
     @Column(name = "color")
     private String color;
     @Column(name = "start_date")

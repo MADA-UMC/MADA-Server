@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @Slf4j
 @Transactional
-@RequestMapping("/api/calender")
+@RequestMapping("/api/calendar")
 public class CalendarController {
     private final CalendarService calendarService;
     @Autowired
