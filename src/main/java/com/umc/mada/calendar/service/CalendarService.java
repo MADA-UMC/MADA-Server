@@ -43,7 +43,8 @@ public class CalendarService {
         Calendar calendar = Calendar.builder()
                 //User Entity 부재
                 .user(user)
-                .calenderName(calendarRequestDto.getCalenderName())
+                .calendarName(calendarRequestDto.getCalendarName())
+                .color(calendarRequestDto.getColor())
                 .d_day(calendarRequestDto.getD_day())
                 .repeat(calendarRequestDto.getRepeat())
                 .memo(calendarRequestDto.getMemo())
@@ -51,26 +52,26 @@ public class CalendarService {
                 .endDate(calendarRequestDto.getEndDate())
                 .build();
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalenderName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
+        return new CalendarResponseDto(calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
     }
     public CalendarResponseDto editCalendar(Authentication authentication,Long id,CalendarRequestDto calendarRequestDto){
         Calendar calendar = calendarRepository.findCalendarById(id);
         calendar.setMemo(calendarRequestDto.getMemo());
         calendar.setStartDate(calendarRequestDto.getStartDate());
         calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalenderName(calendarRequestDto.getCalenderName());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
         calendar.setColor(calendarRequestDto.getColor());
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalenderName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
+        return new CalendarResponseDto(calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getD_day(), calendarRequestDto.getColor());
     }
-    public List<CalendarResponseDto> readCalendars(Authentication authentication, int month) {
+    public List<CalendarResponseDto> readCalendars(Authentication authentication) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         List<Calendar> calendarList = calendarRepository.findAllByUser(user);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(CalendarResponseDto.builder().
-                    calenderName(calendar.getCalenderName()).
+                    calendarName(calendar.getCalendarName()).
                     startDate(calendar.getStartDate()).
                     endDate(calendar.getEndDate()).
                     d_day(calendar.getD_day()).
@@ -90,11 +91,11 @@ public class CalendarService {
     public boolean calendarNameExist(Authentication authentication ,CalendarRequestDto calendarRequestDto){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalenderName(
+        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalendarName(
                 user
                 , calendarRequestDto.getStartDate()
                 , calendarRequestDto.getEndDate()
-                ,calendarRequestDto.getCalenderName()
+                ,calendarRequestDto.getCalendarName()
                 );
     }
         //return calendarResponseDtoList;

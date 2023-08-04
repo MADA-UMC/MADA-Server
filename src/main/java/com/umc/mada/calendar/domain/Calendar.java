@@ -4,6 +4,7 @@ package com.umc.mada.calendar.domain;
 import com.umc.mada.global.BaseEntity;
 import com.umc.mada.user.domain.User;
 import lombok.*;
+import net.bytebuddy.asm.Advice;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "CALENDER")
-public class Calendar extends BaseEntity {
+public class Calendar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -31,7 +32,7 @@ public class Calendar extends BaseEntity {
     private User user;
 
     @Column(name = "calender_name")
-    private String calenderName;
+    private String calendarName;
     @Column(name = "color")
     private String color;
     @Column(name = "start_date")
