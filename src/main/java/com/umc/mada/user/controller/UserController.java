@@ -63,13 +63,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
     }
 
-//    @Operation(description = "로그아웃")
-//    @GetMapping("/logout")
-//    public ResponseEntity<String> logout(){
-//        //세션 삭제
-//        SecurityContextHolder.clearContext();
-//        return ResponseEntity.status(HttpStatus.OK).body("로그아웃 성공했습니다.");
-//    }
+    @Operation(description = "로그아웃")
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(){
+        //세션 삭제
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.status(HttpStatus.OK).body("로그아웃 성공했습니다.");
+    }
 
     @Operation(description = "회원탈퇴")
     @DeleteMapping("/withdrawal")

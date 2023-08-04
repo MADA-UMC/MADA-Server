@@ -17,7 +17,7 @@ public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     List<Calendar> findAllByUser(User user);
     Calendar findCalendarById(Long id);
     void deleteCalendarById(Long id);
-    boolean existsCalendarByUserAndEndDateBetweenAndCalenderName(User user, Date startDate, Date endDate, String calendarName);
+    boolean existsCalendarByUserAndEndDateBetweenAndCalendarName(User user, Date startDate, Date endDate, String calendarName);
     @Override
     Calendar getReferenceById(Long id);
 
