@@ -9,7 +9,7 @@ import java.time.LocalTime;
 
 @Data
 public class TimetableRequestDto {
-    private User userId; // 유저 ID
+    //private User userId; // 유저 ID
     private LocalDate date; // 시간표 일자
     private String scheduleName; // 일정 이름
     private String color; // 일정 색상

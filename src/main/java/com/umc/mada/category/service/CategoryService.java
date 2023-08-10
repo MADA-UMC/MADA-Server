@@ -6,6 +6,8 @@ import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.repository.CategoryRepository;
 import com.umc.mada.file.domain.File;
 import com.umc.mada.file.repository.FileRepository;
+import com.umc.mada.user.domain.User;
+import com.umc.mada.user.repository.UserRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +22,11 @@ import java.util.stream.Collectors;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final FileRepository fileRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public CategoryService(CategoryRepository categoryRepository, FileRepository fileRepository) {
-
+    public CategoryService(UserRepository userRepository, CategoryRepository categoryRepository, FileRepository fileRepository) {
+        this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.fileRepository = fileRepository;
     }
@@ -34,8 +37,9 @@ public class CategoryService {
      * @param categoryRequestDto 카테고리 생성 요청 데이터
      * @return 생성된 카테고리 정보
      */
-    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
+    public CategoryResponseDto createCategory(User user, CategoryRequestDto categoryRequestDto) {
         // 카테고리 이름이 없거나 길이를 초과한 경우 예외 처리
+        validateUserId(user);
         validateCategoryName(categoryRequestDto.getCategoryName());
 
         // 존재하지 않는 아이콘인 경우 예외 처리
@@ -45,7 +49,7 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
-        Category category = new Category(categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), icon);
+        Category category = new Category(user, categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), icon);
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
@@ -60,15 +64,15 @@ public class CategoryService {
      * @return 수정된 카테고리 정보
      */
     @Transactional
-    public CategoryResponseDto updateCategory(int categoryId, CategoryRequestDto categoryRequestDto) {
+    public CategoryResponseDto updateCategory(User user, int categoryId, CategoryRequestDto categoryRequestDto) {
         // 주어진 categoryId가 유효한지 검사
         if (categoryId <= 0) {
             throw new IllegalArgumentException("유효하지 않은 카테고리 ID입니다.");
         }
 
         // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + categoryId));
+        Category category = categoryRepository.findCategoryByUserIdAndId(user, categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
 
         // 이름 변경 처리
         if (categoryRequestDto.getCategoryName() != null) {
@@ -99,12 +103,12 @@ public class CategoryService {
      *
      * @param categoryId 카테고리 ID
      */
-    public void deleteCategory(int categoryId) {
+    public void deleteCategory(User userId, int categoryId) {
         // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
-        Optional<Category> optionalCategory = categoryRepository.findCategoryById(categoryId);
+        Optional<Category> optionalCategory = categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
         if (optionalCategory.isPresent()) {
             // 주어진 categoryId에 해당하는 카테고리가 존재하는 경우 삭제
-            categoryRepository.deleteById(categoryId);
+            categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
         } else {
             // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
@@ -112,35 +116,25 @@ public class CategoryService {
     }
 
     /**
-     * 모든 카테고리 목록 조회 로직
+     * 사용자 카테고리 목록 조회 로직
      *
-     * @return 모든 카테고리 정보 목록
+     * @return 해당 유저의 카테고리 정보 목록
      */
-    public List<CategoryResponseDto> getAllCategories() {
+    public List<CategoryResponseDto> getUserCategories(User userId) {
         // 모든 카테고리 엔티티 조회
-        List<Category> categories = categoryRepository.findAll();
+        List<Category> userCategories = categoryRepository.findCategoriesByUserId(userId);
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
-        return categories.stream()
+        return userCategories.stream()
                 .map(category -> new CategoryResponseDto(category.getCategoryName(), category.getColor(), category.getIconId()))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 특정 카테고리 조회 로직
-     *
-     * @param category_id 카테고리 ID
-     * @return 특정 카테고리 정보
-     */
-    public CategoryResponseDto getCategoryById(int category_id) {
-        // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
-        Optional<Category> optionalCategory = categoryRepository.findCategoryById(category_id);
-        if (optionalCategory.isPresent()) {
-            Category category = optionalCategory.get();
-            // 카테고리 엔티티 정보를 기반으로 CategoryResponseDto 생성하여 반환
-            return new CategoryResponseDto(category.getCategoryName(), category.getColor(), category.getIconId());
+    // 유저 ID 유효성 검사 메서드
+    private void validateUserId(User userId) {
+        Optional<User> optionalUser = userRepository.findUserById(userId.getId());
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 유저 ID입니다.");
         }
-        // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
-        throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
     }
 
     // 카테고리 이름 유효성 검사 메서드
