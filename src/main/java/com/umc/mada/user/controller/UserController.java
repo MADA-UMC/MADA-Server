@@ -55,7 +55,8 @@ public class UserController {
     public ResponseEntity<String> singupNickName(@PathVariable String nickName, Authentication authentication){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         userService.nickNameSetting(nickName, userOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
+//        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
+        return ResponseEntity.ok().build();
     }
 
     @Operation(description = "로그아웃")
@@ -63,7 +64,7 @@ public class UserController {
     public ResponseEntity<String> logout(){
         //세션 삭제
         SecurityContextHolder.clearContext();
-        return ResponseEntity.status(HttpStatus.OK).body("로그아웃 성공했습니다.");
+        return ResponseEntity.ok().build();
     }
 
     @Operation(description = "회원탈퇴")
@@ -72,7 +73,7 @@ public class UserController {
 //        User user = cusomtUserDetails.getUser();
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         userService.withdrawal(userOptional.get());
-        return ResponseEntity.status(HttpStatus.OK).body("회원탈퇴에 성공했습니다.");
+        return ResponseEntity.ok().build();
     }
 
 //    private User findUser(Authentication authentication){
