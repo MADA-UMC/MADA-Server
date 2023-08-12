@@ -78,7 +78,7 @@ public class TimetableService {
         }
 
         // 메모 내용 변경 처리
-        if (timetableRequestDto.getEndTime() != null){
+        if (timetableRequestDto.getMemo() != null){
             timetable.setMemo(timetableRequestDto.getMemo());
         }
 
