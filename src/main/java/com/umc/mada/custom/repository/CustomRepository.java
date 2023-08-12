@@ -1,8 +1,14 @@
 package com.umc.mada.custom.repository;
 
 import com.umc.mada.custom.domain.CustomItem;
+import com.umc.mada.custom.domain.ItemType;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CustomRepository extends JpaRepository<CustomItem, Long> {
+import java.util.List;
+import java.util.Optional;
 
+public interface CustomRepository extends JpaRepository<CustomItem, Long> {
+    Optional<CustomItem> findCustomItemById(Long id);
+
+    List<CustomItem> findCustomItemByItemType(ItemType type);
 }

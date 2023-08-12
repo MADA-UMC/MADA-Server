@@ -1,18 +1,16 @@
 package com.umc.mada.custom.controller;
 
+import com.umc.mada.custom.dto.CustomItemsResponse;
+import com.umc.mada.custom.dto.UserCharacterResponse;
 import com.umc.mada.custom.service.CustomService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import springfox.documentation.spring.web.json.Json;
-
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,27 +27,50 @@ public class CustomController {
         this.userRepository = userRepository;
     }
 
-    @Operation(description = "사용자 캐릭터 아이템 변경")
+    @Operation(description = "사용자 캐릭터 출력")
+    @GetMapping("/")
+    public ResponseEntity<UserCharacterResponse> printUserCharacter(Authentication authentication){
+        User user = findUser(authentication);
+        UserCharacterResponse userCharacterResponse = customService.printUserCharacter(user);
+        return new ResponseEntity<>(userCharacterResponse, HttpStatus.OK);
+    }
+
+    @Operation(description = "현재 화면의 아이템 타입에 맞는 아이템 조회하기/ 해당 타입의 아이템 목록, 사용자의 소유 여부 반환")
+    @GetMapping("/item/{item_type}")
+    public ResponseEntity<?> findItemsByItemType(@PathVariable String item_type, Authentication authentication){
+        User user = findUser(authentication);
+        CustomItemsResponse customItemsResponse = customService.findItemsByType(user, item_type);
+        return new ResponseEntity<>(customItemsResponse, HttpStatus.OK);
+    }
+
+    @Operation(description = "사용자 캐릭터 착용 아이템 변경")
     @PatchMapping("/change/{item_id}")
     public ResponseEntity<Void> changeCharacter(Authentication authentication, @PathVariable Long item_id){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = findUser(authentication);
         customService.changeUserItem(user, item_id);
         return ResponseEntity.ok().build();
     }
 
     @Operation(description = "캐릭터 초기화")
     @GetMapping("/reset")
-    public ResponseEntity<Map<String, Object>> resetCharacter(Authentication authentication){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+    public ResponseEntity<Void> resetCharacter(Authentication authentication){
+        User user = findUser(authentication);
         customService.resetCharcter(user);
+        return ResponseEntity.ok().build();
+    }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("status", 200);
-        result.put("message", "캐릭터 초기화 성공했습니다.");
+    @Operation(description = "아이템 구매")
+    @PostMapping("/buy/{item_id}")
+    public ResponseEntity<Void> buyItem(Authentication authentication, @PathVariable Long item_id){
+        User user = findUser(authentication);
+        customService.buyItem(user, item_id);
+        return ResponseEntity.ok().build();
+    }
 
-        return ResponseEntity.ok().body(result);
+
+    private User findUser(Authentication authentication){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+//        User user = userOptional.get(); //TODO: get값이 NULL인 경우를 체크해줘야함
+        return userOptional.get();
     }
 }
