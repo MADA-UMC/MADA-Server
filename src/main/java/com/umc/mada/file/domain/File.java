@@ -24,6 +24,9 @@ public class File {
     @Column(name = "name", updatable = false)
     private String name; // 파일 이름
 
+    @Column(name = "file_path")
+    private String filePath; //파일 경로
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt; // 생성 시간
