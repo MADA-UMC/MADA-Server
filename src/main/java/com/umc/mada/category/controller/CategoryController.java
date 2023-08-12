@@ -39,9 +39,9 @@ public class CategoryController {
         User user = userOptional.get();
         CategoryResponseDto newCategory = categoryService.createCategory(user, categoryRequestDto);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("status", 200);
-        result.put("success", true);
-        result.put("message", "카테고리 생성이 완료되었습니다.");
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "카테고리 생성이 완료되었습니다.");
         result.put("data", newCategory);
         return ResponseEntity.ok().body(result);
     }
@@ -53,9 +53,9 @@ public class CategoryController {
         User user = userOptional.get();
         CategoryResponseDto updatedCategory = categoryService.updateCategory(user, categoryId, categoryRequestDto);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("status", 200);
-        result.put("success", true);
-        result.put("message", "카테고리 수정이 완료되었습니다.");
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "카테고리 수정이 완료되었습니다.");
         result.put("data", updatedCategory);
         if (updatedCategory != null) {
             return ResponseEntity.ok().body(result);
@@ -72,9 +72,9 @@ public class CategoryController {
             User user = userOptional.get();
             categoryService.deleteCategory(user,categoryId);
             Map<String, Object> result = new LinkedHashMap<>();
-            result.put("status", 200);
-            result.put("success", true);
-            result.put("message", "카테고리 삭제가 완료되었습니다.");
+            //result.put("status", 200);
+            //result.put("success", true);
+            //result.put("message", "카테고리 삭제가 완료되었습니다.");
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -89,9 +89,9 @@ public class CategoryController {
             User user = userOptional.get();
             List<CategoryResponseDto> userCategories = categoryService.getUserCategories(user);
             Map<String, Object> result = new LinkedHashMap<>();
-            result.put("status", 200);
-            result.put("success", true);
-            result.put("message", "카테고리가 정상적으로 조회되었습니다.");
+            //result.put("status", 200);
+            //result.put("success", true);
+            //result.put("message", "카테고리가 정상적으로 조회되었습니다.");
             result.put("data", userCategories);
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){

@@ -38,9 +38,9 @@ public class TodoController {
         User user = userOptional.get();
         TodoResponseDto newTodo = todoService.createTodo(user, todoRequestDto);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("status", 200);
-        result.put("success", true);
-        result.put("message", "투두 생성이 완료되었습니다.");
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "투두 생성이 완료되었습니다.");
         result.put("data", newTodo);
         return ResponseEntity.ok().body(result);
     }
@@ -52,9 +52,9 @@ public class TodoController {
         User user = userOptional.get();
         TodoResponseDto updatedTodo = todoService.updateTodo(user, todoId, todoRequestDto);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("status", 200);
-        result.put("success", true);
-        result.put("message", "투두 수정이 완료되었습니다.");
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "투두 수정이 완료되었습니다.");
         result.put("data", updatedTodo);
         return ResponseEntity.ok().body(result);
     }
@@ -67,9 +67,9 @@ public class TodoController {
             User user = userOptional.get();
             todoService.deleteTodo(user, todoId);
             Map<String, Object> result = new LinkedHashMap<>();
-            result.put("status", 200);
-            result.put("success", true);
-            result.put("message", "투두 삭제가 완료되었습니다.");
+            //result.put("status", 200);
+            //result.put("success", true);
+            //result.put("message", "투두 삭제가 완료되었습니다.");
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -84,30 +84,13 @@ public class TodoController {
             User user = userOptional.get();
             List<TodoResponseDto> userTodos = todoService.getUserTodo(user, date);
             Map<String, Object> result = new LinkedHashMap<>();
-            result.put("status", 200);
-            result.put("success", true);
-            result.put("message", "투두가 정상적으로 조회되었습니다.");
+            //result.put("status", 200);
+            //result.put("success", true);
+            //result.put("message", "투두가 정상적으로 조회되었습니다.");
             result.put("data", userTodos);
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-
-//    @GetMapping("/todoId/{todoId}")
-//    public ResponseEntity<TodoResponseDto> getTodoById(@PathVariable int todoId) {
-//        // 특정 투두 조회 API
-//        try{
-//            TodoResponseDto todoDto = todoService.getTodoById(todoId);
-//            return new ResponseEntity<>(todoDto, HttpStatus.OK);
-//        } catch (IllegalArgumentException e){
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//        }
-//    }
-//    @GetMapping
-//    public ResponseEntity<List<TodoResponseDto>> getAllTodos() {
-//        // 모든 투두 목록 조회 API
-//        List<TodoResponseDto> todos = todoService.getAllTodos();
-//        return new ResponseEntity<>(todos, HttpStatus.OK);
-//    }
 }
