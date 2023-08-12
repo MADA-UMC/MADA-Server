@@ -33,13 +33,14 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<String> test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public ResponseEntity<?> test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 //        System.out.println("oAuth2User = " + oAuth2User);
 //        authentication.getPrincipal()
-        System.out.println(authentication.getName());
 //        System.out.println(cusomtUserDetails.getUser());
-        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName());
+//        System.out.println(authentication.getName());
+//        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName());
+        return ResponseEntity.ok().build();
     }
 
 //    @GetMapping("/oauth2/code/{provider}")
