@@ -1,5 +1,6 @@
 package com.umc.mada.todo.repository;
 
+import com.umc.mada.todo.domain.RepeatMonth;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 

@@ -15,7 +15,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TimetableResponseDto {
-    private User userId; // 유저 ID
+    //private User userId; // 유저 ID
     private LocalDate date; // 시간표 일자
     private String scheduleName; // 일정 이름
     private String color; // 일정 색상

@@ -28,7 +28,6 @@ public class Todo{
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
-    //@JoinTable(name = "USER", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="id"))
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User userId; // 유저 ID
 
@@ -40,16 +39,21 @@ public class Todo{
     @Column(name = "todo_name", nullable = false)
     private String todoName; // 투두 이름
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "`repeat`", nullable = false, length = 10)
+    @Enumerated(value = EnumType.STRING)
     private Repeat repeat; // 반복 설정 (N: 반복 안함, day: 매일 반복, week: 매주 반복, month: 매월 반복)
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "repeat_week", length = 10)
+    @Enumerated(value = EnumType.STRING)
     private RepeatWeek repeatWeek; // 매주 반복 요일 (null 또는 "mon", "tue", "wed", "thu", "fri", "sat", "sun")
 
+    //@Enumerated(value = EnumType.STRING)
+    @Column(name = "repeat_month")
+    @Convert(converter = RepeatMonthConverter.class)
+    private RepeatMonth repeatMonth;
+
     @Column(name = "complete", nullable = false)
-    private boolean complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
+    private Boolean complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
 
     @Column(name = "start_repeat_date")
     private LocalDate startRepeatDate; // 반복 시작 일자
@@ -68,25 +72,8 @@ public class Todo{
     @Column(name = "update_at")
     private LocalDateTime updatedAt; // 수정 시간
 
-    public enum Repeat {
-        N,    // 반복 안함
-        DAY,  // 매일 반복
-        WEEK, // 매주 반복
-        MONTH // 매월 반복
-    }
-
-    public enum RepeatWeek {
-        MON, // 월요일
-        TUE, // 화요일
-        WED, // 수요일
-        THU, // 목요일
-        FRI, // 금요일
-        SAT, // 토요일
-        SUN  // 일요일
-    }
-
     // 생성자 (필수 필드)
-    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, LocalDate startRepeatDate, LocalDate endRepeatDate) {
+    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate) {
         this.userId = userId;
         this.date = date;
         this.categoryId = categoryId;
@@ -94,6 +81,7 @@ public class Todo{
         this.complete = complete;
         this.repeat = repeat;
         this.repeatWeek = repeatWeek;
+        this.repeatMonth = repeatMonth;
         this.startRepeatDate = startRepeatDate;
         this.endRepeatDate = endRepeatDate;
     }

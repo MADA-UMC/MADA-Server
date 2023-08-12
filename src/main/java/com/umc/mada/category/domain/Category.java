@@ -3,6 +3,7 @@ package com.umc.mada.category.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.umc.mada.file.domain.File;
+import com.umc.mada.user.domain.User;
 import lombok.*;
 import javax.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -22,7 +23,12 @@ import java.time.LocalDateTime;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; //카테고리 IDc
+    private int id; //카테고리 ID
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    private User userId; // 유저 ID
 
     @Column(name = "category_name", nullable = false)
     private String categoryName; // 카테고리명
@@ -44,7 +50,8 @@ public class Category {
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Category(String categoryName, String color, File iconId) {
+    public Category(User userId, String categoryName, String color, File iconId) {
+        this.userId = userId;
         this.categoryName = categoryName;
         this.color = color;
         this.iconId = iconId;
