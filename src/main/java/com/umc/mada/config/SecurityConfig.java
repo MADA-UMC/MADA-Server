@@ -88,7 +88,9 @@ public class SecurityConfig{
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     private static final String[] ignores = {
-            "/swagger-ui/**"
+            "/favicon.ico",
+            "/error", "/swagger-ui/**","/swagger-resources/**",
+            "/user/test"
     };
 
     @Bean

@@ -27,10 +27,9 @@ public class HaveItem {
     private boolean wearing;
 
     @Builder
-    public HaveItem(User user, CustomItem customItem, boolean wearing){
+    public HaveItem(User user, CustomItem customItem){
         this.user = user;
         this.customItem = customItem;
-        this.wearing = wearing;
     }
 
     public void updateHaveItemWearing(boolean wearing){
