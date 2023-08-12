@@ -47,6 +47,11 @@ public class Todo{
     @Enumerated(value = EnumType.STRING)
     private RepeatWeek repeatWeek; // 매주 반복 요일 (null 또는 "mon", "tue", "wed", "thu", "fri", "sat", "sun")
 
+    //@Enumerated(value = EnumType.STRING)
+    @Column(name = "repeat_month")
+    @Convert(converter = RepeatMonthConverter.class)
+    private RepeatMonth repeatMonth;
+
     @Column(name = "complete", nullable = false)
     private Boolean complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
 
@@ -68,7 +73,7 @@ public class Todo{
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, LocalDate startRepeatDate, LocalDate endRepeatDate) {
+    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate) {
         this.userId = userId;
         this.date = date;
         this.categoryId = categoryId;
@@ -76,6 +81,7 @@ public class Todo{
         this.complete = complete;
         this.repeat = repeat;
         this.repeatWeek = repeatWeek;
+        this.repeatMonth = repeatMonth;
         this.startRepeatDate = startRepeatDate;
         this.endRepeatDate = endRepeatDate;
     }
