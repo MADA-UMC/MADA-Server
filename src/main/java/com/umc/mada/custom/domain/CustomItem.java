@@ -23,7 +23,8 @@ public class CustomItem {
     private File file;
 
     @Column(name = "type")
-    private String itemType;
+    @Enumerated(value = EnumType.STRING)
+    private ItemType itemType;
 
     private String unlock_condition;
 
@@ -36,7 +37,7 @@ public class CustomItem {
     private LocalDateTime updatedAt; // 수정 시간
 
     @Builder
-    public CustomItem(File file, String itemType, String unlock_condition){
+    public CustomItem(File file, ItemType itemType, String unlock_condition){
         this.file = file;
         this.itemType = itemType;
         this.unlock_condition = unlock_condition;
