@@ -32,7 +32,7 @@ public class UserService {
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
 
-    public void nicknameSetting(String nickname, User user){
+    public void nickNameSetting(String nickname, User user){
         userRepository.save(user.setNickname(nickname));
     }
 
