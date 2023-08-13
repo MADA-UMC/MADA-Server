@@ -17,6 +17,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -85,17 +87,19 @@ public class UserController {
      * 닉네임 변경 API
      */
     @PatchMapping("/change/nickname")
-    public BaseResponse<NicknameResponseDto> changeNickname(Authentication authentication,
-                                                            @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto, BindingResult bindingResult) {
+    public ResponseEntity<Map<String, Object>>changeNickname(Authentication authentication,
+                                                                  @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        if(bindingResult.hasErrors()){
-            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
-            return BaseResponse.onFailure(400, objectError.getDefaultMessage(), null);
-        }
-
-        NicknameResponseDto result = userService.changeNickname(user, changeNicknameRequestDto);
-        return BaseResponse.onSuccess(result);
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.changeNickname(user, changeNicknameRequestDto));
+//        if(bindingResult.hasErrors()){
+//            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
+//            return ResponseEntity
+//        }
+        return ResponseEntity.ok(map);
     }
 
+//    @PatchMapping("/isAlarm")
+//    public BaseResponse<>
 }
