@@ -32,8 +32,8 @@ public class UserService {
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
 
-    public void nickNameSetting(String nickName, User user){
-        userRepository.save(user.setNickname(nickName));
+    public void nicknameSetting(String nickname, User user){
+        userRepository.save(user.setNickname(nickname));
     }
 
     public void withdrawal(User user){
