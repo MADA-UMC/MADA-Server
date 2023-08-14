@@ -16,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
@@ -35,9 +36,10 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
-
+    private boolean startTodoAtMonday;
+    private boolean endTodoBackSetting;
+    private boolean newTodoStartSetting;
     private boolean account_expired;
-    private boolean is_alarm;
     private String refreshToken;
 
     @CreationTimestamp
