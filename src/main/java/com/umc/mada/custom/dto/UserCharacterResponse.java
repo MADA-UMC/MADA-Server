@@ -3,6 +3,7 @@ package com.umc.mada.custom.dto;
 import com.umc.mada.custom.domain.CustomItem;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,11 @@ public class UserCharacterResponse {
     public UserCharacterResponse(List<CharacterItemResponse> items){
         this.data = items;
     }
+
+//    public UserCharacterResponse(CharacterItemResponse characterItemResponse){
+//        data = new ArrayList<>();
+//        this.data.add(characterItemResponse);
+//    }
 
     public static UserCharacterResponse of(List<CustomItem> customItems){
         List<CharacterItemResponse> characterItemResponse = customItems.stream()
