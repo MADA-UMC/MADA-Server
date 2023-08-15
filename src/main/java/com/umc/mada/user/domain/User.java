@@ -16,7 +16,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
@@ -40,6 +39,8 @@ public class User {
     private boolean endTodoBackSetting;
     private boolean newTodoStartSetting;
     private boolean account_expired;
+    @Column(nullable = false, name = "is_alarm")
+    private boolean isAlarm;
     private String refreshToken;
 
     @CreationTimestamp
@@ -48,32 +49,31 @@ public class User {
 
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updatedAt; //
+    private LocalDateTime updatedAt; // 수정 시간
 
     @OneToMany(mappedBy = "user")
     private List<HaveItem> haveItems = new ArrayList<>();
 
     @Builder
-    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role){
+    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role, boolean isAlarm) {
         this.authId = authId;
         this.nickname = nickname;
         this.email = email;
         this.subscribe = subscribe;
         this.provider = provider;
         this.role = role;
+        this.isAlarm = isAlarm;
     }
 
-    public void updateNickname(String nickname){
-        this.nickname=nickname;
-    }
+    public void updateNickname(String nickname) { this.nickname = nickname; }
 
-    public User update(String authId, String email){
+    public User update(String authId, String email) {
         this.authId = authId;
         this.email = email;
         return this;
     }
 
-    public User expiredUserUpdate(){
+    public User expiredUserUpdate() {
         this.account_expired = true;
         return this;
     }
@@ -82,7 +82,7 @@ public class User {
         this.refreshToken = refreshToken;
     }
 
-    public User setNickname(String nickname){
+    public User setNickname(String nickname) {
         this.nickname = nickname;
         return this;
     }
