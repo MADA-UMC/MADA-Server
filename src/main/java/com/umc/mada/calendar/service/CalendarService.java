@@ -132,7 +132,8 @@ public class CalendarService {
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
-                .filter(calendar -> calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0).collect(Collectors.toList());
+                .filter(calendar -> calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0)
+                .collect(Collectors.toList());
     }
 
     private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList, int month){

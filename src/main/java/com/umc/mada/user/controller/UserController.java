@@ -17,6 +17,8 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -96,6 +98,16 @@ public class UserController {
 
         NicknameResponseDto result = userService.changeNickname(user, changeNicknameRequestDto);
         return BaseResponse.onSuccess(result);
+    }
+    @PatchMapping("/subscribe")
+    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
+        Map<String,Object> map = new HashMap<>();
+        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+        return ResponseEntity.ok(map);
+    }
+    @PostMapping("/pageInfo")
+    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
+        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
     }
 
 }
