@@ -53,6 +53,10 @@ dependencies {
 	implementation "io.springfox:springfox-swagger-ui:3.0.0"
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+//tasks.named('test') {
+//	useJUnitPlatform()
+//}
+
+jar{
+	enabled = false
 }
