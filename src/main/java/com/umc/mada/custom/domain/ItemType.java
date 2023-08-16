@@ -4,8 +4,8 @@ import java.util.Arrays;
 
 public enum ItemType {
     I1("color"),
-    I2("clothing"),
-    I3("goods"),
+    I2("set"),
+    I3("item"),
     I4("background");
     //UNKNOWN("알수없음");
 
