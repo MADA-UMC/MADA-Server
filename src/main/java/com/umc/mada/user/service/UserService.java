@@ -39,24 +39,6 @@ public class UserService {
     }
     public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
         User user = this.getUser(authentication);
-        user.setSubscribe(is_subscribe);
-        return user.isSubscribe();
-    }
-    public Map<String,Object> userPageSettings(Authentication authentication, Map<String,Boolean> map){
-        User user = this.getUser(authentication);
-        user.setEndTodoBackSetting(map.get("setEndTodoBackSetting"));
-        user.setNewTodoStartSetting(map.get("setNewTodoStartSetting"));
-        user.setStartTodoAtMonday(map.get("setStartTodoAtMonday"));
-        Map<String,Object> userPageInfos = new HashMap<>();
-        userPageInfos.put("setEndTodoBackSetting",user.isEndTodoBackSetting());
-        userPageInfos.put("setNewTodoStartSetting",user.isNewTodoStartSetting());
-        userPageInfos.put("setStartTodoAtMonday",user.isStartTodoAtMonday());
-        return userPageInfos;
-    }
-
-
-    public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
-        User user = this.getUser(authentication);
         user.updateSubscribe(is_subscribe);
         return user.isSubscribe();
     }
@@ -70,9 +52,9 @@ public class UserService {
         return userPageInfos;
     }
 
-    public void nickNameSetting(String nickName, User user){
+    public void nickNameSetting(String nickName, User user) {
         userRepository.save(user.setNickname(nickName));
-
+    }
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }
