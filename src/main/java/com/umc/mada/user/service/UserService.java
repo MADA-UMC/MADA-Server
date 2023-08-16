@@ -54,8 +54,8 @@ public class UserService {
         return userPageInfos;
     }
 
-    public void nickNameSetting(String nickName, User user){
-        userRepository.save(user.setNickname(nickName));
+    public void nickNameSetting(String nickname, User user){
+        userRepository.save(user.setNickname(nickname));
     }
 
     public void withdrawal(User user){
