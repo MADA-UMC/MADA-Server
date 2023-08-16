@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,10 +36,10 @@ public class TodoService {
     public TodoResponseDto createTodo(User user, TodoRequestDto todoRequestDto) {
         // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
         validateUserId(user);
-        validateCategoryId(todoRequestDto.getCategoryId().getId());
+        validateCategoryId(todoRequestDto.getCategory().getId());
         validateTodoName(todoRequestDto.getTodoName());
 
-        Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategoryId().getId())
+        Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategory().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
 
         // 투두 앤티티 생성
@@ -61,16 +60,7 @@ public class TodoService {
         Todo savedTodo = todoRepository.save(todo);
 
         // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
-        return new TodoResponseDto(
-                savedTodo.getDate(),
-                savedTodo.getCategoryId(),
-                savedTodo.getTodoName(),
-                savedTodo.getComplete(),
-                savedTodo.getRepeat(),
-                savedTodo.getRepeatWeek(),
-                savedTodo.getRepeatMonth(),
-                savedTodo.getStartRepeatDate(),
-                savedTodo.getEndRepeatDate());
+        return TodoResponseDto.of(savedTodo);
     }
 
     @Transactional
@@ -150,10 +140,10 @@ public class TodoService {
         }
 
         // 카테고리 ID 변경 처리
-        if (todoRequestDto.getCategoryId() != null) {
-            Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategoryId().getId())
+        if (todoRequestDto.getCategory() != null) {
+            Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategory().getId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
-            todo.setCategoryId(category);
+            todo.setCategory(category);
         }
 
         // 투두 이름 변경 처리
@@ -185,16 +175,7 @@ public class TodoService {
         Todo updatedTodo = todoRepository.save(todo);
 
         // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
-        return new TodoResponseDto(
-                updatedTodo.getDate(),
-                updatedTodo.getCategoryId(),
-                updatedTodo.getTodoName(),
-                updatedTodo.getComplete(),
-                updatedTodo.getRepeat(),
-                updatedTodo.getRepeatWeek(),
-                updatedTodo.getRepeatMonth(),
-                updatedTodo.getStartRepeatDate(),
-                updatedTodo.getEndRepeatDate());
+        return TodoResponseDto.of(updatedTodo);
     }
 
     @Transactional
@@ -215,16 +196,7 @@ public class TodoService {
     public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
         List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-        return userTodos.stream().map(todo -> new TodoResponseDto(
-                todo.getDate(),
-                todo.getCategoryId(),
-                todo.getTodoName(),
-                todo.getComplete(),
-                todo.getRepeat(),
-                todo.getRepeatWeek(),
-                todo.getRepeatMonth(),
-                todo.getStartRepeatDate(),
-                todo.getEndRepeatDate())).collect(Collectors.toList());
+        return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
    }
 
     // 투두 이름 유효성 검사 메서드

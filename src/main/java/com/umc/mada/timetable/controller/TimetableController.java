@@ -111,7 +111,7 @@ public class TimetableController {
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : todos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
-            todoMap.put("iconId", todo.getCategoryId().getIconId()); // Category의 아이콘 ID
+            todoMap.put("iconId", todo.getCategory().getIcon().getId()); // Category의 아이콘 ID
             todoMap.put("todoName", todo.getTodoName());
             todoList.add(todoMap);
         }
@@ -122,6 +122,7 @@ public class TimetableController {
             if (!date.isBefore(calendar.getStartDate().toLocalDate()) && !date.isAfter(calendar.getEndDate().toLocalDate())) {
                 Map<String, Object> calendarMap = new LinkedHashMap<>();
                 calendarMap.put("CalendarName", calendar.getCalendarName());
+                calendarMap.put("color", calendar.getColor());
                 calendarMap.put("startDate", calendar.getStartDate().toLocalDate()); // 시작 시간
                 calendarMap.put("endDate", calendar.getEndDate().toLocalDate());     // 종료 시간
                 calendarList.add(calendarMap);
