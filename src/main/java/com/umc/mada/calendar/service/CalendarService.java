@@ -102,7 +102,7 @@ public class CalendarService {
                 .endDate(calendarRequestDto.getEndDate())
                 .build();
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(), calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(), calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
     }
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
@@ -114,7 +114,7 @@ public class CalendarService {
         calendar.setCalendarName(calendarRequestDto.getCalendarName());
         calendar.setColor(calendarRequestDto.getColor());
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(),calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(),calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
     }
 
 
@@ -184,6 +184,7 @@ public class CalendarService {
     }
     private CalendarResponseDto calendarToDto(Calendar calendar){
         return CalendarResponseDto.builder()
+                .calendarId(calendar.getId())
                 .calendarName(calendar.getCalendarName())
                 .startDate(calendar.getStartDate())
                 .endDate(calendar.getEndDate())

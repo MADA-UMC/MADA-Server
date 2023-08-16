@@ -65,7 +65,6 @@ public class CalendarController {
     }
     @GetMapping("/date/{date}")
     ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable Date date){
-
         return ResponseEntity.ok(calendarService.calendarsReadByDate(authentication,date));
     }
 

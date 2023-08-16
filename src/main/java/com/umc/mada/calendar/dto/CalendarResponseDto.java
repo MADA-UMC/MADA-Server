@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CalendarResponseDto {
+   private Long calendarId;
    private String calendarName;
    private Date startDate;
    private Date endDate;
