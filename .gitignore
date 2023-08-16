@@ -28,6 +28,7 @@ out/
 application-jwt.properties
 application-oauth2.properties
 application-DB.properties
+application-s3.properties
 
 ### NetBeans ###
 /nbproject/private/
