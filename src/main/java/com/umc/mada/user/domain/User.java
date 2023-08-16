@@ -30,7 +30,7 @@ public class User {
 
     @Column(unique = true, nullable = false)
     private String email;
-    private boolean subscribe;
+    private Boolean subscribe;
     private String provider;
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)

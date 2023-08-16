@@ -101,10 +101,11 @@ public class UserController {
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/subscribe")
-    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        return ResponseEntity.ok(map);
+    public ResponseEntity<Void> userSubscribe(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+        userService.userSubscribeSettings(authentication,is_subscribe);
+        return ResponseEntity.ok().build();
     }
     @PostMapping("/pageInfo")
     public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
