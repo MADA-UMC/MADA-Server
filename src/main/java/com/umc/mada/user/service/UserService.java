@@ -64,6 +64,11 @@ public class UserService {
         userRepository.save(user.expiredUserUpdate());
     }
 
+    private User getUser(Authentication authentication){
+        Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
+        return optionalUser.get();
+    }
+
 //    @Override
 //    @Transactional
 //    public AlarmSetResponseDto updateAlarm(Long id, AlarmSetRequestDto alarmSetRequestDto) {
