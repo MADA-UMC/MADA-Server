@@ -1,5 +1,6 @@
 package com.umc.mada.custom.service;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.umc.mada.custom.domain.CustomItem;
 import com.umc.mada.custom.domain.HaveItem;
 import com.umc.mada.custom.domain.ItemType;
@@ -10,10 +11,12 @@ import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.user.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +24,22 @@ public class CustomService {
 
     private final CustomRepository customRepository;
     private final HaveItemRepository haveItemRepository;
+//    private final AmazonS3 amazonS3;
+//    @Value("${cloud.aws.s3.bucket}")
+//    private String bucket;
 
     public UserCharacterResponse printUserCharacter(User user){
         //List<HaveItem> wearingItems = haveItemRepository.findByUserAndWearing(user, true); //사용자가 보유한 아이템 중 착용하고 있는 아이템
         List<CustomItem> customItems = haveItemRepository.findCustomItemByUserAndWearing(user, true);
+        // S3 url 부분
+//        String url = amazonS3.getUrl(bucket, customItems.get(0).getFileName()).toString();
+//        System.out.println(url);
+
+        List<CustomItem> colorItems = customItems.stream().filter(item -> ItemType.I1.equals(item.getItemType())).collect(Collectors.toList());
+        if(customItems.isEmpty()|| colorItems.isEmpty()){ //사용자 캐릭터가 디폴트 값이라면 디폴트 캐릭터 데이터를 넘겨준다.
+            //return new UserCharacterResponse(CharacterItemResponse.of(customRepository.findCustomItemById(1L).get()));
+            customItems.add(customRepository.findCustomItemById(1L).get()); //TODO: isPresent() 체크하기
+        }
         return UserCharacterResponse.of(customItems);
     }
 
@@ -71,7 +86,7 @@ public class CustomService {
 //        HaveItem oldhaveItem = oldhaveItemOptional.get();
         //TODO: 아이템 타입 보고 같은 타입 아이템 wearing을 false로 해야함
         List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
-        for(int i=0; i<oldhaveItemList.size(); i++){
+        for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
             HaveItem oldhaveItem = oldhaveItemList.get(i);
             //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
             if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){

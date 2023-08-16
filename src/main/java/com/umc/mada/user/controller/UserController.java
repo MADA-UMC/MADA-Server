@@ -2,18 +2,13 @@ package com.umc.mada.user.controller;
 
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
-import com.umc.mada.user.dto.nickname.NicknameResponseDto;
-import com.umc.mada.global.BaseResponse;
 import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -99,16 +94,16 @@ public class UserController {
 //        }
         return ResponseEntity.ok(map);
     }
-    @PatchMapping("/subscribe")
-    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        return ResponseEntity.ok(map);
-    }
-    @PostMapping("/pageInfo")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
-        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
-    }
+//    @PatchMapping("/subscribe")
+//    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+//        return ResponseEntity.ok(map);
+//    }
+//    @PostMapping("/pageInfo")
+//    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
+//        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+//    }
 
 //    @PatchMapping("/isAlarm")
 //    public BaseResponse<>
