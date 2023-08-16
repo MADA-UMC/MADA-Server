@@ -36,8 +36,11 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
+    @Column
     private boolean startTodoAtMonday;
+    @Column
     private boolean endTodoBackSetting;
+    @Column
     private boolean newTodoStartSetting;
     private boolean account_expired;
     private String refreshToken;
