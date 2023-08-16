@@ -4,7 +4,7 @@ import lombok.*;
 
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Getter
 public class AlarmSetRequestDto {
     public static class AlarmUpdateRequestDto {
