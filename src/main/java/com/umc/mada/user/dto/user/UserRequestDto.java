@@ -7,8 +7,12 @@ public class UserRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Getter
-    @Setter
-    public static class UpdateNickname{
+    public static class UpdateNickname {
         private String nickname;
+    }
+
+    public static class UpdateAlarm {
+        private Long id;
+        private boolean isAlarm;
     }
 }
