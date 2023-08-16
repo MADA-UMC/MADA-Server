@@ -6,7 +6,13 @@ import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.security.Key;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -32,11 +38,30 @@ public class UserService {
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
 
-    public void nickNameSetting(String nickname, User user){
-        userRepository.save(user.setNickname(nickname));
+
+    public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
+        User user = this.getUser(authentication);
+        user.updateSubscribe(is_subscribe);
+        return user.isSubscribe();
     }
+    public Map<String,Object> userPageSettings(Authentication authentication, Map<String,Boolean> map){
+        User user = this.getUser(authentication);
+        user.updatePageSetting(map.get("setEndTodoBackSetting"),map.get("setNewTodoStartSetting"),map.get("setStartTodoAtMonday"));
+        Map<String,Object> userPageInfos = new HashMap<>();
+        userPageInfos.put("setEndTodoBackSetting",user.isEndTodoBackSetting());
+        userPageInfos.put("setNewTodoStartSetting",user.isNewTodoStartSetting());
+        userPageInfos.put("setStartTodoAtMonday",user.isStartTodoAtMonday());
+        return userPageInfos;
+    }
+
+    public void nickNameSetting(String nickName, User user){
+        userRepository.save(user.setNickname(nickName));
 
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
+    }
+    private User getUser(Authentication authentication){
+        Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
+        return optionalUser.get();
     }
 }
