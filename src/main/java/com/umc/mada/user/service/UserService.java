@@ -37,8 +37,6 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
-
-
     public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
         User user = this.getUser(authentication);
         user.updateSubscribe(is_subscribe);
@@ -57,7 +55,6 @@ public class UserService {
     public void nickNameSetting(String nickName, User user) {
         userRepository.save(user.setNickname(nickName));
     }
-
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }

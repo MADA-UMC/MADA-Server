@@ -7,5 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileRequestDto {
+    private int id;
     private String name; // 파일 이름
 }
