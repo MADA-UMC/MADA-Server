@@ -32,9 +32,8 @@ public class CalendarController {
 
     @GetMapping("/")
     ResponseEntity<Map<String,Object>> calendarRead(Authentication authentication){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data", calendarService.calendarsRead(authentication));
-        return ResponseEntity.ok(map);
+
+        return ResponseEntity.ok(calendarService.calendarsRead(authentication));
     }
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
@@ -57,21 +56,18 @@ public class CalendarController {
     }
     @GetMapping("/dday")
     ResponseEntity<Map<String,Object>> readD_days(Authentication authentication){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",calendarService.readDday(authentication));
-        return ResponseEntity.ok(map);
+
+        return ResponseEntity.ok(calendarService.readDday(authentication));
     }
     @GetMapping("/{month}")
-    ResponseEntity<Map<String,Object>> readCalendarByMonth(Authentication authentication ,@PathVariable int month){
-        Map<String ,Object> map = new HashMap<>();
-        map.put("data",calendarService.readMonthCalendar(authentication,month));
-        return ResponseEntity.ok(map);
+    ResponseEntity<Map<String,Object>> readCalendarByMonth(Authentication authentication ,@PathVariable int year ,@PathVariable int month){
+
+        return ResponseEntity.ok(calendarService.readMonthCalendar(authentication,year,month));
     }
     @GetMapping("/date/{date}")
     ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable Date date){
-        Map<String ,Object> map = new HashMap<>();
-        map.put("data",calendarService.calendarsReadByDate(authentication,date));
-        return ResponseEntity.ok(map);
+
+        return ResponseEntity.ok(calendarService.calendarsReadByDate(authentication,date));
     }
 
     /*@ExceptionHandler(ManyD_dayException.class)

@@ -30,9 +30,8 @@ public class Calendar {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @Column(name = "calender_name")
-    private String calenderName;
+    @Column(name = "calendar_name")
+    private String calendarName;
     @Column(name = "color")
     private String color;
     @Column(name = "start_date")
@@ -40,7 +39,9 @@ public class Calendar {
     @Column(name = "end_date")
     private Date endDate;
     @Column(name = "`repeat`")
-    private Character repeat;
+    //No, Day, Week, Month, Year
+    private String  repeat;
+
     @Column(name = "d_day")
     private Character dday;
     @Column(name = "memo")
