@@ -27,6 +27,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String authId;
     private String nickname;
+
     @Column(unique = true, nullable = false)
     private String email;
     private boolean subscribe;

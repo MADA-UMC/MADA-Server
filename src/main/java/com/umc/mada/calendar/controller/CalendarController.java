@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 @RestController
 @Slf4j
 @Transactional
-@RequestMapping("/api/calender")
+@RequestMapping("/api/calendar")
 public class CalendarController {
     private final CalendarService calendarService;
     @Autowired
@@ -37,9 +37,9 @@ public class CalendarController {
     }
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
-    ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calenderDto){
+    ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
         Map<String,Object> map = new HashMap<>();
-        map.put("data",calendarService.calendarCreate(authentication,calenderDto));
+        map.put("data",calendarService.calendarCreate(authentication,calendarDto));
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
@@ -56,7 +56,6 @@ public class CalendarController {
     }
     @GetMapping("/dday")
     ResponseEntity<Map<String,Object>> readD_days(Authentication authentication){
-
         return ResponseEntity.ok(calendarService.readDday(authentication));
     }
     @GetMapping("/{month}")
@@ -66,7 +65,6 @@ public class CalendarController {
     }
     @GetMapping("/date/{date}")
     ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable Date date){
-
         return ResponseEntity.ok(calendarService.calendarsReadByDate(authentication,date));
     }
 
