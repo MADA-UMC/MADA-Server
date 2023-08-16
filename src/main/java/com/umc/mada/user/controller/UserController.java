@@ -1,5 +1,8 @@
 package com.umc.mada.user.controller;
 
+import com.umc.mada.calendar.domain.Calendar;
+import com.umc.mada.timetable.domain.Timetable;
+import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
@@ -8,6 +11,7 @@ import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -16,8 +20,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.umc.mada.todo.repository.TodoRepository;
+import com.umc.mada.timetable.repository.TimetableRepository;
 
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 
 @RestController
@@ -25,11 +32,15 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
+    private final TimetableRepository timetableRepository;
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository){
+    public UserController(UserService userService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
         this.userService = userService;
         this.userRepository = userRepository;
+        this.todoRepository = todoRepository;
+        this.timetableRepository = timetableRepository;
     }
 
     @GetMapping("/test")
@@ -96,6 +107,16 @@ public class UserController {
 
         NicknameResponseDto result = userService.changeNickname(user, changeNicknameRequestDto);
         return BaseResponse.onSuccess(result);
+    }
+    @PatchMapping("/subscribe")
+    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
+        Map<String,Object> map = new HashMap<>();
+        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+        return ResponseEntity.ok(map);
+    }
+    @PostMapping("/pageInfo")
+    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
+        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
     }
 
 }
