@@ -36,10 +36,10 @@ public class Category {
     @Column(name = "color", nullable = false, length = 45)
     private String color; // 카테고리 색상
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "icon_id", referencedColumnName = "id", nullable = false)
-    private File iconId; // 아이콘 ID (외래키)
+    private File icon; // 아이콘 ID (외래키)
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
@@ -50,10 +50,10 @@ public class Category {
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Category(User userId, String categoryName, String color, File iconId) {
+    public Category(User userId, String categoryName, String color, File icon) {
         this.userId = userId;
         this.categoryName = categoryName;
         this.color = color;
-        this.iconId = iconId;
+        this.icon = icon;
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import javax.validation.Valid;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createCategory(Authentication authentication, @RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<Map<String, Object>> createCategory(Authentication authentication, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 생성 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
@@ -47,7 +48,7 @@ public class CategoryController {
     }
 
     @PatchMapping("/{categoryId}")
-    public ResponseEntity<Map<String, Object>> updateCategory(Authentication authentication,@PathVariable int categoryId, @RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<Map<String, Object>> updateCategory(Authentication authentication,@PathVariable int categoryId, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 수정 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();

@@ -44,7 +44,7 @@ public class TimetableService {
         Timetable savedTimetable = timetableRepository.save(timetable);
 
         // 저장된 시간표 정보를 기반으로 TimetalbeResponseDto 생성 후 반환
-        return new TimetableResponseDto(savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
+        return new TimetableResponseDto(savedTimetable.getId(), savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
                 savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo());
     }
     @Transactional
@@ -86,7 +86,7 @@ public class TimetableService {
         Timetable updatedTimetable = timetableRepository.save(timetable);
 
         // 저장된 투두 정보를 기반으로 timetableRepository 생성하여 반환
-        return new TimetableResponseDto(updatedTimetable.getDate(), updatedTimetable.getScheduleName(), updatedTimetable.getColor(),
+        return new TimetableResponseDto(updatedTimetable.getId(), updatedTimetable.getDate(), updatedTimetable.getScheduleName(), updatedTimetable.getColor(),
                 updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo());
     }
 
@@ -106,7 +106,7 @@ public class TimetableService {
     public List<TimetableResponseDto> getUserTimetable(User userId, LocalDate date) {
         List<Timetable> userTimetables = timetableRepository.findTimetablesByUserIdAndDateIs(userId, date);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-        return userTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getDate(), timetable.getScheduleName(),
+        return userTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
                 timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo())).collect(Collectors.toList());
     }
 
