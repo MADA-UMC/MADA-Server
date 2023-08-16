@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 @RestController
 @Slf4j
 @Transactional
-@RequestMapping("/api/calender")
+@RequestMapping("/api/calendar")
 public class CalendarController {
     private final CalendarService calendarService;
     @Autowired
@@ -66,7 +66,6 @@ public class CalendarController {
     }
     @GetMapping("/date/{date}")
     ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable Date date){
-
         return ResponseEntity.ok(calendarService.calendarsReadByDate(authentication,date));
     }
 
