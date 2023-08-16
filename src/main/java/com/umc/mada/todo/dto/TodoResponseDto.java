@@ -62,7 +62,7 @@ public class TodoResponseDto {
                 .repeatMonth(todo.getRepeatMonth())
                 .startRepeatDate(todo.getStartRepeatDate())
                 .endRepeatDate(todo.getEndRepeatDate())
-                .isAlarm(todo.getUserId().is_alarm())
+                .isAlarm(todo.getUserId().isAlarm())
                 .startTodoAtMonday(todo.getUserId().isStartTodoAtMonday())
                 .endTodoBackSetting(todo.getUserId().isEndTodoBackSetting())
                 .newTodoStartSetting(todo.getUserId().isNewTodoStartSetting())
