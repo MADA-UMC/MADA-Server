@@ -15,11 +15,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CalendarResponseDto {
-   private String calenderName;
+   private String calendarName;
    private Date startDate;
    private Date endDate;
    private Character dday;
-   private Character repeat;
+   private String  repeat;
    private String memo;
    private String color;
 }

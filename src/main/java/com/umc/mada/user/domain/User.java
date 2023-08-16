@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
@@ -16,7 +17,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
@@ -36,11 +36,11 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
-    @Column(name="start_todo_at_monday")
+    @Column
     private boolean startTodoAtMonday;
-    @Column(name="end_todo_back_setting")
+    @Column
     private boolean endTodoBackSetting;
-    @Column(name="new_todo_start_setting")
+    @Column
     private boolean newTodoStartSetting;
     private boolean account_expired;
     @Column(nullable = false, name = "is_alarm")
@@ -82,12 +82,21 @@ public class User {
         return this;
     }
 
+    public void updateSubscribe(boolean subscribe){
+        this.subscribe = subscribe;
+    }
     public void setRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
     }
 
     public User setNickname(String nickname) {
         this.nickname = nickname;
+        return this;
+    }
+    public User updatePageSetting(boolean startTodoAtMonday, boolean endTodoBackSetting,boolean newTodoStartSetting){
+        this.startTodoAtMonday = startTodoAtMonday;
+        this.endTodoBackSetting = endTodoBackSetting;
+        this.newTodoStartSetting = newTodoStartSetting;
         return this;
     }
 }

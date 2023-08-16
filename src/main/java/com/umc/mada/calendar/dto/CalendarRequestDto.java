@@ -13,11 +13,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CalendarRequestDto {
-    private String calenderName;
+    private Long calendar_id;
+    private String calendarName;
     private Date startDate;
     private Date endDate;
     private String color;
-    private Character repeat;
+    private String  repeat;
     private Character dday;
     private String memo;
 }
