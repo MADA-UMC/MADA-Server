@@ -2,13 +2,10 @@ package com.umc.mada.todo.dto;
 
 import com.umc.mada.category.domain.Category;
 import com.umc.mada.todo.domain.RepeatMonth;
-import com.umc.mada.user.domain.User;
 import lombok.*;
 import com.umc.mada.todo.domain.Repeat;
 import com.umc.mada.todo.domain.RepeatWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 public class TodoRequestDto {

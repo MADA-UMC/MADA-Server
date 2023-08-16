@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "CALENDER")
+@Table(name = "CALENDAR")
 public class Calendar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

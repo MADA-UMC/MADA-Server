@@ -1,15 +1,12 @@
 package com.umc.mada.todo.dto;
 
-import com.umc.mada.category.domain.Category;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.todo.domain.Repeat;
 import com.umc.mada.todo.domain.RepeatMonth;
 import com.umc.mada.todo.domain.RepeatWeek;
 import com.umc.mada.todo.domain.Todo;
-import com.umc.mada.user.domain.User;
 import lombok.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Data
 @Builder

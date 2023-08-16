@@ -1,6 +1,5 @@
 package com.umc.mada.todo.service;
 
-import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.todo.domain.*;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

@@ -1,10 +1,6 @@
 package com.umc.mada.category.dto;
 
 import com.umc.mada.category.domain.Category;
-import com.umc.mada.custom.domain.CustomItem;
-import com.umc.mada.custom.dto.CharacterItemResponse;
-import com.umc.mada.custom.dto.ItemsElementResponse;
-import com.umc.mada.file.domain.File;
 import lombok.*;
 
 @Getter

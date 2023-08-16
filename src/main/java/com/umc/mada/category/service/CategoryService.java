@@ -8,7 +8,6 @@ import com.umc.mada.file.domain.File;
 import com.umc.mada.file.repository.FileRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.umc.mada.global.BaseResponseStatus;

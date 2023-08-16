@@ -1,6 +1,5 @@
 package com.umc.mada.category.dto;
 
-import com.umc.mada.file.domain.File;
 import lombok.*;
 
 import javax.validation.constraints.NotNull;

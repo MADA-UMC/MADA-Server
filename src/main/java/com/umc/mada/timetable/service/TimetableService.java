@@ -1,13 +1,10 @@
 package com.umc.mada.timetable.service;
 
-import com.umc.mada.category.repository.CategoryRepository;
 import com.umc.mada.global.BaseResponseStatus;
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.repository.TimetableRepository;
-import com.umc.mada.todo.domain.Todo;
-import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

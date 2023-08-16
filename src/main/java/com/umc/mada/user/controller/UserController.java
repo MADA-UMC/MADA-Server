@@ -1,23 +1,14 @@
 package com.umc.mada.user.controller;
 
-import com.umc.mada.calendar.domain.Calendar;
-import com.umc.mada.timetable.domain.Timetable;
-import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
-import com.umc.mada.user.dto.nickname.NicknameResponseDto;
-import com.umc.mada.global.BaseResponse;
 import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.umc.mada.todo.repository.TodoRepository;
@@ -26,8 +17,6 @@ import com.umc.mada.timetable.repository.TimetableRepository;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.time.LocalDate;
-import java.util.*;
 
 
 @RestController

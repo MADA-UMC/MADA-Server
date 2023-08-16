@@ -1,16 +1,13 @@
 package com.umc.mada.todo.controller;
 
-import com.umc.mada.global.BaseResponse;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.service.TodoService;
-import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

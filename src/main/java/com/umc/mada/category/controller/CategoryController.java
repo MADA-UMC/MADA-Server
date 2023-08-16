@@ -4,8 +4,6 @@ package com.umc.mada.category.controller;
 import com.umc.mada.category.dto.CategoryRequestDto;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.service.CategoryService;
-import com.umc.mada.global.BaseResponse;
-import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
