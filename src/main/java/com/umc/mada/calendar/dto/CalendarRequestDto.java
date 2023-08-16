@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class CalendarRequestDto {
-    private Long calendar_id;
+    private Long calendarId;
     private String calendarName;
     private Date startDate;
     private Date endDate;
