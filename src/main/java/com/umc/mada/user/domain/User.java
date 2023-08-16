@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
@@ -17,6 +16,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
@@ -37,23 +37,23 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
-    @Column
+    @Column(name = "start_todo_at_monday") //TODO: Cannot resolve column 'start_todo_at_monday'
     private boolean startTodoAtMonday;
-    @Column
+    @Column(name = "end_todo_back_setting") //TODO: Cannot resolve column
     private boolean endTodoBackSetting;
-    @Column
+    @Column(name = "new_todo_start_setting") //TODO: Cannot resolve column
     private boolean newTodoStartSetting;
     private boolean account_expired;
-    @Column(nullable = false, name = "is_alarm")
+    @Column(nullable = false, name = "is_alarm") //TODO: Cannot resolve column
     private boolean isAlarm;
     private String refreshToken;
 
     @CreationTimestamp
-    @Column(name = "create_at", updatable = false)
+    @Column(name = "create_at", updatable = false) //TODO: Cannot resolve column
     private LocalDateTime createdAt; // 생성 시간
 
     @UpdateTimestamp
-    @Column(name = "update_at")
+    @Column(name = "update_at") //TODO: Cannot resolve column
     private LocalDateTime updatedAt; // 수정 시간
 
     @OneToMany(mappedBy = "user")

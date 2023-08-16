@@ -60,11 +60,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private String makeRedirectUrl(String accessToken, boolean newUser){
         if(newUser){ //회원가입한 유저라면 닉네임 입력받는 곳으로 리다이렉트
-            return UriComponentsBuilder.fromUriString("http://localhost:8080/user/signup") //"http://localhost:8080/login/oauth2/code/google"
+            return UriComponentsBuilder.fromUriString("http://15.165.210.13/user/signup") //"http://localhost:8080/login/oauth2/code/google"
                     .queryParam("token", accessToken)
                     .build().toUriString();
         }
-        return UriComponentsBuilder.fromUriString("http://localhost:8080/user/test") //"http://localhost:8080/login/oauth2/code/google"
+        return UriComponentsBuilder.fromUriString("http://15.165.210.13/user/test") //"http://localhost:8080/login/oauth2/code/google"
                 .queryParam("token", accessToken)
                 .build().toUriString();
     }
