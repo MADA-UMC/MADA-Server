@@ -42,18 +42,20 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
-    public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
+    public Boolean userSubscribeSettings(Authentication authentication, Map<String,Boolean> is_subscribe){
         User user = this.getUser(authentication);
-        user.updateSubscribe(is_subscribe);
-        return user.isSubscribe();
+        user.updateSubscribe(is_subscribe.get("is_subscribe"));
+        userRepository.save(user);
+        return user.getSubscribe();
     }
     public Map<String,Object> userPageSettings(Authentication authentication, Map<String,Boolean> map){
         User user = this.getUser(authentication);
-        user.updatePageSetting(map.get("setEndTodoBackSetting"),map.get("setNewTodoStartSetting"),map.get("setStartTodoAtMonday"));
+        user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
         Map<String,Object> userPageInfos = new HashMap<>();
-        userPageInfos.put("setEndTodoBackSetting",user.isEndTodoBackSetting());
-        userPageInfos.put("setNewTodoStartSetting",user.isNewTodoStartSetting());
-        userPageInfos.put("setStartTodoAtMonday",user.isStartTodoAtMonday());
+        userPageInfos.put("endTodoBackSetting",user.isEndTodoBackSetting());
+        userPageInfos.put("newTodoStartSetting",user.isNewTodoStartSetting());
+        userPageInfos.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        userRepository.save(user);
         return userPageInfos;
     }
 

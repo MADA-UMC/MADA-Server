@@ -83,7 +83,7 @@ public class CalendarService {
     }
     //동일 이름의 일정이 동일한 날짜에 있는지 검증
     //캘린더 생성코드
-    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) throws ManyD_dayException,SameCalendarNameExist{
+    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) { //throws ManyD_dayException,SameCalendarNameExist
         User user = this.getUser(authentication);
        /* if (calendarRequestDto.getDday() == 'Y' && tooManyD_dayExists(authentication)) {
             throw new ManyD_dayException("D_day가 3개 이상 존재합니다");
@@ -94,6 +94,7 @@ public class CalendarService {
         Calendar calendar = Calendar.builder()
                 //User Entity 부재
                 .user(user)
+                .color(calendarRequestDto.getColor())
                 .calendarName(calendarRequestDto.getCalendarName())
                 .dday(calendarRequestDto.getDday())
                 .repeat(calendarRequestDto.getRepeat())
