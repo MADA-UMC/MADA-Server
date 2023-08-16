@@ -1,9 +1,12 @@
 package com.umc.mada.user.service;
 
 import com.umc.mada.user.domain.User;
+import com.umc.mada.user.dto.alarm.AlarmSetRequestDto;
+import com.umc.mada.user.dto.alarm.AlarmSetResponseDto;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
+import com.umc.mada.user.dto.user.UserResponseDto;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,8 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -58,8 +63,22 @@ public class UserService {
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }
+
     private User getUser(Authentication authentication){
         Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
         return optionalUser.get();
     }
+
+//    @Override
+//    @Transactional
+//    public AlarmSetResponseDto updateAlarm(Long id, AlarmSetRequestDto alarmSetRequestDto) {
+//
+//    }
+//    @Transactional
+//    public UserResponseDto toggleAlarm(User userAccount) {
+//        User user = userRepository.findUserById(userAccount.getId()).get();
+//        user.updateAlarm(!user.getIsAlarm());
+//        userRepository.save(user);
+//        return UserResponseDto.of()
+//    }
 }

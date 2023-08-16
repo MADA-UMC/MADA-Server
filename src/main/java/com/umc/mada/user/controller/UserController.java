@@ -111,6 +111,6 @@ public class UserController {
         return ResponseEntity.ok(userService.userPageSettings(authentication,map));
     }
 
-//    @PatchMapping("/isAlarm")
-//    public BaseResponse<>
+//    @PatchMapping("/isalarm/{id}")
+//    public ResponseEntity<>
 }
