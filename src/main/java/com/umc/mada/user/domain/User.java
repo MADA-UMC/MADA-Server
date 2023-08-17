@@ -100,6 +100,12 @@ public class User {
         return this;
     }
 
+    public User updateProfile(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
+        return this;
+    }
+
 //    public boolean updateAlarm(AlarmSetRequestDto alarmSetRequestDto) {
 //        this.isAlarm = alarmSetRequestDto.isSet();
 //    }
