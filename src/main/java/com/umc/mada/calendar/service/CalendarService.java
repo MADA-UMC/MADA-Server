@@ -189,6 +189,8 @@ public class CalendarService {
                 .calendarName(calendar.getCalendarName())
                 .startDate(calendar.getStartDate())
                 .endDate(calendar.getEndDate())
+                .startTime(calendar.getStartTime())
+                .endTime(calendar.getEndTime())
                 .color(calendar.getColor())
                 .dday(calendar.getDday())
                 .memo(calendar.getMemo())
