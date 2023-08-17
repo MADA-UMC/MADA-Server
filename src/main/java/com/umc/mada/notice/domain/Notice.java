@@ -1,7 +1,10 @@
 package com.umc.mada.notice.domain;
 
 import lombok.*;
+import net.bytebuddy.asm.Advice;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
@@ -16,12 +19,15 @@ public class Notice {
     private String title;
     @Column(name="content")
     private String content;
+    @Column(name="date")
+    private LocalDate date;
 
     @Builder
-    public Notice(Long id, String title, String content) {
+    public Notice(Long id, String title, String content, LocalDate date) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.date = date;
     }
 
     public void update(String title, String content) {
