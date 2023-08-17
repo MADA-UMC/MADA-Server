@@ -24,6 +24,18 @@ import java.util.stream.Collectors;
 @Transactional //트렌젝션 처리
 public class CalendarService {
     private final CalendarRepository calendarRepository;
+    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendar.setEndTime(calendarRequestDto.getEndTime());
+        calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendarRepository.save(calendar);
+        return calendar;
+    }
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -72,7 +84,6 @@ public class CalendarService {
         map.put("data",calendarResponseDtoList);
         return map;
     }
-
     public Map<String, Object> calendarsRead(Authentication authentication) {
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUser(user);
@@ -99,6 +110,7 @@ public class CalendarService {
         calendarRepository.save(calendar);
         return this.calendarToDto(calendar);
     }
+
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
 
@@ -133,25 +145,24 @@ public class CalendarService {
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
                 .filter(calendar -> calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
-                || calendar.getRepeat() == "Day"
-                                ||calendar.getRepeat() == "Week"
-                                && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
-                                && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
-                                || calendar.getRepeat() =="Month"
-                                && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
-                                && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
-                                || calendar.getRepeat()=="Year"
-                                && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
-                                && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()
+                        || calendar.getRepeat() == "Day"
+                        ||calendar.getRepeat() == "Week"
+                        && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
+                        && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
+                        || calendar.getRepeat() =="Month"
+                        && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
+                        && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
+                        || calendar.getRepeat()=="Year"
+                        && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
+                        && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()
                 )
                 .collect(Collectors.toList());
     }
-
     private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList,int year, int month){
         Date date = new Date(year,month,1);
         return calendarList.stream()
                 .filter(calendar -> calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
-                &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year
+                        &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year
                         ||calendar.getRepeat() == "Day"
                         ||calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
@@ -197,17 +208,6 @@ public class CalendarService {
                 .startTime(calendarRequestDto.getStartTime())
                 .endTime(calendarRequestDto.getEndTime())
                 .build();
-    }
-    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
-        calendar.setMemo(calendarRequestDto.getMemo());
-        calendar.setStartDate(calendarRequestDto.getStartDate());
-        calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalendarName(calendarRequestDto.getCalendarName());
-        calendar.setColor(calendarRequestDto.getColor());
-        calendar.setStartTime(calendarRequestDto.getStartTime());
-        calendar.setEndTime(calendarRequestDto.getEndTime());
-        calendarRepository.save(calendar);
-        return calendar;
     }
 
 }
