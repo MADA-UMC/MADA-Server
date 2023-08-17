@@ -209,6 +209,7 @@ public class CalendarService {
                 .endDate(calendarRequestDto.getEndDate())
                 .startTime(calendarRequestDto.getStartTime())
                 .endTime(calendarRequestDto.getEndTime())
+                .color(calendarRequestDto.getColor())
                 .build();
     }
 
