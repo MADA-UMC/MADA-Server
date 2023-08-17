@@ -123,8 +123,8 @@ public class TimetableController {
                 Map<String, Object> calendarMap = new LinkedHashMap<>();
                 calendarMap.put("CalendarName", calendar.getCalendarName());
                 calendarMap.put("color", calendar.getColor());
-                calendarMap.put("startDate", calendar.getStartDate().toLocalDate()); // 시작 시간
-                calendarMap.put("endDate", calendar.getEndDate().toLocalDate());     // 종료 시간
+                calendarMap.put("startTime", calendar.getStartTime()); // 시작 시간
+                calendarMap.put("endTime", calendar.getEndTime());     // 종료 시간
                 calendarList.add(calendarMap);
             }
         }
