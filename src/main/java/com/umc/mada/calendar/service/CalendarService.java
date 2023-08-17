@@ -25,11 +25,13 @@ import java.util.stream.Collectors;
 public class CalendarService {
     private final CalendarRepository calendarRepository;
     private final UserRepository userRepository;
+
     @Autowired
-    public  CalendarService(CalendarRepository calendarRepository, UserRepository userRepository){
+    public CalendarService(CalendarRepository calendarRepository, UserRepository userRepository){
         this.calendarRepository = calendarRepository;
         this.userRepository = userRepository;
     }
+
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'N');
@@ -56,6 +58,7 @@ public class CalendarService {
         map.put("data",calendarResponseDtoList);
         return map;
     }
+
     public Map<String,Object> calendarsReadByDate(Authentication authentication,Date date){
         User user = this.getUser(authentication);
 
@@ -69,6 +72,7 @@ public class CalendarService {
         map.put("data",calendarResponseDtoList);
         return map;
     }
+
     public Map<String, Object> calendarsRead(Authentication authentication) {
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUser(user);
@@ -83,7 +87,7 @@ public class CalendarService {
     }
     //동일 이름의 일정이 동일한 날짜에 있는지 검증
     //캘린더 생성코드
-    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) throws ManyD_dayException,SameCalendarNameExist{
+    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) {
         User user = this.getUser(authentication);
        /* if (calendarRequestDto.getDday() == 'Y' && tooManyD_dayExists(authentication)) {
             throw new ManyD_dayException("D_day가 3개 이상 존재합니다");
@@ -91,30 +95,16 @@ public class CalendarService {
         if(calendarNameExist(authentication,calendarRequestDto)){
             throw new SameCalendarNameExist("기간 중에 동일한 이름의 캘린더가 존재합니다");
         }*/
-        Calendar calendar = Calendar.builder()
-                //User Entity 부재
-                .user(user)
-                .calendarName(calendarRequestDto.getCalendarName())
-                .dday(calendarRequestDto.getDday())
-                .repeat(calendarRequestDto.getRepeat())
-                .memo(calendarRequestDto.getMemo())
-                .startDate(calendarRequestDto.getStartDate())
-                .endDate(calendarRequestDto.getEndDate())
-                .build();
+        Calendar calendar = this.calendarBuilder(user,calendarRequestDto);
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(), calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        return this.calendarToDto(calendar);
     }
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
 
         Calendar calendar = calendarRepository.findCalendarById(id);
-        calendar.setMemo(calendarRequestDto.getMemo());
-        calendar.setStartDate(calendarRequestDto.getStartDate());
-        calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalendarName(calendarRequestDto.getCalendarName());
-        calendar.setColor(calendarRequestDto.getColor());
-        calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(),calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
+        return this.calendarToDto(updateCalendar);
     }
 
 
@@ -193,6 +183,31 @@ public class CalendarService {
                 .memo(calendar.getMemo())
                 .repeat(calendar.getRepeat())
                 .build();
+    }
+    private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
+        return Calendar.builder()
+                //User Entity 부재
+                .user(user)
+                .calendarName(calendarRequestDto.getCalendarName())
+                .dday(calendarRequestDto.getDday())
+                .repeat(calendarRequestDto.getRepeat())
+                .memo(calendarRequestDto.getMemo())
+                .startDate(calendarRequestDto.getStartDate())
+                .endDate(calendarRequestDto.getEndDate())
+                .startTime(calendarRequestDto.getStartTime())
+                .endTime(calendarRequestDto.getEndTime())
+                .build();
+    }
+    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendar.setEndTime(calendarRequestDto.getEndTime());
+        calendarRepository.save(calendar);
+        return calendar;
     }
 
 }
