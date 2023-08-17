@@ -24,12 +24,26 @@ import java.util.stream.Collectors;
 @Transactional //트렌젝션 처리
 public class CalendarService {
     private final CalendarRepository calendarRepository;
+    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendar.setEndTime(calendarRequestDto.getEndTime());
+        calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendarRepository.save(calendar);
+        return calendar;
+    }
+
     private final UserRepository userRepository;
+
     @Autowired
-    public  CalendarService(CalendarRepository calendarRepository, UserRepository userRepository){
+    public CalendarService(CalendarRepository calendarRepository, UserRepository userRepository){
         this.calendarRepository = calendarRepository;
         this.userRepository = userRepository;
     }
+
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'N');
@@ -56,6 +70,7 @@ public class CalendarService {
         map.put("data",calendarResponseDtoList);
         return map;
     }
+
     public Map<String,Object> calendarsReadByDate(Authentication authentication,Date date){
         User user = this.getUser(authentication);
 
@@ -83,7 +98,7 @@ public class CalendarService {
     }
     //동일 이름의 일정이 동일한 날짜에 있는지 검증
     //캘린더 생성코드
-    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) { //throws ManyD_dayException,SameCalendarNameExist
+    public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) {
         User user = this.getUser(authentication);
        /* if (calendarRequestDto.getDday() == 'Y' && tooManyD_dayExists(authentication)) {
             throw new ManyD_dayException("D_day가 3개 이상 존재합니다");
@@ -91,31 +106,17 @@ public class CalendarService {
         if(calendarNameExist(authentication,calendarRequestDto)){
             throw new SameCalendarNameExist("기간 중에 동일한 이름의 캘린더가 존재합니다");
         }*/
-        Calendar calendar = Calendar.builder()
-                //User Entity 부재
-                .user(user)
-                .color(calendarRequestDto.getColor())
-                .calendarName(calendarRequestDto.getCalendarName())
-                .dday(calendarRequestDto.getDday())
-                .repeat(calendarRequestDto.getRepeat())
-                .memo(calendarRequestDto.getMemo())
-                .startDate(calendarRequestDto.getStartDate())
-                .endDate(calendarRequestDto.getEndDate())
-                .build();
+        Calendar calendar = this.calendarBuilder(user,calendarRequestDto);
         calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(), calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        return this.calendarToDto(calendar);
     }
+
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
 
         Calendar calendar = calendarRepository.findCalendarById(id);
-        calendar.setMemo(calendarRequestDto.getMemo());
-        calendar.setStartDate(calendarRequestDto.getStartDate());
-        calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalendarName(calendarRequestDto.getCalendarName());
-        calendar.setColor(calendarRequestDto.getColor());
-        calendarRepository.save(calendar);
-        return new CalendarResponseDto(calendarRequestDto.getCalendarId(),calendarRequestDto.getCalendarName(),calendarRequestDto.getStartDate(),calendarRequestDto.getEndDate(),calendarRequestDto.getDday(),calendarRequestDto.getRepeat(),calendarRequestDto.getMemo(), calendarRequestDto.getColor());
+        Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
+        return this.calendarToDto(updateCalendar);
     }
 
 
@@ -144,25 +145,24 @@ public class CalendarService {
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
                 .filter(calendar -> calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
-                || calendar.getRepeat() == "Day"
-                                ||calendar.getRepeat() == "Week"
-                                && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
-                                && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
-                                || calendar.getRepeat() =="Month"
-                                && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
-                                && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
-                                || calendar.getRepeat()=="Year"
-                                && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
-                                && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()
+                        || calendar.getRepeat() == "Day"
+                        ||calendar.getRepeat() == "Week"
+                        && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
+                        && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
+                        || calendar.getRepeat() =="Month"
+                        && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
+                        && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
+                        || calendar.getRepeat()=="Year"
+                        && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
+                        && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()
                 )
                 .collect(Collectors.toList());
     }
-
     private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList,int year, int month){
         Date date = new Date(year,month,1);
         return calendarList.stream()
                 .filter(calendar -> calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
-                &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year
+                        &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year
                         ||calendar.getRepeat() == "Day"
                         ||calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
@@ -193,6 +193,20 @@ public class CalendarService {
                 .dday(calendar.getDday())
                 .memo(calendar.getMemo())
                 .repeat(calendar.getRepeat())
+                .build();
+    }
+    private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
+        return Calendar.builder()
+                //User Entity 부재
+                .user(user)
+                .calendarName(calendarRequestDto.getCalendarName())
+                .dday(calendarRequestDto.getDday())
+                .repeat(calendarRequestDto.getRepeat())
+                .memo(calendarRequestDto.getMemo())
+                .startDate(calendarRequestDto.getStartDate())
+                .endDate(calendarRequestDto.getEndDate())
+                .startTime(calendarRequestDto.getStartTime())
+                .endTime(calendarRequestDto.getEndTime())
                 .build();
     }
 

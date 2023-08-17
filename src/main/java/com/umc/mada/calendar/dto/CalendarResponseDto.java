@@ -8,6 +8,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Builder
 @AllArgsConstructor
@@ -20,6 +21,8 @@ public class CalendarResponseDto {
    private Date startDate;
    private Date endDate;
    private Character dday;
+   private LocalTime startTime;
+   private LocalTime endTime;
    private String  repeat;
    private String memo;
    private String color;
