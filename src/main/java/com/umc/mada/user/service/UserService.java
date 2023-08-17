@@ -36,6 +36,15 @@ public class UserService {
         return user;
     }
 
+    public Map<String, String> changeProfile(Authentication authentication) {
+        User user = getUser(authentication);
+        Map<String, String> userProfile = new HashMap<>();
+        userProfile.put("nickname", user.getNickname());
+        userProfile.put("email", user.getEmail());
+        userRepository.save(user);
+        return userProfile;
+    }
+
     public NicknameResponseDto changeNickname(User userAccount, NicknameRequestDto changeNicknameRequestDto) {
         User user = userRepository.findById(userAccount.getId()).get();
         user.updateNickname(changeNicknameRequestDto.getNickname());
