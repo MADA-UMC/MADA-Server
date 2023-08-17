@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.umc.mada.todo.repository.TodoRepository;
+import com.umc.mada.timetable.repository.TimetableRepository;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +24,15 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
+    private final TimetableRepository timetableRepository;
 
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository){
+    public UserController(UserService userService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
         this.userService = userService;
         this.userRepository = userRepository;
+        this.todoRepository = todoRepository;
+        this.timetableRepository = timetableRepository;
     }
 
     @GetMapping("/test")
@@ -95,16 +101,17 @@ public class UserController {
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/subscribe")
-    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        return ResponseEntity.ok(map);
+    public ResponseEntity<Void> userSubscribe(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+        userService.userSubscribeSettings(authentication,is_subscribe);
+        return ResponseEntity.ok().build();
     }
     @PostMapping("/pageInfo")
     public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
-      return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
     }
 
-//    @PatchMapping("/isAlarm")
-//    public BaseResponse<>
+//    @PatchMapping("/isalarm/{id}")
+//    public ResponseEntity<>
 }

@@ -8,7 +8,6 @@ import com.umc.mada.file.domain.File;
 import com.umc.mada.file.repository.FileRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.umc.mada.global.BaseResponseStatus;
@@ -45,7 +44,7 @@ public class CategoryService {
         // 존재하지 않는 아이콘인 경우 예외 처리
         //validateIconId(categoryRequestDto.getIcon_id());
 
-        File icon = fileRepository.findFileById(categoryRequestDto.getIconId().getId())
+        File icon = fileRepository.findFileById(categoryRequestDto.getIconId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
@@ -53,7 +52,7 @@ public class CategoryService {
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
-        return new CategoryResponseDto(savedCategory.getCategoryName(), savedCategory.getColor(), savedCategory.getIconId());
+        return CategoryResponseDto.of(savedCategory);
     }
 
     /**
@@ -85,17 +84,20 @@ public class CategoryService {
         }
 
         // iconId 변경 처리
-        if (categoryRequestDto.getIconId() != null) {
-            File icon = fileRepository.findById(categoryRequestDto.getIconId().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
-            category.setIconId(icon);
-        }
+        File icon = fileRepository.findById(categoryRequestDto.getIconId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
+        category.setIcon(icon);
+//        if (categoryRequestDto.getIconId() != null) {
+//            File icon = fileRepository.findById(categoryRequestDto.getIconId())
+//                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
+//            category.setIconId(icon);
+//        }
 
         // 수정된 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category updatedCategory = categoryRepository.save(category);
 
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
-        return new CategoryResponseDto(updatedCategory.getCategoryName(), updatedCategory.getColor(), updatedCategory.getIconId());
+        return CategoryResponseDto.of(updatedCategory);
     }
 
     /**
@@ -125,7 +127,7 @@ public class CategoryService {
         List<Category> userCategories = categoryRepository.findCategoriesByUserId(userId);
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
         return userCategories.stream()
-                .map(category -> new CategoryResponseDto(category.getCategoryName(), category.getColor(), category.getIconId()))
+                .map(CategoryResponseDto::of)
                 .collect(Collectors.toList());
     }
 

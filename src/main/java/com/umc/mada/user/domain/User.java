@@ -5,10 +5,11 @@ import javax.persistence.*;
 //import com.umc.mada.BaseTimeEntity;
 import com.umc.mada.custom.domain.HaveItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.umc.mada.user.dto.alarm.AlarmSetRequestDto;
+import com.umc.mada.user.dto.user.UserRequestDto;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,7 +17,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "USER")
@@ -29,10 +29,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String authId;
     private String nickname;
-
     @Column(unique = true, nullable = false)
     private String email;
-    private boolean subscribe;
+    private Boolean subscribe;
     private String provider;
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -100,5 +99,9 @@ public class User {
         this.newTodoStartSetting = newTodoStartSetting;
         return this;
     }
+
+//    public boolean updateAlarm(AlarmSetRequestDto alarmSetRequestDto) {
+//        this.isAlarm = alarmSetRequestDto.isSet();
+//    }
 }
 

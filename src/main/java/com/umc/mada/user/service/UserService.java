@@ -1,9 +1,12 @@
 package com.umc.mada.user.service;
 
 import com.umc.mada.user.domain.User;
+import com.umc.mada.user.dto.alarm.AlarmSetRequestDto;
+import com.umc.mada.user.dto.alarm.AlarmSetResponseDto;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
+import com.umc.mada.user.dto.user.UserResponseDto;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,8 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -37,32 +42,45 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
-
-
-    public boolean userSubscribeSettings(Authentication authentication, boolean is_subscribe){
+    public Boolean userSubscribeSettings(Authentication authentication, Map<String,Boolean> is_subscribe){
         User user = this.getUser(authentication);
-        user.updateSubscribe(is_subscribe);
-        return user.isSubscribe();
+        user.updateSubscribe(is_subscribe.get("is_subscribe"));
+        userRepository.save(user);
+        return user.getSubscribe();
     }
     public Map<String,Object> userPageSettings(Authentication authentication, Map<String,Boolean> map){
         User user = this.getUser(authentication);
-        user.updatePageSetting(map.get("setEndTodoBackSetting"),map.get("setNewTodoStartSetting"),map.get("setStartTodoAtMonday"));
+        user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
         Map<String,Object> userPageInfos = new HashMap<>();
-        userPageInfos.put("setEndTodoBackSetting",user.isEndTodoBackSetting());
-        userPageInfos.put("setNewTodoStartSetting",user.isNewTodoStartSetting());
-        userPageInfos.put("setStartTodoAtMonday",user.isStartTodoAtMonday());
+        userPageInfos.put("endTodoBackSetting",user.isEndTodoBackSetting());
+        userPageInfos.put("newTodoStartSetting",user.isNewTodoStartSetting());
+        userPageInfos.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        userRepository.save(user);
         return userPageInfos;
     }
 
     public void nickNameSetting(String nickName, User user) {
         userRepository.save(user.setNickname(nickName));
     }
-
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }
+
     private User getUser(Authentication authentication){
         Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
         return optionalUser.get();
     }
+
+//    @Override
+//    @Transactional
+//    public AlarmSetResponseDto updateAlarm(Long id, AlarmSetRequestDto alarmSetRequestDto) {
+//
+//    }
+//    @Transactional
+//    public UserResponseDto toggleAlarm(User userAccount) {
+//        User user = userRepository.findUserById(userAccount.getId()).get();
+//        user.updateAlarm(!user.getIsAlarm());
+//        userRepository.save(user);
+//        return UserResponseDto.of()
+//    }
 }

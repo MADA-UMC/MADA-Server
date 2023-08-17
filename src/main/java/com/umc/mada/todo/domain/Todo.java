@@ -9,7 +9,6 @@ import javax.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -34,7 +33,7 @@ public class Todo{
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
-    private Category categoryId; // 카테고리 ID
+    private Category category; // 카테고리 ID
 
     @Column(name = "todo_name", nullable = false)
     private String todoName; // 투두 이름
@@ -73,10 +72,10 @@ public class Todo{
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Todo(User userId, LocalDate date, Category categoryId, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate) {
+    public Todo(User userId, LocalDate date, Category category, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate) {
         this.userId = userId;
         this.date = date;
-        this.categoryId = categoryId;
+        this.category = category;
         this.todoName = todoName;
         this.complete = complete;
         this.repeat = repeat;
