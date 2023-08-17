@@ -38,7 +38,7 @@ public class Category {
     @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "icon_id", referencedColumnName = "id", nullable = false)
-    private File icon; // 아이콘 ID (외래키)
+    private Icon icon; // 아이콘 ID (외래키)
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
@@ -49,7 +49,7 @@ public class Category {
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Category(User userId, String categoryName, String color, File icon) {
+    public Category(User userId, String categoryName, String color, Icon icon) {
         this.userId = userId;
         this.categoryName = categoryName;
         this.color = color;
