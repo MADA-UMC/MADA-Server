@@ -1,11 +1,11 @@
 package com.umc.mada.category.service;
 
 import com.umc.mada.category.domain.Category;
+import com.umc.mada.category.domain.Icon;
 import com.umc.mada.category.dto.CategoryRequestDto;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.repository.CategoryRepository;
-import com.umc.mada.file.domain.File;
-import com.umc.mada.file.repository.FileRepository;
+import com.umc.mada.category.repository.IconRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final FileRepository fileRepository;
+    private final IconRepository iconRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public CategoryService(UserRepository userRepository, CategoryRepository categoryRepository, FileRepository fileRepository) {
+    public CategoryService(UserRepository userRepository, CategoryRepository categoryRepository, IconRepository iconRepository) {
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
-        this.fileRepository = fileRepository;
+        this.iconRepository = iconRepository;
     }
 
     /**
@@ -44,7 +44,7 @@ public class CategoryService {
         // 존재하지 않는 아이콘인 경우 예외 처리
         //validateIconId(categoryRequestDto.getIcon_id());
 
-        File icon = fileRepository.findFileById(categoryRequestDto.getIconId())
+        Icon icon = iconRepository.findIconById(categoryRequestDto.getIconId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
@@ -84,14 +84,11 @@ public class CategoryService {
         }
 
         // iconId 변경 처리
-        File icon = fileRepository.findById(categoryRequestDto.getIconId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
-        category.setIcon(icon);
-//        if (categoryRequestDto.getIconId() != null) {
-//            File icon = fileRepository.findById(categoryRequestDto.getIconId())
-//                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
-//            category.setIconId(icon);
-//        }
+        if (categoryRequestDto.getIconId() != null){
+            Icon icon = iconRepository.findIconById(categoryRequestDto.getIconId())
+                    .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
+            category.setIcon(icon);
+        }
 
         // 수정된 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category updatedCategory = categoryRepository.save(category);
@@ -105,6 +102,7 @@ public class CategoryService {
      *
      * @param categoryId 카테고리 ID
      */
+    @Transactional
     public void deleteCategory(User userId, int categoryId) {
         // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
         Optional<Category> optionalCategory = categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
@@ -148,8 +146,8 @@ public class CategoryService {
 
     // 아이콘 ID 유효성 검사 메서드
     private void validateIconId(int iconId) {
-        Optional<File> optionalFile = fileRepository.findFileById(iconId);
-        if (optionalFile.isEmpty()) {
+        Optional<Icon> optionalIcon = iconRepository.findIconById(iconId);
+        if (optionalIcon.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 아이콘 ID입니다.");
         }
     }

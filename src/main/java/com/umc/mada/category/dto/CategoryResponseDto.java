@@ -13,7 +13,7 @@ public class CategoryResponseDto {
     private int id;
     private String categoryName; // 카테고리명
     private String color; // 카테고리 색상
-    private int iconId; //아이콘 ID
+    private Integer iconId; //아이콘 ID
     @Builder
     public CategoryResponseDto(int id, String categoryName, String color, Integer iconId){
         this.id = id;
