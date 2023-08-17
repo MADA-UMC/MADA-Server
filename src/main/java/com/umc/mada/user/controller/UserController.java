@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.timetable.repository.TimetableRepository;
 
+import javax.swing.text.html.Option;
+import javax.xml.ws.Response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -85,9 +87,19 @@ public class UserController {
 //    }
 
     /**
+     * 프로필 편집창 API
+     */
+    @GetMapping("/profile/change")
+    public ResponseEntity<Map<String, Object>>userProfile(Authentication authentication) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.changeProfile(authentication));
+        return ResponseEntity.ok(map);
+    }
+
+    /**
      * 닉네임 변경 API
      */
-    @PatchMapping("/change/nickname")
+    @PatchMapping("/profile/change/nickname")
     public ResponseEntity<Map<String, Object>>changeNickname(Authentication authentication,
                                                                   @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
@@ -100,17 +112,29 @@ public class UserController {
 //        }
         return ResponseEntity.ok(map);
     }
+
+    /**
+     * 구독 API
+     */
     @PatchMapping("/subscribe")
-    public ResponseEntity<Map<String,Object>> userSubscribe(Authentication authentication,@RequestBody boolean is_subscribe){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        return ResponseEntity.ok(map);
+    public ResponseEntity<Void> userSubscribe(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
+        userService.userSubscribeSettings(authentication,is_subscribe);
+        return ResponseEntity.ok().build();
     }
+
+    /**
+     * 화면 설정 API
+     */
     @PostMapping("/pageInfo")
     public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
         return ResponseEntity.ok(userService.userPageSettings(authentication,map));
     }
 
+    /**
+     * 알람 설정 API
+     */
 //    @PatchMapping("/isalarm/{id}")
 //    public ResponseEntity<>
 }

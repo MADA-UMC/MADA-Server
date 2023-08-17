@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 @Entity
@@ -38,6 +39,10 @@ public class Calendar {
     private Date startDate;
     @Column(name = "end_date")
     private Date endDate;
+    @Column(name ="start_time")
+    private LocalTime startTime;
+    @Column(name = "end_time")
+    private LocalTime endTime;
     @Column(name = "`repeat`")
     //No, Day, Week, Month, Year
     private String  repeat;

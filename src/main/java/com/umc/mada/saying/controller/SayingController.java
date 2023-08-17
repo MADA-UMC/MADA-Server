@@ -11,6 +11,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SayingController {
     private final SayingService sayingService;
-    @GetMapping("/saying")
+    @GetMapping("/my")
     public List<SayingResponseDto> getAllSaying() { return sayingService.findAllSaying(); }
 }

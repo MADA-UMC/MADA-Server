@@ -31,7 +31,7 @@ public class User {
     private String nickname;
     @Column(unique = true, nullable = false)
     private String email;
-    private boolean subscribe;
+    private Boolean subscribe;
     private String provider;
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
@@ -97,6 +97,12 @@ public class User {
         this.startTodoAtMonday = startTodoAtMonday;
         this.endTodoBackSetting = endTodoBackSetting;
         this.newTodoStartSetting = newTodoStartSetting;
+        return this;
+    }
+
+    public User updateProfile(String nickname, String email) {
+        this.nickname = nickname;
+        this.email = email;
         return this;
     }
 

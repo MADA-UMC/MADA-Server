@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Builder
 @AllArgsConstructor
@@ -18,6 +19,8 @@ public class CalendarRequestDto {
     private Date startDate;
     private Date endDate;
     private String color;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private String  repeat;
     private Character dday;
     private String memo;
