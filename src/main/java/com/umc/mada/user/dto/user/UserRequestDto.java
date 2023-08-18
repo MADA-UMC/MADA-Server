@@ -10,9 +10,4 @@ public class UserRequestDto {
     public static class UpdateNickname {
         private String nickname;
     }
-
-    public static class UpdateAlarm {
-        private Long id;
-        private boolean isAlarm;
-    }
 }
