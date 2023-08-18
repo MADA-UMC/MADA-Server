@@ -9,6 +9,5 @@ import javax.validation.constraints.NotNull;
 public class CategoryRequestDto {
     private String categoryName; // 카테고리명
     private String color; // 카테고리 색상
-    @NotNull
-    private int iconId; //아이콘 ID
+    private Integer iconId; //아이콘 ID
 }
