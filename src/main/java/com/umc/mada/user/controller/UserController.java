@@ -1,11 +1,14 @@
 package com.umc.mada.user.controller;
 
+import com.umc.mada.timetable.domain.Timetable;
+import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,9 +19,8 @@ import com.umc.mada.timetable.repository.TimetableRepository;
 
 import javax.swing.text.html.Option;
 import javax.xml.ws.Response;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 
 
 @RestController
@@ -130,6 +132,42 @@ public class UserController {
     @PostMapping("/pageInfo")
     public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
         return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+    }
+
+    @GetMapping("/statistics/day/{date}")
+    public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
+        List<Timetable> timetables = timetableRepository.findTimetablesByUserIdAndDateIs(user, date);
+
+        List<Map<String, Object>> todoList = new ArrayList<>();
+        for (Todo todo : todos) {
+            Map<String, Object> todoMap = new LinkedHashMap<>();
+            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // Category의 아이콘 ID
+            todoMap.put("categoryName", todo.getCategory().getCategoryName());
+            todoMap.put("todoName", todo.getTodoName());
+            todoMap.put("complete", todo.getComplete());
+            todoList.add(todoMap);
+        }
+
+        List<Map<String, Object>> timetableList = new ArrayList<>();
+        for (Timetable timetable : timetables) {
+            Map<String, Object> timetableMap = new LinkedHashMap<>();
+            timetableMap.put("scheduleName", timetable.getScheduleName());
+            timetableMap.put("color", timetable.getColor());
+            timetableMap.put("startTime", timetable.getStartTime());
+            timetableMap.put("endTime", timetable.getEndTime());
+            timetableMap.put("memo", timetable.getMemo());
+            timetableList.add(timetableMap);
+        }
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("todoList", todoList);
+        data.put("timetableList", timetableList);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data",data);
+        return ResponseEntity.ok().body(result);
     }
 
     /**
