@@ -1,8 +1,6 @@
 package com.umc.mada.user.service;
 
 import com.umc.mada.user.domain.User;
-import com.umc.mada.user.dto.alarm.AlarmSetRequestDto;
-import com.umc.mada.user.dto.alarm.AlarmSetResponseDto;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
@@ -57,7 +55,7 @@ public class UserService {
         userRepository.save(user);
         return user.getSubscribe();
     }
-    public Map<String,Object> userPageSettings(Authentication authentication, Map<String,Boolean> map){
+    public Map<String, Object> userPageSettings(Authentication authentication, Map<String, Boolean> map) {
         User user = this.getUser(authentication);
         user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
         Map<String,Object> userPageInfos = new HashMap<>();
@@ -68,6 +66,19 @@ public class UserService {
         return userPageInfos;
     }
 
+    public Map<String, Object> userAlarmSettings(Authentication authentication, Map<String, Boolean>map) {
+        User user = this.getUser(authentication);
+        user.updateAlarmSetting(map.get("calendarAlarmSetting"), map.get("dDayAlarmSetting"), map.get("timetableAlarmSetting"));
+        Map<String, Object> userAlarmInfos = new HashMap<>();
+        userAlarmInfos.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
+        userAlarmInfos.put("dDayAlarmSetting", user.isDDayAlarmSetting());
+        userAlarmInfos.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
+        userRepository.save(user);
+        return userAlarmInfos;
+    }
+
+    public void nickNameSetting(String nickName, User user) {
+        userRepository.save(user.setNickname(nickName));
     public void nickNameSetting(Map<String, String> nickName, User user) {
         userRepository.save(user.setNickname(nickName.get("nickName")));
     }
@@ -79,17 +90,4 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
         return optionalUser.get();
     }
-
-//    @Override
-//    @Transactional
-//    public AlarmSetResponseDto updateAlarm(Long id, AlarmSetRequestDto alarmSetRequestDto) {
-//
-//    }
-//    @Transactional
-//    public UserResponseDto toggleAlarm(User userAccount) {
-//        User user = userRepository.findUserById(userAccount.getId()).get();
-//        user.updateAlarm(!user.getIsAlarm());
-//        userRepository.save(user);
-//        return UserResponseDto.of()
-//    }
 }

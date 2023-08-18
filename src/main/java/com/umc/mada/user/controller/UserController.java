@@ -157,6 +157,8 @@ public class UserController {
     /**
      * 알람 설정 API
      */
-//    @PatchMapping("/isalarm/{id}")
-//    public ResponseEntity<>
+    @PatchMapping("/alarmInfo")
+    public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
+        return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
+    }
 }
