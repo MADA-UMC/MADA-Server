@@ -1,13 +1,11 @@
 package com.umc.mada.auth.handler;
 
-import com.umc.mada.auth.dto.OAuth2Attributes;
-import com.umc.mada.auth.jwt.JwtTokenProvider;
+import com.umc.mada.auth.handler.jwt.JwtTokenProvider;
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -17,10 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sound.midi.SysexMessage;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -48,23 +44,35 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         CusomtUserDetails cusomtUserDetails = (CusomtUserDetails) authentication.getPrincipal();
         String redirectUrl = makeRedirectUrl(accessToken, cusomtUserDetails.getNewUser());
 
-//        @Async
         response.setHeader("Content-type", "text/plain");
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
         response.sendRedirect(redirectUrl);
         PrintWriter writer = response.getWriter();
         writer.println("ok");
+//        @Async
+//        response.setContentType("text/html;charset=UTF-8");
+//        response.setHeader("Content-type", "text/plain");
+//        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
+////        response.setContentType("application/json;charset=UTF-8");
+//
+//        response.sendRedirect(redirectUrl);
+//        PrintWriter writer = response.getWriter();
+//        writer.println("ok");
+//        PrintWriter out = response.getWriter();
+//        //스트림에 텍스트를 기록
+//        out.println(accessToken);
+//        out.flush();
         System.out.println("성공");
         System.out.println(response.getHeader(HttpHeaders.AUTHORIZATION));
     }
 
     private String makeRedirectUrl(String accessToken, boolean newUser){
         if(newUser){ //회원가입한 유저라면 닉네임 입력받는 곳으로 리다이렉트
-            return UriComponentsBuilder.fromUriString("http://15.165.210.13/user/signup") //"http://localhost:8080/login/oauth2/code/google"
+            return UriComponentsBuilder.fromUriString("http://15.165.210.13:8080/user/signup") //"http://localhost:8080/login/oauth2/code/google"
                     .queryParam("token", accessToken)
                     .build().toUriString();
         }
-        return UriComponentsBuilder.fromUriString("http://15.165.210.13/user/test") //"http://localhost:8080/login/oauth2/code/google"
+        return UriComponentsBuilder.fromUriString("http://15.165.210.13:8080/user/test") //"http://localhost:8080/login/oauth2/code/google"
                 .queryParam("token", accessToken)
                 .build().toUriString();
     }
