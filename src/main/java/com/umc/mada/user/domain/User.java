@@ -5,7 +5,6 @@ import javax.persistence.*;
 //import com.umc.mada.BaseTimeEntity;
 import com.umc.mada.custom.domain.HaveItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.umc.mada.user.dto.alarm.AlarmSetRequestDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -43,9 +42,16 @@ public class User {
     @Column(name = "new_todo_start_setting") //TODO: Cannot resolve column
     private boolean newTodoStartSetting;
     private boolean account_expired;
+    private String refreshToken;
+
     @Column(nullable = false, name = "is_alarm") //TODO: Cannot resolve column
     private boolean isAlarm;
-    private String refreshToken;
+    @Column(name = "calendar_alarm_setting") //TODO: Cannot resolve column
+    private boolean calendarAlarmSetting;
+    @Column(name = "d_day_alarm_setting") //TODO: Cannot resolve column
+    private boolean dDayAlarmSetting;
+    @Column(name = "timetable_alarm_setting") //TODO: Cannot resolve column
+    private boolean timetableAlarmSetting;
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false) //TODO: Cannot resolve column
@@ -93,10 +99,17 @@ public class User {
         this.nickname = nickname;
         return this;
     }
-    public User updatePageSetting(boolean startTodoAtMonday, boolean endTodoBackSetting,boolean newTodoStartSetting){
+    public User updatePageSetting(boolean endTodoBackSetting, boolean newTodoStartSetting, boolean startTodoAtMonday) {
         this.startTodoAtMonday = startTodoAtMonday;
         this.endTodoBackSetting = endTodoBackSetting;
         this.newTodoStartSetting = newTodoStartSetting;
+        return this;
+    }
+
+    public User updateAlarmSetting(boolean calendarAlarmSetting, boolean dDayAlarmSetting, boolean timetableAlarmSetting) {
+        this.calendarAlarmSetting = calendarAlarmSetting;
+        this.dDayAlarmSetting = dDayAlarmSetting;
+        this.timetableAlarmSetting = timetableAlarmSetting;
         return this;
     }
 
@@ -105,9 +118,5 @@ public class User {
         this.email = email;
         return this;
     }
-
-//    public boolean updateAlarm(AlarmSetRequestDto alarmSetRequestDto) {
-//        this.isAlarm = alarmSetRequestDto.isSet();
-//    }
 }
 

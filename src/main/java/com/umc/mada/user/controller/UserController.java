@@ -8,6 +8,7 @@ import com.umc.mada.user.repository.UserRepository;
 import com.umc.mada.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.*;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.timetable.repository.TimetableRepository;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import javax.swing.text.html.Option;
 import javax.xml.ws.Response;
 import java.time.LocalDate;
@@ -40,14 +47,25 @@ public class UserController {
     }
 
     @GetMapping("/test")
-    public ResponseEntity<?> test(Authentication authentication) { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public void test(Authentication authentication, HttpServletResponse response, @RequestParam String token) throws IOException { //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 //        System.out.println("oAuth2User = " + oAuth2User);
 //        authentication.getPrincipal()
 //        System.out.println(cusomtUserDetails.getUser());
 //        System.out.println(authentication.getName());
 //        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName());
-        return ResponseEntity.ok().build();
+
+        //httpServletResponse 방법
+        response.setHeader("Content-type", "text/plain");
+        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+        PrintWriter writer = response.getWriter();
+        writer.println("ok");
+
+        //responseEntity 방법
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+//
+//        return ResponseEntity.ok().headers(headers).build();
     }
 
 //    @GetMapping("/oauth2/code/{provider}")
@@ -57,9 +75,18 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
 //    }
 
+    @Operation(description = "dsfasdf")
+    @GetMapping("/signup")
+    public void signupToken(HttpServletResponse response, @RequestParam String token) throws IOException {//
+        response.setHeader("Content-type", "text/plain");
+        response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+        PrintWriter writer = response.getWriter();
+        writer.println("ok");
+    }
+
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
-    @PostMapping("/singup/{nickName}")
-    public ResponseEntity<String> singupNickName(@PathVariable String nickName, Authentication authentication){
+    @PostMapping("/signup/nickName")
+    public ResponseEntity<String> signupNickName(@RequestBody Map<String, String> nickName, Authentication authentication){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         userService.nickNameSetting(nickName, userOptional.get());
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
@@ -103,7 +130,7 @@ public class UserController {
      */
     @PatchMapping("/profile/change/nickname")
     public ResponseEntity<Map<String, Object>>changeNickname(Authentication authentication,
-                                                                  @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
+                                                             @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         Map<String, Object> map = new HashMap<>();
@@ -132,6 +159,14 @@ public class UserController {
     @PostMapping("/pageInfo")
     public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
         return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+    }
+
+    /**
+     * 알람 설정 API
+     */
+    @PatchMapping("/alarmInfo")
+    public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
+        return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
     }
 
     @GetMapping("/statistics/day/{date}")
@@ -169,10 +204,4 @@ public class UserController {
         result.put("data",data);
         return ResponseEntity.ok().body(result);
     }
-
-    /**
-     * 알람 설정 API
-     */
-//    @PatchMapping("/isalarm/{id}")
-//    public ResponseEntity<>
 }

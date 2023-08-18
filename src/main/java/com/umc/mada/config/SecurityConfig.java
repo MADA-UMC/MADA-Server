@@ -65,12 +65,11 @@
 package com.umc.mada.config;
 
 import com.umc.mada.auth.handler.OAuth2LoginSuccessHandler;
-import com.umc.mada.auth.jwt.JwtAuthenticationFilter;
-import com.umc.mada.auth.jwt.JwtTokenProvider;
+import com.umc.mada.auth.handler.jwt.JwtAuthenticationFilter;
+import com.umc.mada.auth.handler.jwt.JwtTokenProvider;
 import com.umc.mada.auth.service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
@@ -90,7 +89,7 @@ public class SecurityConfig{
     private static final String[] ignores = {
             "/favicon.ico",
             "/error", "/swagger-ui/**","/swagger-resources/**",
-            "/user/test"
+            "/user/test", "/user/signup"
     };
 
     @Bean

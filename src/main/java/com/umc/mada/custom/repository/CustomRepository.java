@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CustomRepository extends JpaRepository<CustomItem, Long> {
-    Optional<CustomItem> findCustomItemById(Long id);
+    Optional<CustomItem> findCustomItemById(int id);
 
     List<CustomItem> findCustomItemByItemType(ItemType type);
 }

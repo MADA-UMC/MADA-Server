@@ -16,11 +16,16 @@ import java.time.LocalDateTime;
 public class CustomItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @OneToOne
-    @JoinColumn(name = "file_id")
-    private File file;
+//    @OneToOne
+//    @JoinColumn(name = "file_id")
+//    private File file;
+
+    private String name;
+
+    @Column(name = "file_path")
+    private String filePath;
 
     @Column(name = "type")
     @Enumerated(value = EnumType.STRING)
@@ -38,7 +43,7 @@ public class CustomItem {
 
     @Builder
     public CustomItem(File file, ItemType itemType, String unlock_condition){
-        this.file = file;
+//        this.file = file;
         this.itemType = itemType;
         this.unlock_condition = unlock_condition;
     }
