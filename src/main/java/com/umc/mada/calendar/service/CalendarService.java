@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 @Transactional //트렌젝션 처리
 public class CalendarService {
     private final CalendarRepository calendarRepository;
+
     private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
         calendar.setMemo(calendarRequestDto.getMemo());
         calendar.setStartDate(calendarRequestDto.getStartDate());
@@ -46,7 +47,7 @@ public class CalendarService {
 
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'N');
+        List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'Y');
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
 
         for (Calendar calendar: calendarList) {
@@ -113,7 +114,6 @@ public class CalendarService {
 
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
-
         Calendar calendar = calendarRepository.findCalendarById(id);
         Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
         return this.calendarToDto(updateCalendar);
@@ -144,7 +144,7 @@ public class CalendarService {
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
-                .filter(calendar -> calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
+                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
                         || calendar.getRepeat() == "Day"
                         ||calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
@@ -170,7 +170,7 @@ public class CalendarService {
                         || calendar.getRepeat() =="Month"
                         && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
                         && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
-                        || calendar.getRepeat()=="Year"
+                        || calendar.getRepeat() == "Year"
                         && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
                         && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear())
                 .collect(Collectors.toList());
