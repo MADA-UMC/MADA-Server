@@ -46,7 +46,6 @@ public class Calendar {
     @Column(name = "`repeat`")
     //No, Day, Week, Month, Year
     private String  repeat;
-
     @Column(name = "d_day")
     private Character dday;
     @Column(name = "memo")
