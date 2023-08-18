@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class CustomItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @OneToOne
     @JoinColumn(name = "file_id")

@@ -6,12 +6,12 @@ import lombok.*;
 @Getter
 @NoArgsConstructor
 public class CharacterItemResponse {
-    private Long id;
+    private int id;
     private String itemType;
     private String filePath;
 
     @Builder
-    private CharacterItemResponse(Long id, String itemType, String filePath){
+    private CharacterItemResponse(int id, String itemType, String filePath){
         this.id = id;
         this.itemType = itemType;
         this.filePath = filePath;

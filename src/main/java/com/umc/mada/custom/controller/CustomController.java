@@ -45,7 +45,7 @@ public class CustomController {
 
     @Operation(description = "사용자 캐릭터 착용 아이템 변경")
     @PatchMapping("/change/{item_id}")
-    public ResponseEntity<Void> changeCharacter(Authentication authentication, @PathVariable Long item_id){
+    public ResponseEntity<Void> changeCharacter(Authentication authentication, @PathVariable int item_id){
         User user = findUser(authentication);
         customService.changeUserItem(user, item_id);
         return ResponseEntity.ok().build();
@@ -61,7 +61,7 @@ public class CustomController {
 
     @Operation(description = "아이템 구매")
     @PostMapping("/buy/{item_id}")
-    public ResponseEntity<Void> buyItem(Authentication authentication, @PathVariable Long item_id){
+    public ResponseEntity<Void> buyItem(Authentication authentication, @PathVariable int item_id){
         User user = findUser(authentication);
         customService.buyItem(user, item_id);
         return ResponseEntity.ok().build();
