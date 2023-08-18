@@ -43,13 +43,13 @@ public class CustomController {
         return new ResponseEntity<>(customItemsResponse, HttpStatus.OK);
     }
 
-    @Operation(description = "사용자 캐릭터 착용 아이템 변경")
-    @PatchMapping("/change/{item_id}")
-    public ResponseEntity<Void> changeCharacter(Authentication authentication, @PathVariable int item_id){
-        User user = findUser(authentication);
-        customService.changeUserItem(user, item_id);
-        return ResponseEntity.ok().build();
-    }
+//    @Operation(description = "사용자 캐릭터 착용 아이템 변경")
+//    @PatchMapping("/change/{item_id}")
+//    public ResponseEntity<Void> changeCharacter(Authentication authentication, @RequestParam(value="items_id[]") int[] items_id){
+//        User user = findUser(authentication);
+//        customService.changeUserItem(user, items_id);
+//        return ResponseEntity.ok().build();
+//    }
 
     @Operation(description = "캐릭터 초기화")
     @GetMapping("/reset")

@@ -69,38 +69,54 @@ public class CustomService {
         return customItemsResponse;
     }
 
-    public void changeUserItem(User user, int item_id){
-        Optional<CustomItem> customItem = customRepository.findCustomItemById(item_id);
-        Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
-        HaveItem newhaveItem = newhaveItemOptional.get();
-
-//        Optional<HaveItem> oldhaveItemOptional = user.getHaveItems().stream() //TODO: 예외처리 추가하기(커스텀 예외처리)
-//                .filter(HaveItem::isWearing)
-//                .reduce((a,b) -> {
-//                    try {
-//                        throw new Exception("캐릭터변경오류발생");
-//                    } catch (Exception e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                });
-//        HaveItem oldhaveItem = oldhaveItemOptional.get();
-        //TODO: 아이템 타입 보고 같은 타입 아이템 wearing을 false로 해야함
-        List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
-        for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
-            HaveItem oldhaveItem = oldhaveItemList.get(i);
-            //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
-            if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
-                oldhaveItem.updateHaveItemWearing(false);
-                haveItemRepository.save(oldhaveItem);
-            }
-        }
-
-        newhaveItem.updateHaveItemWearing(true);
-//        oldhaveItem.updateHaveItemWearing(false);
-
-        haveItemRepository.save(newhaveItem);
-//        haveItemRepository.save(oldhaveItem);
-    }
+//    public void changeUserItem(User user, int[] items_id){
+//        for(int item_id : items_id){
+//            Optional<CustomItem> customItem = customRepository.findCustomItemById(item_id);
+//            Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
+//            HaveItem newhaveItem = newhaveItemOptional.get();
+//            List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
+//            for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
+//                HaveItem oldhaveItem = oldhaveItemList.get(i);
+//                //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
+//                if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
+//                    oldhaveItem.updateHaveItemWearing(false);
+//                    haveItemRepository.save(oldhaveItem);
+//                }
+//            }
+//            newhaveItem.updateHaveItemWearing(true);
+//            haveItemRepository.save(newhaveItem);
+//        }
+////        Optional<CustomItem> customItem = customRepository.findCustomItemById(item_id);
+////        Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
+////        HaveItem newhaveItem = newhaveItemOptional.get();
+////
+//////        Optional<HaveItem> oldhaveItemOptional = user.getHaveItems().stream() //TODO: 예외처리 추가하기(커스텀 예외처리)
+//////                .filter(HaveItem::isWearing)
+//////                .reduce((a,b) -> {
+//////                    try {
+//////                        throw new Exception("캐릭터변경오류발생");
+//////                    } catch (Exception e) {
+//////                        throw new RuntimeException(e);
+//////                    }
+//////                });
+//////        HaveItem oldhaveItem = oldhaveItemOptional.get();
+////        //TODO: 아이템 타입 보고 같은 타입 아이템 wearing을 false로 해야함
+////        List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
+////        for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
+////            HaveItem oldhaveItem = oldhaveItemList.get(i);
+////            //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
+////            if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
+////                oldhaveItem.updateHaveItemWearing(false);
+////                haveItemRepository.save(oldhaveItem);
+////            }
+////        }
+////
+////        newhaveItem.updateHaveItemWearing(true);
+//////        oldhaveItem.updateHaveItemWearing(false);
+////
+////        haveItemRepository.save(newhaveItem);
+////        haveItemRepository.save(oldhaveItem);
+//    }
 
     public void resetCharcter(User user){
         List<HaveItem> oldsetItemList = haveItemRepository.findByUser(user); //TODO: 예외처리 추가하기(커스텀 예외처리)
