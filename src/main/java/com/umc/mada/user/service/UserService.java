@@ -68,8 +68,8 @@ public class UserService {
         return userPageInfos;
     }
 
-    public void nickNameSetting(String nickName, User user) {
-        userRepository.save(user.setNickname(nickName));
+    public void nickNameSetting(Map<String, String> nickName, User user) {
+        userRepository.save(user.setNickname(nickName.get("nickName")));
     }
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());

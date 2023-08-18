@@ -78,8 +78,8 @@ public class UserController {
     }
 
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
-    @PostMapping("/signup/{nickName}")
-    public ResponseEntity<String> signupNickName(@PathVariable String nickName, Authentication authentication){
+    @PostMapping("/signup/nickName")
+    public ResponseEntity<String> signupNickName(@RequestBody Map<String, String> nickName, Authentication authentication){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         userService.nickNameSetting(nickName, userOptional.get());
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
