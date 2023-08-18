@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/home/category")
@@ -37,11 +34,13 @@ public class CategoryController {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         CategoryResponseDto newCategory = categoryService.createCategory(user, categoryRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Category", newCategory);
         Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
         //result.put("status", 200);
         //result.put("success", true);
         //result.put("message", "카테고리 생성이 완료되었습니다.");
-        result.put("data", newCategory);
         return ResponseEntity.ok().body(result);
     }
 
@@ -51,11 +50,13 @@ public class CategoryController {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         CategoryResponseDto updatedCategory = categoryService.updateCategory(user, categoryId, categoryRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Category", updatedCategory);
         Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
         //result.put("status", 200);
         //result.put("success", true);
         //result.put("message", "카테고리 수정이 완료되었습니다.");
-        result.put("data", updatedCategory);
         if (updatedCategory != null) {
             return ResponseEntity.ok().body(result);
         } else {
@@ -87,11 +88,13 @@ public class CategoryController {
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
             List<CategoryResponseDto> userCategories = categoryService.getUserCategories(user);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("CategoryList", userCategories);
             Map<String, Object> result = new LinkedHashMap<>();
+            result.put("data", data);
             //result.put("status", 200);
             //result.put("success", true);
             //result.put("message", "카테고리가 정상적으로 조회되었습니다.");
-            result.put("data", userCategories);
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

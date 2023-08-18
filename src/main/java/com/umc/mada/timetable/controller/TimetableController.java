@@ -41,11 +41,13 @@ public class TimetableController {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         TimetableResponseDto newTimetable = timetableService.createTimetable(user, timetableRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Timetable", newTimetable);
         Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
         //result.put("status", 200);
         //result.put("success", true);
         //result.put("message", "시간표 생성이 완료되었습니다.");
-        result.put("data", newTimetable);
         return ResponseEntity.ok().body(result);
     }
 
@@ -55,12 +57,14 @@ public class TimetableController {
         try{
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
-            TimetableResponseDto updatedTimetalbe = timetableService.updateTimetable(user, scheduleId, timetableRequestDto);
+            TimetableResponseDto updatedTimetable = timetableService.updateTimetable(user, scheduleId, timetableRequestDto);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Timetable", updatedTimetable);
             Map<String, Object> result = new LinkedHashMap<>();
+            result.put("data", data);
             //result.put("status", 200);
             //result.put("success", true);
             //result.put("message", "시간표 수정이 완료되었습니다.");
-            result.put("data", updatedTimetalbe);
             return ResponseEntity.ok().body(result);
         }catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -91,11 +95,13 @@ public class TimetableController {
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
             List<TimetableResponseDto> userTimetables = timetableService.getUserTimetable(user, date);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("TimetableList", userTimetables);
             Map<String, Object> result = new LinkedHashMap<>();
+            result.put("data", data);
             //result.put("status", 200);
             //result.put("success", true);
             //result.put("message", "시간표가 정상적으로 조회되었습니다.");
-            result.put("data", userTimetables);
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -103,6 +109,7 @@ public class TimetableController {
     }
 
     @GetMapping("search/date/{date}")
+    // 시간표 추가 시, 특정 유저 일정과 투두 조회 API
     public ResponseEntity<Map<String, Object>> getTodoAndCalendar(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
