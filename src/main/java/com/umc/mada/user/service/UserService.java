@@ -77,8 +77,6 @@ public class UserService {
         return userAlarmInfos;
     }
 
-    public void nickNameSetting(String nickName, User user) {
-        userRepository.save(user.setNickname(nickName));
     public void nickNameSetting(Map<String, String> nickName, User user) {
         userRepository.save(user.setNickname(nickName.get("nickName")));
     }
