@@ -15,6 +15,7 @@ public class ItemsElementResponse {
     @Builder
     private ItemsElementResponse(int id, String name, String itemType, String itemUnlockCondition,String filePath, boolean have){
         this.id = id;
+        this.name = name;
         this.itemType = itemType;
         this.itemUnlockCondition = itemUnlockCondition;
         this.filePath = filePath;
