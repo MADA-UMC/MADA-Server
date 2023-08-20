@@ -1,5 +1,6 @@
 package com.umc.mada.todo.controller;
 
+import com.umc.mada.todo.domain.Repeat;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.service.TodoService;
@@ -96,5 +97,18 @@ public class TodoController {
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/repeat")
+        // 반복 투두 조회 API
+    public ResponseEntity<Map<String, Object>> getUserRepeatTodo(Authentication authentication){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        List<TodoResponseDto> repeatTodos = todoService.getUserRepeatTodo(user);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("RepeatTodoList", repeatTodos);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
+        return ResponseEntity.ok().body(result);
     }
 }
