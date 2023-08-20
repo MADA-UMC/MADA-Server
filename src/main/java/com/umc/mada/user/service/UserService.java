@@ -49,12 +49,14 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
+
     public Boolean userSubscribeSettings(Authentication authentication, Map<String,Boolean> is_subscribe){
         User user = this.getUser(authentication);
         user.updateSubscribe(is_subscribe.get("is_subscribe"));
         userRepository.save(user);
         return user.getSubscribe();
     }
+
     public Map<String, Object> userPageSettings(Authentication authentication, Map<String, Boolean> map) {
         User user = this.getUser(authentication);
         user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
@@ -80,6 +82,7 @@ public class UserService {
     public void nickNameSetting(Map<String, String> nickName, User user) {
         userRepository.save(user.setNickname(nickName.get("nickName")));
     }
+
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }

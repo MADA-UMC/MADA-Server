@@ -21,9 +21,6 @@ import com.umc.mada.timetable.repository.TimetableRepository;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -167,6 +164,9 @@ public class UserController {
         return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
     }
 
+    /**
+     * 투두 일별 통계 API
+     */
     @GetMapping("/statistics/day/{date}")
     public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
