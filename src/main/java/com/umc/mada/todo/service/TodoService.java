@@ -1,6 +1,8 @@
 package com.umc.mada.todo.service;
 
 import com.umc.mada.todo.domain.*;
+import com.umc.mada.todo.dto.TodoAverageCalcRequestDto;
+import com.umc.mada.todo.dto.TodoAverageCalcResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.repository.TodoRepository;
@@ -10,10 +12,13 @@ import com.umc.mada.category.repository.CategoryRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -199,6 +204,7 @@ public class TodoService {
         return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
    }
 
+
     // 투두 이름 유효성 검사 메서드
     private void validateTodoName(String todoName) {
         if (todoName == null || todoName.isEmpty()) {
@@ -221,4 +227,13 @@ public class TodoService {
             throw new IllegalArgumentException("존재하지 않는 카테고리 ID입니다.");
         }
     }
+    private int getWeekOfMonth(LocalDate localDate){
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(localDate.getYear(),localDate.getMonthValue()-1,localDate.getDayOfMonth());
+        return calendar.get(Calendar.WEEK_OF_MONTH);
+    }
+    private int getMonthOfYear(LocalDate localDate){
+        return localDate.getMonthValue();
+    }
+
 }

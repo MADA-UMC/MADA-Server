@@ -93,7 +93,7 @@ public class User {
         this.nickname = nickname;
         return this;
     }
-    public User updatePageSetting( boolean endTodoBackSetting,boolean startTodoAtMonday,boolean newTodoStartSetting){
+    public User updatePageSetting(boolean endTodoBackSetting,boolean newTodoStartSetting,boolean startTodoAtMonday){
         this.startTodoAtMonday = startTodoAtMonday;
         this.endTodoBackSetting = endTodoBackSetting;
         this.newTodoStartSetting = newTodoStartSetting;
