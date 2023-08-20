@@ -32,4 +32,20 @@ public class SayingService {
         }
         return null;
     }
+
+//    @Transactional
+//    public Map<String, Object> findAllSaying() {
+//        try {
+//            List<Saying> sayingList = sayingRepository.findAllDesc();
+//            List<SayingResponseDto> responseDtoList = new ArrayList<>();
+//            for (Saying saying : sayingList) {
+//                responseDtoList.add(
+//                        new SayingResponseDto(saying)
+//                );
+//            }
+//            return responseDtoList;
+//        } catch (Exception e) {
+//        }
+//        return null;
+//    }
 }
