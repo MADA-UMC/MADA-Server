@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
@@ -44,10 +46,11 @@ public class CustomController {
     }
 
     @Operation(description = "사용자 캐릭터 착용 아이템 변경")
-    @PatchMapping("/change/{item_id}")
-    public ResponseEntity<Void> changeCharacter(Authentication authentication, @PathVariable Long item_id){
+    @PatchMapping("/change") ///{item_id}
+    public ResponseEntity<Void> changeCharacter(Authentication authentication, HttpServletRequest request){ // @RequestParam(value="items_id[]") List<String> items_id
         User user = findUser(authentication);
-        customService.changeUserItem(user, item_id);
+        String[] items_id = request.getParameterValues("item_id");
+        customService.changeUserItem(user, items_id);
         return ResponseEntity.ok().build();
     }
 
@@ -61,7 +64,7 @@ public class CustomController {
 
     @Operation(description = "아이템 구매")
     @PostMapping("/buy/{item_id}")
-    public ResponseEntity<Void> buyItem(Authentication authentication, @PathVariable Long item_id){
+    public ResponseEntity<Void> buyItem(Authentication authentication, @PathVariable int item_id){
         User user = findUser(authentication);
         customService.buyItem(user, item_id);
         return ResponseEntity.ok().build();

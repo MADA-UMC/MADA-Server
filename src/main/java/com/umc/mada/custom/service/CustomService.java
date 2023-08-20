@@ -11,7 +11,6 @@ import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class CustomService {
         List<CustomItem> colorItems = customItems.stream().filter(item -> ItemType.I1.equals(item.getItemType())).collect(Collectors.toList());
         if(customItems.isEmpty()|| colorItems.isEmpty()){ //사용자 캐릭터가 디폴트 값이라면 디폴트 캐릭터 데이터를 넘겨준다.
             //return new UserCharacterResponse(CharacterItemResponse.of(customRepository.findCustomItemById(1L).get()));
-            customItems.add(customRepository.findCustomItemById(1L).get()); //TODO: isPresent() 체크하기
+            customItems.add(customRepository.findCustomItemById(1).get()); //TODO: isPresent() 체크하기
         }
         return UserCharacterResponse.of(customItems);
     }
@@ -69,36 +68,52 @@ public class CustomService {
         return customItemsResponse;
     }
 
-    public void changeUserItem(User user, Long item_id){
-        Optional<CustomItem> customItem = customRepository.findCustomItemById(item_id);
-        Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
-        HaveItem newhaveItem = newhaveItemOptional.get();
-
-//        Optional<HaveItem> oldhaveItemOptional = user.getHaveItems().stream() //TODO: 예외처리 추가하기(커스텀 예외처리)
-//                .filter(HaveItem::isWearing)
-//                .reduce((a,b) -> {
-//                    try {
-//                        throw new Exception("캐릭터변경오류발생");
-//                    } catch (Exception e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                });
-//        HaveItem oldhaveItem = oldhaveItemOptional.get();
-        //TODO: 아이템 타입 보고 같은 타입 아이템 wearing을 false로 해야함
-        List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
-        for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
-            HaveItem oldhaveItem = oldhaveItemList.get(i);
-            //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
-            if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
-                oldhaveItem.updateHaveItemWearing(false);
-                haveItemRepository.save(oldhaveItem);
+    public void changeUserItem(User user, String[] items_id){//List<String> items_id
+        for(String item_id : items_id){
+            Optional<CustomItem> customItem = customRepository.findCustomItemById(Integer.valueOf(item_id));
+            Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
+            HaveItem newhaveItem = newhaveItemOptional.get();
+            List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
+            for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
+                HaveItem oldhaveItem = oldhaveItemList.get(i);
+                //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
+                if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
+                    oldhaveItem.updateHaveItemWearing(false);
+                    haveItemRepository.save(oldhaveItem);
+                }
             }
+            newhaveItem.updateHaveItemWearing(true);
+            haveItemRepository.save(newhaveItem);
         }
-
-        newhaveItem.updateHaveItemWearing(true);
-//        oldhaveItem.updateHaveItemWearing(false);
-
-        haveItemRepository.save(newhaveItem);
+//        Optional<CustomItem> customItem = customRepository.findCustomItemById(item_id);
+//        Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
+//        HaveItem newhaveItem = newhaveItemOptional.get();
+//
+////        Optional<HaveItem> oldhaveItemOptional = user.getHaveItems().stream() //TODO: 예외처리 추가하기(커스텀 예외처리)
+////                .filter(HaveItem::isWearing)
+////                .reduce((a,b) -> {
+////                    try {
+////                        throw new Exception("캐릭터변경오류발생");
+////                    } catch (Exception e) {
+////                        throw new RuntimeException(e);
+////                    }
+////                });
+////        HaveItem oldhaveItem = oldhaveItemOptional.get();
+//        //TODO: 아이템 타입 보고 같은 타입 아이템 wearing을 false로 해야함
+//        List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
+//        for(int i=0; i<oldhaveItemList.size(); i++){ //'for' loop can be replaced with enhanced 'for'
+//            HaveItem oldhaveItem = oldhaveItemList.get(i);
+//            //입으려는 아이템 타입과 같은 아이템 타입만 false로 해준다.
+//            if(newhaveItem.getCustomItem().getItemType().equals(oldhaveItem.getCustomItem().getItemType())){
+//                oldhaveItem.updateHaveItemWearing(false);
+//                haveItemRepository.save(oldhaveItem);
+//            }
+//        }
+//
+//        newhaveItem.updateHaveItemWearing(true);
+////        oldhaveItem.updateHaveItemWearing(false);
+//
+//        haveItemRepository.save(newhaveItem);
 //        haveItemRepository.save(oldhaveItem);
     }
 
@@ -111,7 +126,7 @@ public class CustomService {
         }
     }
 
-    public void buyItem(User user, Long item_id){
+    public void buyItem(User user, int item_id){
         Optional<CustomItem> customItemOptional = customRepository.findCustomItemById(item_id);
         CustomItem customItem = customItemOptional.get();
         if(haveItemRepository.findByCustomItemAndUser(customItem, user).isPresent()){
