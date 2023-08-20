@@ -92,10 +92,5 @@ public class TodoController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/average")
-    public ResponseEntity<TodoAverageCalcResponseDto> calcUserTodoAverage(Authentication authentication, @RequestBody TodoAverageCalcRequestDto todoAverageCalcRequestDto){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
 
-    }
 }
