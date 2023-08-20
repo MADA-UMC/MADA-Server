@@ -1,4 +1,4 @@
-package com.umc.mada.saying.domain;
+package com.umc.mada.my.domain;
 
 import lombok.*;
 import javax.persistence.*;
@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Saying {
+public class My {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -17,7 +17,7 @@ public class Saying {
     private String sayer;
 
     @Builder
-    public Saying(Long id, String content, String sayer) {
+    public My(Long id, String content, String sayer) {
         this.id = id;
         this.content = content;
         this.sayer = sayer;
