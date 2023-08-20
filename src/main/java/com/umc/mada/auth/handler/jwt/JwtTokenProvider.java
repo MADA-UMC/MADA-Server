@@ -1,4 +1,4 @@
-package com.umc.mada.auth.jwt;
+package com.umc.mada.auth.handler.jwt;
 
 import com.umc.mada.user.domain.Role;
 //import com.umc.mada.user.domain.User;
@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.security.Keys;
@@ -29,8 +28,8 @@ public class JwtTokenProvider {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
     private static final String AUTHORITIES_KEY = "authority"; //role로 줄 예정
-    private Long ACCESS_TOKEN_EXPIRE_TIME = 1000L*60*600; //10hour
-    private Long REFRESH_TOKEN_EXPIRE_TIME = 1000L*60*60*24*14; //14day
+    private final Long ACCESS_TOKEN_EXPIRE_TIME = 1000L*60*600; //10hour
+    private final Long REFRESH_TOKEN_EXPIRE_TIME = 1000L*60*60*24*14; //14day
 
     private Key key;
 
@@ -79,9 +78,9 @@ public class JwtTokenProvider {
     public String resolveToken(HttpServletRequest request){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-//        if(!StringUtils.hasText(token) || !token.startsWith("Bearer ")){
-//            throw new IllegalStateException("토큰이 없습니다.");
-//        }
+        if(!StringUtils.hasText(token) || !token.startsWith("Bearer ")){
+            throw new IllegalStateException("토큰이 없습니다.");
+        }
 
         return token.substring(7);
     }

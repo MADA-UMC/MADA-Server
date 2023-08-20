@@ -33,8 +33,6 @@ public class CategoryService {
     /**
      * 카테고리 생성 로직
      *
-     * @param categoryRequestDto 카테고리 생성 요청 데이터
-     * @return 생성된 카테고리 정보
      */
     public CategoryResponseDto createCategory(User user, CategoryRequestDto categoryRequestDto) {
         // 카테고리 이름이 없거나 길이를 초과한 경우 예외 처리
@@ -58,9 +56,6 @@ public class CategoryService {
     /**
      * 카테고리 수정 로직
      *
-     * @param categoryId 카테고리 ID
-     * @param categoryRequestDto 카테고리 수정 요청 데이터
-     * @return 수정된 카테고리 정보
      */
     @Transactional
     public CategoryResponseDto updateCategory(User user, int categoryId, CategoryRequestDto categoryRequestDto) {
@@ -100,7 +95,6 @@ public class CategoryService {
     /**
      * 카테고리 삭제 로직
      *
-     * @param categoryId 카테고리 ID
      */
     @Transactional
     public void deleteCategory(User userId, int categoryId) {
@@ -118,7 +112,6 @@ public class CategoryService {
     /**
      * 사용자 카테고리 목록 조회 로직
      *
-     * @return 해당 유저의 카테고리 정보 목록
      */
     public List<CategoryResponseDto> getUserCategories(User userId) {
         // 모든 카테고리 엔티티 조회

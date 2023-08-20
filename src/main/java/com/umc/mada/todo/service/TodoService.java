@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -198,6 +199,13 @@ public class TodoService {
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
         return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
    }
+
+   // 특정 유저 반복 투두 조회 로직
+    public List<TodoResponseDto> getUserRepeatTodo(User userId){
+        List<Repeat> nonNRepeats = Arrays.asList(Repeat.DAY, Repeat.WEEK, Repeat.MONTH);
+        List<Todo> nonNRepeatTodos = todoRepository.findByUserIdAndRepeatIn(userId, nonNRepeats);
+        return nonNRepeatTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
+    }
 
     // 투두 이름 유효성 검사 메서드
     private void validateTodoName(String todoName) {

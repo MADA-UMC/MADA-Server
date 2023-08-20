@@ -1,4 +1,4 @@
-package com.umc.mada.auth.jwt;
+package com.umc.mada.auth.handler.jwt;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -18,7 +18,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // Request Header에서 JWT 토큰 추출
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
+        String token = jwtTokenProvider.resolveToken(request);
 
         //validateToken으로 토큰 유효성 검사
         if(token != null && jwtTokenProvider.validateToken(token)){
