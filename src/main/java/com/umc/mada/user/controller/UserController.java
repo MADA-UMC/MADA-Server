@@ -209,7 +209,7 @@ public class UserController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication, TodoAverageRequestDto todoAverageRequestDto) {
+    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         Map<String,Object> map = new HashMap<>();

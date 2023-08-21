@@ -79,14 +79,16 @@ public class TodoService {
 
             // 해당 월의 첫 주의 마지막날을 구합니다
             LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
-            return todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
+            Optional<Double> avgWeek = todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
+            return avgWeek.get();
         }
         if(option.equals("month")) {
             LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
 
             // 해당 달의 마지막날을 가져옵니다
             LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-            return todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
+            Optional<Double> avgMonth = todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
+            return avgMonth.get();
         }
         return -1.0;
     }
