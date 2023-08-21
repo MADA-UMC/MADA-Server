@@ -24,6 +24,6 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
 
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
 
-   /* @Query("select  AVG(complete) from Todo where repeat = 'N' and endRepeatDate > :endDate and startRepeatDate < :startDate and userId = :uid")
-    Double findTodosAVG(@Param("uid") User uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);*/
+    @Query("select  AVG(complete) from Todo where repeat = 'N' and endRepeatDate > :endDate and startRepeatDate < :startDate and userId = :uid")
+    Double findTodosAVG(@Param("uid") User uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
 }

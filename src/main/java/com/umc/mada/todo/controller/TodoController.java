@@ -1,8 +1,8 @@
 package com.umc.mada.todo.controller;
 
-/*import com.umc.mada.todo.domain.Repeat;
+import com.umc.mada.todo.domain.Repeat;
 import com.umc.mada.todo.dto.TodoAverageRequestDto;
-import com.umc.mada.todo.dto.TodoAverageResponseDto;*/
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.service.TodoService;
@@ -113,7 +113,7 @@ public class TodoController {
         result.put("data", data);
         return ResponseEntity.ok().body(result);
     }
-   /* @GetMapping("/avg")
+    @GetMapping("/avg")
     public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication , TodoAverageRequestDto todoAverageRequestDto){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
@@ -122,5 +122,5 @@ public class TodoController {
         data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
         map.put("data" , data);
         return ResponseEntity.ok(map);
-    }*/
+    }
 }
