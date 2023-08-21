@@ -1,6 +1,5 @@
 package com.umc.mada.custom.domain;
 
-import com.umc.mada.file.domain.File;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,10 +17,6 @@ public class CustomItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-//    @OneToOne
-//    @JoinColumn(name = "file_id")
-//    private File file;
-
     private String name;
 
     @Column(name = "file_path")
@@ -31,7 +26,9 @@ public class CustomItem {
     @Enumerated(value = EnumType.STRING)
     private ItemType itemType;
 
-    private String unlock_condition;
+    @Column(name = "unlock_condition")
+    @Enumerated(value = EnumType.STRING)
+    private ItemUnlockCondition unlockCondition;
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
@@ -42,10 +39,9 @@ public class CustomItem {
     private LocalDateTime updatedAt; // 수정 시간
 
     @Builder
-    public CustomItem(File file, ItemType itemType, String unlock_condition){
-//        this.file = file;
+    public CustomItem(ItemType itemType, ItemUnlockCondition unlock_condition){
         this.itemType = itemType;
-        this.unlock_condition = unlock_condition;
+        this.unlockCondition = unlock_condition;
     }
 
 

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,18 +28,19 @@ public class CustomService {
 //    private String bucket;
 
     public UserCharacterResponse printUserCharacter(User user){
-        //List<HaveItem> wearingItems = haveItemRepository.findByUserAndWearing(user, true); //사용자가 보유한 아이템 중 착용하고 있는 아이템
         List<CustomItem> customItems = haveItemRepository.findCustomItemByUserAndWearing(user, true);
+        return UserCharacterResponse.of(customItems);
+
         // S3 url 부분
 //        String url = amazonS3.getUrl(bucket, customItems.get(0).getFileName()).toString();
 //        System.out.println(url);
 
-        List<CustomItem> colorItems = customItems.stream().filter(item -> ItemType.I1.equals(item.getItemType())).collect(Collectors.toList());
-        if(customItems.isEmpty()|| colorItems.isEmpty()){ //사용자 캐릭터가 디폴트 값이라면 디폴트 캐릭터 데이터를 넘겨준다.
-            //return new UserCharacterResponse(CharacterItemResponse.of(customRepository.findCustomItemById(1L).get()));
-            customItems.add(customRepository.findCustomItemById(10).get()); //TODO: isPresent() 체크하기
-        }
-        return UserCharacterResponse.of(customItems);
+        //사용자 캐릭터가 디폴트 값이라면 디폴트 캐릭터 데이터를 넘겨준다.
+//        List<CustomItem> colorItems = customItems.stream().filter(item -> ItemType.I1.equals(item.getItemType())).collect(Collectors.toList());
+//        if(customItems.isEmpty()|| colorItems.isEmpty()){
+//            //return new UserCharacterResponse(CharacterItemResponse.of(customRepository.findCustomItemById(1L).get()));
+//            customItems.add(customRepository.findCustomItemById(10).get()); //TODO: isPresent() 체크하기
+//        }
     }
 
     public CustomItemsResponse findItemsByType(User user, String itemType) {
