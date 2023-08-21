@@ -1,6 +1,7 @@
 package com.umc.mada.todo.service;
 
 import com.umc.mada.todo.domain.*;
+import com.umc.mada.todo.dto.TodoAverageRequestDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.repository.TodoRepository;
@@ -18,6 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.time.DayOfWeek;
+import java.time.temporal.TemporalAdjusters;
 
 @Service
 public class TodoService {
@@ -64,6 +67,26 @@ public class TodoService {
         return TodoResponseDto.of(savedTodo);
     }
 
+    /*public Double calcTodoAverage(User user,TodoAverageRequestDto todoAverageRequestDto){
+        LocalDate date =  todoAverageRequestDto.getDate();
+        String option = todoAverageRequestDto.getOption();
+
+        if(option == "week"){
+            LocalDate firstDayOfFirstWeek = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
+
+            // 해당 월의 첫 주의 마지막날을 구합니다
+            LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
+            return todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
+        }
+        if(option == "month"){
+            LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
+
+            // 해당 달의 마지막날을 가져옵니다
+            LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
+            return todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
+        }
+        return -1.0;
+    }*/
     @Transactional
     // 투두 수정 로직
     public TodoResponseDto updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
@@ -229,4 +252,5 @@ public class TodoService {
             throw new IllegalArgumentException("존재하지 않는 카테고리 ID입니다.");
         }
     }
+
 }
