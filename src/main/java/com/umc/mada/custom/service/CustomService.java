@@ -70,7 +70,7 @@ public class CustomService {
         return customItemsResponse;
     }
 
-    public void changeUserItem(User user, String[] items_id){//List<String> items_id
+    public void changeUserItem(User user, List<String> items_id){//List<String>  String[] items_id
         boolean colorCheck = false;
         //소유한 아이템들만 착용하는지 확인하기
         for(String item_id : items_id){
@@ -119,6 +119,11 @@ public class CustomService {
             oldsetItem.updateHaveItemWearing(false);
             haveItemRepository.save(oldsetItem);
         }
+        //컬러 디폴트 설정하기
+        Optional<HaveItem> defaultItemOptional = haveItemRepository.findByCustomItemAndUser(customRepository.findCustomItemById(10).get(), user);
+        HaveItem defaultHaveItem = defaultItemOptional.get();
+        defaultHaveItem.updateHaveItemWearing(true);
+        haveItemRepository.save(defaultHaveItem);
     }
 
     public void buyItem(User user, int item_id){
