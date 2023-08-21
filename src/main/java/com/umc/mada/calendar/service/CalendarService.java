@@ -54,8 +54,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String,Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
 
@@ -67,8 +69,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String,Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
 
@@ -81,8 +85,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
     public Map<String, Object> calendarsRead(Authentication authentication) {
@@ -93,8 +99,10 @@ public class CalendarService {
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
     //동일 이름의 일정이 동일한 날짜에 있는지 검증
