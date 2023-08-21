@@ -49,10 +49,10 @@ public class TodoService {
         // 투두 앤티티 생성
         Todo todo = new Todo(
                 user,
-                todoRequestDto.getDate(),
+                todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(),
                 category,
                 todoRequestDto.getTodoName(),
-                todoRequestDto.getComplete(),
+                todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false,
                 todoRequestDto.getRepeat(),
                 todoRequestDto.getRepeatWeek(),
                 todoRequestDto.getRepeatMonth(),

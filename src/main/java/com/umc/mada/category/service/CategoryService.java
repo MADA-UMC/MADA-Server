@@ -5,7 +5,9 @@ import com.umc.mada.category.domain.Icon;
 import com.umc.mada.category.dto.CategoryRequestDto;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.repository.CategoryRepository;
+import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.category.repository.IconRepository;
+import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +22,13 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final TodoRepository todoRepository;
     private final IconRepository iconRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public CategoryService(UserRepository userRepository, CategoryRepository categoryRepository, IconRepository iconRepository) {
+    public CategoryService(UserRepository userRepository, TodoRepository todoRepository, CategoryRepository categoryRepository, IconRepository iconRepository) {
+        this.todoRepository = todoRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.iconRepository = iconRepository;
@@ -100,8 +104,10 @@ public class CategoryService {
     public void deleteCategory(User userId, int categoryId) {
         // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
         Optional<Category> optionalCategory = categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
+        List<Todo> todosToDelete = todoRepository.deleteTodosByUserIdAndCategoryId(userId, categoryId);
         if (optionalCategory.isPresent()) {
             // 주어진 categoryId에 해당하는 카테고리가 존재하는 경우 삭제
+            todoRepository.deleteAll(todosToDelete);
             categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
         } else {
             // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)

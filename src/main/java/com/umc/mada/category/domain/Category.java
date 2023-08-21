@@ -2,7 +2,6 @@ package com.umc.mada.category.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.umc.mada.file.domain.File;
 import com.umc.mada.user.domain.User;
 import lombok.*;
 import javax.persistence.*;
