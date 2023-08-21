@@ -10,6 +10,7 @@ import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.exception.BuyOwnedItemException;
 import com.umc.mada.exception.ErrorType;
+import com.umc.mada.exception.NotAllowToWearingException;
 import com.umc.mada.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,20 +71,44 @@ public class CustomService {
     }
 
     public void changeUserItem(User user, String[] items_id){//List<String> items_id
-        //이전에 입고 있는 아이템 없애기
+        boolean colorCheck = false;
+        //소유한 아이템들만 착용하는지 확인하기
+        for(String item_id : items_id){
+            Optional<CustomItem> customItem = customRepository.findCustomItemById(Integer.valueOf(item_id));
+            Optional<HaveItem> newHaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user);
+            if(customItem.get().getItemType().equals(ItemType.I1)){
+                colorCheck = true;
+            }
+            //소유한 아이템이 아니라면 예외발생
+            if(!newHaveItemOptional.isPresent()){
+                throw new NotAllowToWearingException(ErrorType.NOT_ALLOW_TO_WEARING.getMessage());
+            }
+        }
+
+        //이전에 입고 있던 아이템 없애기
         List<HaveItem> oldhaveItemList = haveItemRepository.findByUserAndWearing(user, true);
         for(HaveItem oldItem: oldhaveItemList){ //예전에 입은 아이템은 false로 해준다.
             oldItem.updateHaveItemWearing(false);
             haveItemRepository.save(oldItem);
         }
 
-        //새로운 아이템 입히기
+        //새로운 아이템 입기
         for(String item_id : items_id){
             Optional<CustomItem> customItem = customRepository.findCustomItemById(Integer.valueOf(item_id));
-            Optional<HaveItem> newhaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user); //TODO: 예외처리 추가하기
-            HaveItem newhaveItem = newhaveItemOptional.get();
-            newhaveItem.updateHaveItemWearing(true);
-            haveItemRepository.save(newhaveItem);
+            Optional<HaveItem> newHaveItemOptional = haveItemRepository.findByCustomItemAndUser(customItem.get(), user);
+
+            //새로운 아이템 입히기
+            HaveItem newHaveItem = newHaveItemOptional.get();
+            newHaveItem.updateHaveItemWearing(true);
+            haveItemRepository.save(newHaveItem);
+        }
+
+        //color를 착용하지 않았을 경우 color 디폴트 설정하기
+        if(!colorCheck){
+            Optional<HaveItem> defaultItemOptional = haveItemRepository.findByCustomItemAndUser(customRepository.findCustomItemById(10).get(), user);
+            HaveItem defaultHaveItem = defaultItemOptional.get();
+            defaultHaveItem.updateHaveItemWearing(true);
+            haveItemRepository.save(defaultHaveItem);
         }
     }
 
