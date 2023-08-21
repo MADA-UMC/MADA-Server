@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -224,9 +225,24 @@ public class TodoService {
 
     // 특정 유저 투두 조회 로직
     public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
-        List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
+        //List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
+        List<Todo> userTodos = todoRepository.findTodosByUserId(userId);
+        List<Todo> filteredTodos = new ArrayList<>();
+
+        for (Todo todo : userTodos){
+            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
+                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
+                    filteredTodos.add(todo);
+                }
+            } else {
+                if (todo.getDate().equals(date)) {
+                    filteredTodos.add(todo);
+                }
+            }
+        }
+        return filteredTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-        return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
+        //return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
    }
 
    // 특정 유저 반복 투두 조회 로직

@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
+    List<Todo> findTodosByUserId(User userId);
     List<Todo> deleteTodosByUserIdAndCategoryId(User userId, int categoryId);
     Optional<Todo> deleteTodoByUserIdAndId(User userId, int id);
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
