@@ -60,7 +60,7 @@ public class Todo{
     @Column(name = "end_repeat_date")
     private LocalDate endRepeatDate; // 반복 종료 일자
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date")
     private LocalDate date; // 투두 일자
 
     @CreationTimestamp
