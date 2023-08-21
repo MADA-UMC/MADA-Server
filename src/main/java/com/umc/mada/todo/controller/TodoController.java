@@ -113,14 +113,4 @@ public class TodoController {
         result.put("data", data);
         return ResponseEntity.ok().body(result);
     }
-    @GetMapping("/avg")
-    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication , TodoAverageRequestDto todoAverageRequestDto){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> data = new HashMap<>();
-        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
-        map.put("data" , data);
-        return ResponseEntity.ok(map);
-    }
 }

@@ -2,6 +2,8 @@ package com.umc.mada.user.controller;
 
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.todo.domain.Todo;
+import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.service.TodoService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.repository.UserRepository;
@@ -29,13 +31,16 @@ import java.util.*;
 @RequestMapping("/user") //user
 public class UserController {
     private final UserService userService;
+    private final TodoService todoService;
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
     private final TimetableRepository timetableRepository;
 
+
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
+    public UserController(UserService userService, TodoService todoService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
         this.userService = userService;
+        this.todoService = todoService;
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
         this.timetableRepository = timetableRepository;
@@ -201,5 +206,16 @@ public class UserController {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("data",data);
         return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication, TodoAverageRequestDto todoAverageRequestDto) {
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        Map<String,Object> map = new HashMap<>();
+        Map<String,Object> data = new HashMap<>();
+        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
+        map.put("data", data);
+        return ResponseEntity.ok(map);
     }
 }
