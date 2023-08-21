@@ -67,18 +67,21 @@ public class TodoService {
         return TodoResponseDto.of(savedTodo);
     }
 
-    /*public Double calcTodoAverage(User user,TodoAverageRequestDto todoAverageRequestDto){
+    /**
+     * 투두 평균 API
+     */
+    public double calcTodoAverage(User user,TodoAverageRequestDto todoAverageRequestDto){
         LocalDate date =  todoAverageRequestDto.getDate();
         String option = todoAverageRequestDto.getOption();
 
-        if(option == "week"){
+        if(option.equals("week")) {
             LocalDate firstDayOfFirstWeek = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
 
             // 해당 월의 첫 주의 마지막날을 구합니다
             LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
             return todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
         }
-        if(option == "month"){
+        if(option.equals("month")) {
             LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
 
             // 해당 달의 마지막날을 가져옵니다
@@ -86,7 +89,8 @@ public class TodoService {
             return todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
         }
         return -1.0;
-    }*/
+    }
+
     @Transactional
     // 투두 수정 로직
     public TodoResponseDto updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
