@@ -7,18 +7,14 @@ import java.util.List;
 
 @Getter
 public class CustomItemsResponse {
-    private final List<ItemsElementResponse> data;
+    private final List<ItemsElementResponse> itemList;
 
     public CustomItemsResponse(){
-        this.data = new ArrayList<>();
-    }
-
-    public CustomItemsResponse(List<ItemsElementResponse> itemsList){
-        this.data = itemsList;
+        this.itemList = new ArrayList<>();
     }
 
     public void addItem(ItemsElementResponse item){
-        data.add(item);
+        itemList.add(item);
     }
 //    public CustomItemsResponse of(List<CustomItem> customItems, boolean haveItem){
 //        List<ItemsElementResponse> itemsElementResponses = customItems.stream()
