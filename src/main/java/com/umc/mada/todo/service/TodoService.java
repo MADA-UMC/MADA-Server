@@ -79,14 +79,25 @@ public class TodoService {
 
             // 해당 월의 첫 주의 마지막날을 구합니다
             LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
-            return todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
+            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfFirstWeek,lastDayOfFirstWeek,Repeat.N);
+            if(todoList.size() == 0){
+                return 0.0;
+            }
+            List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
+            double percent =  completeTodoList.size()/todoList.size();
+
         }
         if(option.equals("month")) {
             LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
 
             // 해당 달의 마지막날을 가져옵니다
             LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-            return todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
+            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfMonth,lastDayOfMonth,Repeat.N);
+            if(todoList.size() == 0){
+                return 0.0;
+            }
+            List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
+            double percent =  completeTodoList.size()/todoList.size();
         }
         return -1.0;
     }
