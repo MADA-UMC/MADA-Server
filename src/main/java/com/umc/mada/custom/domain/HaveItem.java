@@ -32,6 +32,13 @@ public class HaveItem {
         this.customItem = customItem;
     }
 
+    @Builder
+    public HaveItem(User user, CustomItem customItem, boolean wearing) {
+        this.user = user;
+        this.customItem = customItem;
+        this.wearing = wearing;
+    }
+
     public void updateHaveItemWearing(boolean wearing){
         this.wearing = wearing;
     }

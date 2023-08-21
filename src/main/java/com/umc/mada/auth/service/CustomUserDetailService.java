@@ -1,32 +1,32 @@
 package com.umc.mada.auth.service;
 
 import com.umc.mada.auth.dto.OAuth2Attributes;
+import com.umc.mada.custom.domain.CustomItem;
+import com.umc.mada.custom.domain.HaveItem;
+import com.umc.mada.custom.domain.ItemUnlockCondition;
+import com.umc.mada.custom.repository.CustomRepository;
+import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.Role;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.security.AuthProvider;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailService extends DefaultOAuth2UserService{ // implements OAuth2UserService<OAuth2UserRequest, OAuth2User>
     private final UserRepository userRepository;
+    private final CustomRepository customRepository;
+    private final HaveItemRepository haveItemRepository;
 
     //userRequest로
     @Override
@@ -60,6 +60,8 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
             //첫 로그인인 경우 사용자를 회원가입(등록)한다.
             newUser = true;
             user = createUser(oAuth2Attributes, provider);
+            //사용자의 기본 데이터를 세팅한다.
+            setUserData(user);
         }
         System.out.println("sfqwdsfqwedsahfbqewkjffqewweffqekqwefbhfewhlwqefhl");
 //
@@ -79,4 +81,15 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
         return userRepository.save(user);
     }
 
+    private void setUserData(User user){
+        //사용자 기본 제공 커스텀 아이템 세팅하기
+        List<CustomItem> basicItemList = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C0);
+        for(CustomItem basicItem : basicItemList){
+            if(basicItem.getId() == 10){
+                haveItemRepository.save(new HaveItem(user, basicItem, true));
+                continue;
+            }
+            haveItemRepository.save(new HaveItem(user, basicItem));
+        }
+    }
 }

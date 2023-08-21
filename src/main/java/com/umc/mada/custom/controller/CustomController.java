@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,18 +33,22 @@ public class CustomController {
 
     @Operation(description = "사용자 캐릭터 출력")
     @GetMapping("/")
-    public ResponseEntity<UserCharacterResponse> printUserCharacter(Authentication authentication){
+    public ResponseEntity<Map<String, Object>> printUserCharacter(Authentication authentication){
         User user = findUser(authentication);
         UserCharacterResponse userCharacterResponse = customService.printUserCharacter(user);
-        return new ResponseEntity<>(userCharacterResponse, HttpStatus.OK);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", userCharacterResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(description = "현재 화면의 아이템 타입에 맞는 아이템 조회하기/ 해당 타입의 아이템 목록, 사용자의 소유 여부 반환")
     @GetMapping("/item/{item_type}")
-    public ResponseEntity<?> findItemsByItemType(@PathVariable String item_type, Authentication authentication){
+    public ResponseEntity<Map<String, Object>> findItemsByItemType(@PathVariable String item_type, Authentication authentication){
         User user = findUser(authentication);
         CustomItemsResponse customItemsResponse = customService.findItemsByType(user, item_type);
-        return new ResponseEntity<>(customItemsResponse, HttpStatus.OK);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", customItemsResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(description = "사용자 캐릭터 착용 아이템 변경")
