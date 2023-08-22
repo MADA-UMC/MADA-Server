@@ -16,10 +16,11 @@ import java.util.Optional;
 public interface TodoRepository extends JpaRepository<Todo, Integer> {
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
-    List<Todo> findTodosByUserId(User userId);
+    List<Todo> findTodosByUserIdAndEndRepeatDateAfter(User userId, LocalDate date);
     List<Todo> deleteTodosByUserIdAndCategoryId(User userId, int categoryId);
     Optional<Todo> deleteTodoByUserIdAndId(User userId, int id);
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
-   @Query("select  AVG(complete) from Todo where repeat = 'N' and endRepeatDate > :endDate and startRepeatDate < :startDate and userId = :uid")
-   Double findTodosAVG(@Param("uid") User uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
+    List<Todo> findTodosByUserIdAndDateBetweenAndRepeat(User user,LocalDate startDate, LocalDate endDate, Repeat repeat);
+    List<Todo> findTodosByUserIdAndRepeat(User user, Repeat repeat);
+    List<Todo> findTodosByUserId(User user);
 }

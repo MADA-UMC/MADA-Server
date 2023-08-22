@@ -2,6 +2,7 @@ package com.umc.mada.todo.service;
 
 import com.umc.mada.todo.domain.*;
 import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.repository.TodoRepository;
@@ -71,7 +72,7 @@ public class TodoService {
     /**
      * 투두 평균 API
      */
-    public double calcTodoAverage(User user,TodoAverageRequestDto todoAverageRequestDto){
+    public TodoAverageResponseDto calcTodoAverage(User user, TodoAverageRequestDto todoAverageRequestDto){
         LocalDate date =  todoAverageRequestDto.getDate();
         String option = todoAverageRequestDto.getOption();
 
@@ -80,17 +81,39 @@ public class TodoService {
 
             // 해당 월의 첫 주의 마지막날을 구합니다
             LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
-            return todoRepository.findTodosAVG(user,firstDayOfFirstWeek,lastDayOfFirstWeek);
+            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfFirstWeek,lastDayOfFirstWeek,Repeat.N);
+
+            List<Todo> todos = todoRepository.findTodosByUserIdAndRepeat(user,Repeat.N);
+
+            if(todoList.size() == 0||todos.size()==0){
+                return TodoAverageResponseDto.builder().todosPercent((double)todos.size()).completeTodoPercent((double)todoList.size()).build();
+            }
+            List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
+            double completePercent =  completeTodoList.size()/todoList.size();
+            double todosPercent =  todoList.size()/todos.size();
+
+            return TodoAverageResponseDto.builder().todosPercent(todosPercent).completeTodoPercent(completePercent).build();
+
+
         }
         if(option.equals("month")) {
             LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
 
             // 해당 달의 마지막날을 가져옵니다
             LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-            return todoRepository.findTodosAVG(user,firstDayOfMonth,lastDayOfMonth);
+            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfMonth,lastDayOfMonth,Repeat.N);
+            List<Todo> todos = todoRepository.findTodosByUserIdAndRepeat(user,Repeat.N);
+            if(todoList.size() == 0){
+                return TodoAverageResponseDto.builder().todosPercent((double)todos.size()).completeTodoPercent((double)todoList.size()).build();
+            }
+            List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
+            double completePercent =  completeTodoList.size()/todoList.size();
+            double todosPercent =  todoList.size()/todos.size();
+            return TodoAverageResponseDto.builder().todosPercent(todosPercent).completeTodoPercent(completePercent).build();
         }
-        return -1.0;
+        return TodoAverageResponseDto.builder().todosPercent(0.0).completeTodoPercent(0.0).build();
     }
+
 
     @Transactional
     // 투두 수정 로직
@@ -223,7 +246,7 @@ public class TodoService {
 
     // 특정 유저 투두 조회 로직
     public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
-        //List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);
+        /* List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);*/
         List<Todo> userTodos = todoRepository.findTodosByUserId(userId);
         List<Todo> filteredTodos = new ArrayList<>();
 
