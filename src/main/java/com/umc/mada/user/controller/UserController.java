@@ -3,6 +3,7 @@ package com.umc.mada.user.controller;
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
 import com.umc.mada.todo.service.TodoService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
@@ -156,17 +157,35 @@ public class UserController {
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
-        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+    @PostMapping("/pageInfo/change")
+    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+        return ResponseEntity.ok(userService.userPageSettings(authentication, map));
     }
 
     /**
      * 알람 설정 API
      */
-    @PatchMapping("/alarmInfo")
+    @PatchMapping("/alarmInfo/change")
     public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
         return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
+    }
+
+    /**
+     * 화면 설정 조회 API
+     */
+    @GetMapping("/pageInfo")
+    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userPageSet(authentication, map));
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 알람 설정 조회 API
+     */
+    @GetMapping("/alarmInfo")
+    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userAlarmSet(authentication, map));
+        return ResponseEntity.ok(map);
     }
 
     /**
@@ -209,13 +228,14 @@ public class UserController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication, TodoAverageRequestDto todoAverageRequestDto) {
+    public ResponseEntity<TodoAverageResponseDto> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> data = new HashMap<>();
-        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
-        map.put("data", data);
-        return ResponseEntity.ok(map);
+//        Map<String,Object> map = new LinkedHashMap<>();
+//        Map<String,Object> data = new LinkedHashMap<>();
+//        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
+//        map.put("data", data);
+        TodoAverageResponseDto todoAverageResponseDto = todoService.calcTodoAverage(user,todoAverageRequestDto);
+        return ResponseEntity.ok().body(todoAverageResponseDto);
     }
 }
