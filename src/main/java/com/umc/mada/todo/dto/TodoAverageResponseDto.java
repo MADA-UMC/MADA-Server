@@ -4,5 +4,6 @@ import lombok.Builder;
 
 @Builder
 public class TodoAverageResponseDto {
-    Double average;
+    Double todosPercent;
+    Double completeTodoPercent;
 }
