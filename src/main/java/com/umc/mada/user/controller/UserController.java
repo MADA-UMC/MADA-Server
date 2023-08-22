@@ -163,7 +163,7 @@ public class UserController {
     }
 
     /**
-     * 알람 설정 API
+     * 알림 설정 API
      */
     @PatchMapping("/alarmInfo/change")
     public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {

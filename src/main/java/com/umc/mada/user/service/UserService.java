@@ -59,8 +59,8 @@ public class UserService {
 
     public Map<String, Object> userPageSettings(Authentication authentication, Map<String, Boolean> map) {
         User user = this.getUser(authentication);
-        user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
-        Map<String,Object> userPageInfos = new HashMap<>();
+        user.updatePageSetting(map.get("endTodoBackSetting"), map.get("newTodoStartSetting"), map.get("startTodoAtMonday"));
+        Map<String, Object> userPageInfos = new HashMap<>();
         userPageInfos.put("endTodoBackSetting",user.isEndTodoBackSetting());
         userPageInfos.put("newTodoStartSetting",user.isNewTodoStartSetting());
         userPageInfos.put("startTodoAtMonday",user.isStartTodoAtMonday());
