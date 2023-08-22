@@ -3,6 +3,7 @@ package com.umc.mada.user.controller;
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
 import com.umc.mada.todo.service.TodoService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
@@ -209,13 +210,14 @@ public class UserController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<Map<String ,Object>> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
+    public ResponseEntity<TodoAverageResponseDto> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> data = new HashMap<>();
-        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
-        map.put("data", data);
-        return ResponseEntity.ok(map);
+//        Map<String,Object> map = new LinkedHashMap<>();
+//        Map<String,Object> data = new LinkedHashMap<>();
+//        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
+//        map.put("data", data);
+        TodoAverageResponseDto todoAverageResponseDto = todoService.calcTodoAverage(user,todoAverageRequestDto);
+        return ResponseEntity.ok().body(todoAverageResponseDto);
     }
 }
