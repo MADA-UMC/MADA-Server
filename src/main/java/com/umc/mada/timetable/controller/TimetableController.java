@@ -113,14 +113,22 @@ public class TimetableController {
     public ResponseEntity<Map<String, Object>> getTodoAndCalendar(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
+        List<Todo> todos = todoRepository.findTodosByUserId(user);
         List<Calendar> calendars = calendarRepository.findAllByUser(user);
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : todos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
             todoMap.put("iconId", todo.getCategory().getIcon().getId()); // Category의 아이콘 ID
             todoMap.put("todoName", todo.getTodoName());
-            todoList.add(todoMap);
+            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null){
+                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())){
+                    todoList.add(todoMap);
+                }
+            } else {
+                if (todo.getDate().equals(date)) {
+                    todoList.add(todoMap);
+                }
+            }
         }
 
         List<Map<String, Object>> calendarList = new ArrayList<>();
