@@ -209,6 +209,7 @@ public class CalendarService {
         calendar.setColor(calendarRequestDto.getColor());
         calendar.setEndTime(calendarRequestDto.getEndTime());
         calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendar.setRepeat(calendarRequestDto.getRepeat());
         calendarRepository.save(calendar);
         return calendar;
     }
