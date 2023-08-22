@@ -85,6 +85,7 @@ public class TodoService {
             }
             List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
             double percent =  completeTodoList.size()/todoList.size();
+            return percent;
 
         }
         if(option.equals("month")) {
@@ -98,6 +99,7 @@ public class TodoService {
             }
             List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
             double percent =  completeTodoList.size()/todoList.size();
+            return percent;
         }
         return -1.0;
     }
