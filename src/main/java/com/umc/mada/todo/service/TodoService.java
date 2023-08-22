@@ -112,38 +112,7 @@ public class TodoService {
         }
         return TodoAverageResponseDto.builder().todosPercent(0.0).completeTodoPercent(0.0).build();
     }
-    public double getCountTodosExistInPeriod(User user,TodoAverageRequestDto todoAverageRequestDto){
-        LocalDate date =  todoAverageRequestDto.getDate();
-        String option = todoAverageRequestDto.getOption();
-        if(option.equals("week")) {
-            LocalDate firstDayOfFirstWeek = date.with(TemporalAdjusters.firstInMonth(DayOfWeek.SUNDAY));
 
-            // 해당 월의 첫 주의 마지막날을 구합니다
-            LocalDate lastDayOfFirstWeek = firstDayOfFirstWeek.plusDays(6);
-            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfFirstWeek,lastDayOfFirstWeek,Repeat.N);
-            if(todoList.size() == 0){
-                return 0.0;
-            }
-            List<Todo> todos = todoRepository.findTodosByUserIdAndRepeat(user,Repeat.N);
-            double todosPercent =  todoList.size()/todos.size();
-            return percent;
-
-        }
-        if(option.equals("month")) {
-            LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());
-
-            // 해당 달의 마지막날을 가져옵니다
-            LocalDate lastDayOfMonth = date.with(TemporalAdjusters.lastDayOfMonth());
-            List<Todo> todoList = todoRepository.findTodosByUserIdAndDateBetweenAndRepeat(user, firstDayOfMonth,lastDayOfMonth,Repeat.N);
-            if(todoList.size() == 0){
-                return 0.0;
-            }
-            List<Todo> todos = todoRepository.findTodosByUserIdAndRepeat(user,Repeat.N);
-            double todosPercent =  todoList.size()/todos.size();
-            return percent;
-        }
-        return -1.0;
-    }
 
     @Transactional
     // 투두 수정 로직
