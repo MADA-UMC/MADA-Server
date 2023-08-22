@@ -91,5 +91,15 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
             }
             haveItemRepository.save(new HaveItem(user, basicItem));
         }
+//
+        List<CustomItem> basicItemList2 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C1);
+        for(CustomItem basicItem : basicItemList2){
+            haveItemRepository.save(new HaveItem(user, basicItem));
+        }
+
+        List<CustomItem> basicItemList3 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C2);
+        for(CustomItem basicItem : basicItemList3){
+            haveItemRepository.save(new HaveItem(user, basicItem));
+        }
     }
 }
