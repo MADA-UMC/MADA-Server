@@ -156,17 +156,35 @@ public class UserController {
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
-        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+    @PostMapping("/pageInfo/change")
+    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+        return ResponseEntity.ok(userService.userPageSettings(authentication, map));
     }
 
     /**
      * 알람 설정 API
      */
-    @PatchMapping("/alarmInfo")
+    @PatchMapping("/alarmInfo/change")
     public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
         return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
+    }
+
+    /**
+     * 화면 설정 조회 API
+     */
+    @GetMapping("/pageInfo")
+    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userPageSet(authentication, map));
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 알람 설정 조회 API
+     */
+    @GetMapping("/alarmInfo")
+    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userAlarmSet(authentication, map));
+        return ResponseEntity.ok(map);
     }
 
     /**
