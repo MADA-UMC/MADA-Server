@@ -89,8 +89,8 @@ public class TodoService {
                 return TodoAverageResponseDto.builder().todosPercent((double)todos.size()).completeTodoPercent((double)todoList.size()).build();
             }
             List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
-            double completePercent =  completeTodoList.size()/todoList.size();
-            double todosPercent =  todoList.size()/todos.size();
+            double completePercent =  Math.round(completeTodoList.size()/todoList.size()*10)/10.0;
+            double todosPercent =  Math.round(todoList.size()/todos.size()*10)/10.0;
 
             return TodoAverageResponseDto.builder().todosPercent(todosPercent).completeTodoPercent(completePercent).build();
 
@@ -107,8 +107,8 @@ public class TodoService {
                 return TodoAverageResponseDto.builder().todosPercent((double)todos.size()).completeTodoPercent((double)todoList.size()).build();
             }
             List<Todo> completeTodoList = todoList.stream().filter(todo-> todo.getComplete()).collect(Collectors.toList());
-            double completePercent =  completeTodoList.size()/todoList.size();
-            double todosPercent =  todoList.size()/todos.size();
+            double completePercent =  Math.round(completeTodoList.size()/todoList.size()*10)/10.0;
+            double todosPercent = Math.round( todoList.size()/todos.size()*10)/10.0;
             return TodoAverageResponseDto.builder().todosPercent(todosPercent).completeTodoPercent(completePercent).build();
         }
         return TodoAverageResponseDto.builder().todosPercent(0.0).completeTodoPercent(0.0).build();
