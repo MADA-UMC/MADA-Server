@@ -22,4 +22,5 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
     List<Todo> findTodosByUserIdAndDateBetweenAndRepeat(User user,LocalDate startDate, LocalDate endDate, Repeat repeat);
     List<Todo> findTodosByUserIdAndRepeat(User user, Repeat repeat);
+    List<Todo> findTodosByUserId(User user);
 }
