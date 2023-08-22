@@ -25,17 +25,7 @@ import java.util.stream.Collectors;
 public class CalendarService {
     private final CalendarRepository calendarRepository;
 
-    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
-        calendar.setMemo(calendarRequestDto.getMemo());
-        calendar.setStartDate(calendarRequestDto.getStartDate());
-        calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalendarName(calendarRequestDto.getCalendarName());
-        calendar.setColor(calendarRequestDto.getColor());
-        calendar.setEndTime(calendarRequestDto.getEndTime());
-        calendar.setStartTime(calendarRequestDto.getStartTime());
-        calendarRepository.save(calendar);
-        return calendar;
-    }
+
 
     private final UserRepository userRepository;
 
@@ -122,17 +112,18 @@ public class CalendarService {
 
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarById(id);
+        Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id);
         Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
         return this.calendarToDto(updateCalendar);
     }
 
 
-    public CalendarResponseDto calendarDelete(Authentication authentication, Long id) throws NoSuchElementException{
+    public CalendarResponseDto calendarDelete(Authentication authentication, Long id){
         User user = this.getUser(authentication);
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id);
+        CalendarResponseDto calendarResponseDto =  this.calendarToDto(calendar);
         calendarRepository.deleteCalendarById(id);
-        return this.calendarToDto(calendar);
+        return calendarResponseDto;
     }
 
     public boolean tooManyD_dayExists(Authentication authentication){
@@ -140,15 +131,6 @@ public class CalendarService {
         return calendarRepository.findAllByUser(user).size() >= 3;
     }
 
-    public boolean calendarNameExist(Authentication authentication ,CalendarRequestDto calendarRequestDto) {
-        User user = this.getUser(authentication);
-        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalendarName(
-                user
-                , calendarRequestDto.getStartDate()
-                , calendarRequestDto.getEndDate()
-                , calendarRequestDto.getCalendarName()
-        );
-    }
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
@@ -207,7 +189,6 @@ public class CalendarService {
     }
     private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
         return Calendar.builder()
-                //User Entity 부재
                 .user(user)
                 .calendarName(calendarRequestDto.getCalendarName())
                 .dday(calendarRequestDto.getDday())
@@ -219,6 +200,17 @@ public class CalendarService {
                 .endTime(calendarRequestDto.getEndTime())
                 .color(calendarRequestDto.getColor())
                 .build();
+    }
+    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendar.setEndTime(calendarRequestDto.getEndTime());
+        calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendarRepository.save(calendar);
+        return calendar;
     }
 
 }
