@@ -134,8 +134,7 @@ public class CalendarService {
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
-                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
-                        ||calendar.getRepeat() == "Day"
+                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0 ||calendar.getRepeat() == "Day"
                         ||calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
                         && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
@@ -206,6 +205,7 @@ public class CalendarService {
         calendar.setStartDate(calendarRequestDto.getStartDate());
         calendar.setEndDate(calendarRequestDto.getEndDate());
         calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setDday(calendarRequestDto.getDday());
         calendar.setColor(calendarRequestDto.getColor());
         calendar.setEndTime(calendarRequestDto.getEndTime());
         calendar.setStartTime(calendarRequestDto.getStartTime());
