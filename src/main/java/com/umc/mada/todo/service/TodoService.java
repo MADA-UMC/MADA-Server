@@ -90,7 +90,14 @@ public class TodoService {
 //            return TodoAverageResponseDto.builder().todosPercent(todosPercent).completeTodoPercent(completePercent).build();
 //            Optional<TodoRepository.statisticsVO> statisticsVO = todoRepository.findTodosAVG(user.getId(), firstDayOfFirstWeek,lastDayOfFirstWeek);
 //            return statisticsVO.get();
-
+            List<StatisticsVO> statisticsVOS = todoRepository.findTodosWeekAVG(user.getId(), firstDayOfFirstWeek, lastDayOfFirstWeek);
+            Map<String, Object> map = new LinkedHashMap<>();
+            List<TodoStatisticsResponseDto> result = new ArrayList<>();
+            for(StatisticsVO s : statisticsVOS){
+                result.add(TodoStatisticsResponseDto.of(s.getTodosPercent(),s.getCompleteTodoPercent()));
+            }
+            map.put("statistics", result);
+            return map;
         }
         if(option.equals("month")) {
             LocalDate firstDayOfMonth = date.with(TemporalAdjusters.firstDayOfMonth());

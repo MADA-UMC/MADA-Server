@@ -55,13 +55,22 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
 //            "group by month(B.date);", nativeQuery = true)
     List<StatisticsVO> findTodosMonthAVG(@Param("uid") Long uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
 
+//    @Query(value = "select IFNULL(ROUND(AVG(A.complete)*100,1),0) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
+//            "from (select user_id, T.date, T.complete\n" +
+//            "      from TODO T\n" +
+//            "      where (user_id = 55) and (T.date between '2023-08-01' and '2023-08-31') and `repeat` = 'N') A right join\n" +
+//            "    (SELECT DATE_FORMAT(ADDDATE('2023-08-01', INTERVAL @num\\:=@num+1 DAY), '%Y-%m-%d') `date`\n" +
+//            "    FROM TODO, (SELECT @num\\:=-1) num\n" +
+//            "    LIMIT 31) B on A.date = B.date\n" + //TODO: limit 진짜 한달 날짜로 해야함
+//            "group by week(B.date);", nativeQuery = true)
     @Query(value = "select IFNULL(ROUND(AVG(A.complete)*100,1),0) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
             "from (select user_id, T.date, T.complete\n" +
             "      from TODO T\n" +
-            "      where (user_id = 55) and (T.date between '2023-08-01' and '2023-08-31') and `repeat` = 'N') A right join\n" +
-            "    (SELECT DATE_FORMAT(ADDDATE('2023-08-01', INTERVAL @num\\:=@num+1 DAY), '%Y-%m-%d') `date`\n" +
+            "      where user_id = 55 and (T.date between '2023-08-01' and '2023-08-31') and `repeat` = 'N') A right join (\n" +
+            "    SELECT DATE_FORMAT(ADDDATE('2023-08-01', INTERVAL @num\\:=@num+1 DAY), '%Y-%m-%d') `date`\n" +
             "    FROM TODO, (SELECT @num\\:=-1) num\n" +
-            "    LIMIT 31) B on A.date = B.date\n" + //TODO: limit 진짜 한달 날짜로 해야함
+            "    LIMIT 31\n" +
+            ") B on A.date = B.date\n" +
             "group by week(B.date);", nativeQuery = true)
     List<StatisticsVO> findTodosWeekAVG(@Param("uid") Long uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
 
