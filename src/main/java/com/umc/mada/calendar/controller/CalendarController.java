@@ -14,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @RestController
 @Slf4j
@@ -38,20 +35,23 @@ public class CalendarController {
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
     ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data",calendarService.calendarCreate(authentication,calendarDto));
+        Map<String,Object> map = new LinkedHashMap<>();
+        Map<String,Object> data = new LinkedHashMap<>();
+        map.put("data",data.put("calendar",calendarService.calendarCreate(authentication,calendarDto)));
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarEdit(Authentication authentication, @PathVariable Long id, @RequestBody CalendarRequestDto calendarRequestDto){
-        Map<String,Object> map = new HashMap<>();
-        map.put("data", calendarService.calendarEdit(authentication,id,calendarRequestDto));
+        Map<String,Object> map = new LinkedHashMap<>();
+        Map<String,Object> data = new LinkedHashMap<>();
+        map.put("data", data.put("calendar",calendarService.calendarEdit(authentication,id,calendarRequestDto)));
         return ResponseEntity.ok(map);
     }
     @DeleteMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id){
         Map<String,Object> map = new HashMap<>();
-        map.put("data",calendarService.calendarDelete(authentication,id));
+        Map<String,Object> data = new HashMap<>();
+        map.put("data",data.put("calendar",calendarService.calendarDelete(authentication,id)));
         return ResponseEntity.ok(map);
     }
     @GetMapping("/dday")

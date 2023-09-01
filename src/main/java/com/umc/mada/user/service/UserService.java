@@ -49,16 +49,18 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
+
     public Boolean userSubscribeSettings(Authentication authentication, Map<String,Boolean> is_subscribe){
         User user = this.getUser(authentication);
         user.updateSubscribe(is_subscribe.get("is_subscribe"));
         userRepository.save(user);
         return user.getSubscribe();
     }
+
     public Map<String, Object> userPageSettings(Authentication authentication, Map<String, Boolean> map) {
         User user = this.getUser(authentication);
-        user.updatePageSetting(map.get("endTodoBackSetting"),map.get("newTodoStartSetting"),map.get("startTodoAtMonday"));
-        Map<String,Object> userPageInfos = new HashMap<>();
+        user.updatePageSetting(map.get("endTodoBackSetting"), map.get("newTodoStartSetting"), map.get("startTodoAtMonday"));
+        Map<String, Object> userPageInfos = new HashMap<>();
         userPageInfos.put("endTodoBackSetting",user.isEndTodoBackSetting());
         userPageInfos.put("newTodoStartSetting",user.isNewTodoStartSetting());
         userPageInfos.put("startTodoAtMonday",user.isStartTodoAtMonday());
@@ -77,9 +79,30 @@ public class UserService {
         return userAlarmInfos;
     }
 
+    public Map<String, Object> userPageSet(Authentication authentication, Map<String, Object> map) {
+        User user = getUser(authentication);
+        Map<String, Object> pageSet = new HashMap<>();
+        pageSet.put("endTodoBackSetting", user.isNewTodoStartSetting());
+        pageSet.put("startTodoAtMonday", user.isStartTodoAtMonday());
+        pageSet.put("newTodoStartSetting", user.isNewTodoStartSetting());
+        userRepository.save(user);
+        return pageSet;
+    }
+
+    public Map<String, Object> userAlarmSet(Authentication authentication, Map<String, Object> map) {
+        User user = getUser(authentication);
+        Map<String, Object> pageSet = new HashMap<>();
+        pageSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
+        pageSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
+        pageSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
+        userRepository.save(user);
+        return pageSet;
+    }
+
     public void nickNameSetting(Map<String, String> nickName, User user) {
         userRepository.save(user.setNickname(nickName.get("nickName")));
     }
+
     public void withdrawal(User user){
         userRepository.save(user.expiredUserUpdate());
     }

@@ -1,6 +1,8 @@
 package com.umc.mada.todo.controller;
 
 import com.umc.mada.todo.domain.Repeat;
+import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.service.TodoService;

@@ -2,6 +2,9 @@ package com.umc.mada.user.controller;
 
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.todo.domain.Todo;
+import com.umc.mada.todo.dto.TodoAverageRequestDto;
+import com.umc.mada.todo.dto.TodoAverageResponseDto;
+import com.umc.mada.todo.service.TodoService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.repository.UserRepository;
@@ -21,9 +24,6 @@ import com.umc.mada.timetable.repository.TimetableRepository;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -32,13 +32,16 @@ import java.util.*;
 @RequestMapping("/user") //user
 public class UserController {
     private final UserService userService;
+    private final TodoService todoService;
     private final UserRepository userRepository;
     private final TodoRepository todoRepository;
     private final TimetableRepository timetableRepository;
 
+
     @Autowired
-    public UserController(UserService userService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
+    public UserController(UserService userService, TodoService todoService, UserRepository userRepository, TodoRepository todoRepository, TimetableRepository timetableRepository){
         this.userService = userService;
+        this.todoService = todoService;
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
         this.timetableRepository = timetableRepository;
@@ -154,19 +157,40 @@ public class UserController {
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map){
-        return ResponseEntity.ok(userService.userPageSettings(authentication,map));
+    @PostMapping("/pageInfo/change")
+    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+        return ResponseEntity.ok(userService.userPageSettings(authentication, map));
     }
 
     /**
-     * 알람 설정 API
+     * 알림 설정 API
      */
-    @PatchMapping("/alarmInfo")
+    @PatchMapping("/alarmInfo/change")
     public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
         return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
     }
 
+    /**
+     * 화면 설정 조회 API
+     */
+    @GetMapping("/pageInfo")
+    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userPageSet(authentication, map));
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 알람 설정 조회 API
+     */
+    @GetMapping("/alarmInfo")
+    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication, Map<String, Object> map) {
+        map.put("data", userService.userAlarmSet(authentication, map));
+        return ResponseEntity.ok(map);
+    }
+
+    /**
+     * 투두 일별 통계 API
+     */
     @GetMapping("/statistics/day/{date}")
     public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
@@ -201,5 +225,17 @@ public class UserController {
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("data",data);
         return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<TodoAverageResponseDto> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+//        Map<String,Object> map = new LinkedHashMap<>();
+//        Map<String,Object> data = new LinkedHashMap<>();
+//        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
+//        map.put("data", data);
+        TodoAverageResponseDto todoAverageResponseDto = todoService.calcTodoAverage(user,todoAverageRequestDto);
+        return ResponseEntity.ok().body(todoAverageResponseDto);
     }
 }

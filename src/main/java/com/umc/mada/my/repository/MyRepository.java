@@ -1,7 +1,6 @@
-package com.umc.mada.saying.repository;
+package com.umc.mada.my.repository;
 
-import com.umc.mada.saying.domain.Saying;
-import com.umc.mada.saying.dto.SayingResponseDto;
+import com.umc.mada.my.domain.My;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SayingRepository extends JpaRepository<Saying, Long> {
+public interface MyRepository extends JpaRepository<My, Long> {
     @Query(value = "SELECT * FROM SAYING ORDER BY RAND() limit 1", nativeQuery = true)
-    List<Saying> findAllDesc();
+    List<My> findAllDesc();
 }

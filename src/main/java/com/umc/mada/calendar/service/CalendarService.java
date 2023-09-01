@@ -25,17 +25,7 @@ import java.util.stream.Collectors;
 public class CalendarService {
     private final CalendarRepository calendarRepository;
 
-    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
-        calendar.setMemo(calendarRequestDto.getMemo());
-        calendar.setStartDate(calendarRequestDto.getStartDate());
-        calendar.setEndDate(calendarRequestDto.getEndDate());
-        calendar.setCalendarName(calendarRequestDto.getCalendarName());
-        calendar.setColor(calendarRequestDto.getColor());
-        calendar.setEndTime(calendarRequestDto.getEndTime());
-        calendar.setStartTime(calendarRequestDto.getStartTime());
-        calendarRepository.save(calendar);
-        return calendar;
-    }
+
 
     private final UserRepository userRepository;
 
@@ -54,8 +44,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String,Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
 
@@ -67,8 +59,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String,Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
 
@@ -81,8 +75,10 @@ public class CalendarService {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
     public Map<String, Object> calendarsRead(Authentication authentication) {
@@ -93,8 +89,10 @@ public class CalendarService {
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
         }
-        map.put("startTodoAtMonday",user.isStartTodoAtMonday());
-        map.put("data",calendarResponseDtoList);
+        Map<String ,Object> data = new HashMap<>();
+        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("calendar",calendarResponseDtoList);
+        map.put("data",data);
         return map;
     }
     //동일 이름의 일정이 동일한 날짜에 있는지 검증
@@ -114,17 +112,18 @@ public class CalendarService {
 
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarById(id);
+        Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id);
         Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
         return this.calendarToDto(updateCalendar);
     }
 
 
-    public CalendarResponseDto calendarDelete(Authentication authentication, Long id) throws NoSuchElementException{
+    public CalendarResponseDto calendarDelete(Authentication authentication, Long id){
         User user = this.getUser(authentication);
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id);
+        CalendarResponseDto calendarResponseDto =  this.calendarToDto(calendar);
         calendarRepository.deleteCalendarById(id);
-        return this.calendarToDto(calendar);
+        return calendarResponseDto;
     }
 
     public boolean tooManyD_dayExists(Authentication authentication){
@@ -132,20 +131,10 @@ public class CalendarService {
         return calendarRepository.findAllByUser(user).size() >= 3;
     }
 
-    public boolean calendarNameExist(Authentication authentication ,CalendarRequestDto calendarRequestDto) {
-        User user = this.getUser(authentication);
-        return calendarRepository.existsCalendarByUserAndEndDateBetweenAndCalendarName(
-                user
-                , calendarRequestDto.getStartDate()
-                , calendarRequestDto.getEndDate()
-                , calendarRequestDto.getCalendarName()
-        );
-    }
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
-                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
-                        || calendar.getRepeat() == "Day"
+                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0 ||calendar.getRepeat() == "Day"
                         ||calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
                         && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
@@ -199,7 +188,6 @@ public class CalendarService {
     }
     private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
         return Calendar.builder()
-                //User Entity 부재
                 .user(user)
                 .calendarName(calendarRequestDto.getCalendarName())
                 .dday(calendarRequestDto.getDday())
@@ -211,6 +199,19 @@ public class CalendarService {
                 .endTime(calendarRequestDto.getEndTime())
                 .color(calendarRequestDto.getColor())
                 .build();
+    }
+    private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        calendar.setMemo(calendarRequestDto.getMemo());
+        calendar.setStartDate(calendarRequestDto.getStartDate());
+        calendar.setEndDate(calendarRequestDto.getEndDate());
+        calendar.setCalendarName(calendarRequestDto.getCalendarName());
+        calendar.setDday(calendarRequestDto.getDday());
+        calendar.setColor(calendarRequestDto.getColor());
+        calendar.setEndTime(calendarRequestDto.getEndTime());
+        calendar.setStartTime(calendarRequestDto.getStartTime());
+        calendar.setRepeat(calendarRequestDto.getRepeat());
+        calendarRepository.save(calendar);
+        return calendar;
     }
 
 }
