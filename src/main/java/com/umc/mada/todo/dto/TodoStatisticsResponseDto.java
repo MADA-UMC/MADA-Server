@@ -4,18 +4,18 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class TodoAverageResponseDto {
+public class TodoStatisticsResponseDto {
     Double todosPercent;
     Double completeTodoPercent;
 
     @Builder
-    public TodoAverageResponseDto(Double todosPercent, Double completeTodoPercent){
+    public TodoStatisticsResponseDto(Double todosPercent, Double completeTodoPercent){
         this.todosPercent = todosPercent;
         this.completeTodoPercent = completeTodoPercent;
     }
 
-    public static TodoAverageResponseDto of(Double todosPercent, Double completeTodoPercent){
-        return TodoAverageResponseDto.builder()
+    public static TodoStatisticsResponseDto of(Double todosPercent, Double completeTodoPercent){
+        return TodoStatisticsResponseDto.builder()
                 .todosPercent(todosPercent)
                 .completeTodoPercent(completeTodoPercent)
                 .build();

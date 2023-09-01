@@ -9,6 +9,7 @@ import com.umc.mada.user.dto.user.UserRequestDto;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +44,8 @@ public class User {
     private boolean newTodoStartSetting;
     private boolean account_expired;
     private String refreshToken;
+    @Column(name = "google_access_token")
+    private String googleAccessToken; //TODO: 테이블 분리하기
 
     @Column(nullable = false, name = "is_alarm") //TODO: Cannot resolve column
     private boolean isAlarm;
@@ -65,7 +68,7 @@ public class User {
     private List<HaveItem> haveItems = new ArrayList<>();
 
     @Builder
-    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role, boolean isAlarm) {
+    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role, boolean isAlarm, String googleAccessToken) {
         this.authId = authId;
         this.nickname = nickname;
         this.email = email;
@@ -73,6 +76,7 @@ public class User {
         this.provider = provider;
         this.role = role;
         this.isAlarm = isAlarm;
+        this.googleAccessToken = googleAccessToken;
     }
 
     public void updateNickname(String nickname) { this.nickname = nickname; }
@@ -80,6 +84,13 @@ public class User {
     public User update(String authId, String email) {
         this.authId = authId;
         this.email = email;
+        return this;
+    }
+
+    public User update(String authId, String email, String googleAccessToken) {
+        this.authId = authId;
+        this.email = email;
+        this.googleAccessToken = googleAccessToken;
         return this;
     }
 

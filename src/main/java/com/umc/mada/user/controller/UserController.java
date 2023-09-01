@@ -228,14 +228,15 @@ public class UserController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<TodoAverageResponseDto> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
+    public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoAverageRequestDto todoAverageRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-//        Map<String,Object> map = new LinkedHashMap<>();
+        Map<String,Object> map = new LinkedHashMap<>();
 //        Map<String,Object> data = new LinkedHashMap<>();
 //        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));
-//        map.put("data", data);
-        TodoAverageResponseDto todoAverageResponseDto = todoService.calcTodoAverage(user,todoAverageRequestDto);
-        return ResponseEntity.ok().body(todoAverageResponseDto);
+//        TodoAverageResponseDto todoAverageResponseDto = todoService.calcTodoAverage(user,todoAverageRequestDto);
+//        TodoRepository.statisticsVO = todoService.calcTodoAverage(user,todoAverageRequestDto);
+        map.put("data", todoService.calcTodoAverage(user,todoAverageRequestDto));
+        return ResponseEntity.ok().body(map);
     }
 }
