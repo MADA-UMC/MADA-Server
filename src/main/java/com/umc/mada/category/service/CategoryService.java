@@ -50,7 +50,7 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
-        Category category = new Category(user, categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), icon);
+        Category category = new Category(user, categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), categoryRequestDto.getIsInActive(), categoryRequestDto.getIsDeleted(), icon);
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
@@ -97,23 +97,37 @@ public class CategoryService {
     }
 
     /**
+     * 카테고리 종료 로직
+     *
+     */
+    @Transactional
+    public void activeCategory(User userId, int categoryId){
+        Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
+        if (optionalCategory.isPresent() && !optionalCategory.get().getIsInActive()){
+            Category category = optionalCategory.get();
+            category.setIsInActive(true);
+            categoryRepository.save(category);
+        }else {
+            throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
+        }
+    }
+
+    /**
      * 카테고리 삭제 로직
      *
      */
     @Transactional
     public void deleteCategory(User userId, int categoryId) {
-        // 주어진 categoryId를 이용하여 카테고리 엔티티 조회
-        Optional<Category> optionalCategory = categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
-        List<Todo> todosToDelete = todoRepository.deleteTodosByUserIdAndCategoryId(userId, categoryId);
-        if (optionalCategory.isPresent()) {
-            // 주어진 categoryId에 해당하는 카테고리가 존재하는 경우 삭제
-            todoRepository.deleteAll(todosToDelete);
-            categoryRepository.deleteCategoryByUserIdAndId(userId, categoryId);
+        Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
+        if (optionalCategory.isPresent() && !optionalCategory.get().getIsDeleted()) {
+            Category category = optionalCategory.get();
+            category.setIsDeleted(true);
+            categoryRepository.save(category);
         } else {
-            // 해당 ID의 카테고리가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
         }
     }
+
 
     /**
      * 사용자 카테고리 목록 조회 로직
@@ -124,6 +138,7 @@ public class CategoryService {
         List<Category> userCategories = categoryRepository.findCategoriesByUserId(userId);
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
         return userCategories.stream()
+                .filter(category -> !category.getIsDeleted())
                 .map(CategoryResponseDto::of)
                 .collect(Collectors.toList());
     }

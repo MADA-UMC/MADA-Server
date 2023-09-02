@@ -64,7 +64,7 @@ public class CategoryController {
         }
     }
 
-    @DeleteMapping("/{categoryId}")
+    @PatchMapping("delete/{categoryId}")
     public ResponseEntity<Map<String, Object>> deleteCategory(Authentication authentication, @PathVariable int categoryId) {
         // 카테고리 삭제 API
         try{
@@ -77,6 +77,20 @@ public class CategoryController {
             //result.put("message", "카테고리 삭제가 완료되었습니다.");
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PatchMapping("active/{categoryId}")
+    public ResponseEntity<Map<String, Object>> activeCategory(Authentication authentication, @PathVariable int categoryId) {
+        //카테고리 종료 API
+        try{
+            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+            User user = userOptional.get();
+            categoryService.activeCategory(user, categoryId);
+            Map<String, Object> result = new LinkedHashMap<>();
+            return ResponseEntity.ok().body(result);
+        }catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
