@@ -59,7 +59,8 @@ public class TodoService {
                 todoRequestDto.getRepeatWeek(),
                 todoRequestDto.getRepeatMonth(),
                 todoRequestDto.getStartRepeatDate(),
-                todoRequestDto.getEndRepeatDate()
+                todoRequestDto.getEndRepeatDate(),
+                todoRequestDto.getIsDeleted()
         );
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
@@ -234,12 +235,12 @@ public class TodoService {
     // 투두 삭제 로직
     public void deleteTodo(User userId, int todoId) {
         // 주어진 투두 ID를 이용하여 투두 엔티티 조회
-        Optional<Todo> optionalTodo = todoRepository.deleteTodoByUserIdAndId(userId, todoId);
-        if (optionalTodo.isPresent()) {
-            // 주어진 투두 ID에 해당하는 Todo가 존재하는 경우 삭제
-            todoRepository.deleteTodoByUserIdAndId(userId, todoId);
+        Optional<Todo> optionalTodo = todoRepository.findTodoByUserIdAndId(userId, todoId);
+        if (optionalTodo.isPresent() && !optionalTodo.get().getIsDeleted()) {
+            Todo todo = optionalTodo.get();
+            todo.setIsDeleted(true);
+            todoRepository.save(todo);
         } else {
-            // 해당 ID의 Todo가 존재하지 않을 경우에 대한 처리 (예외 처리 등)
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
         }
     }
@@ -253,15 +254,22 @@ public class TodoService {
         for (Todo todo : userTodos){
             if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
                 if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
-                    filteredTodos.add(todo);
+                    if (!todo.getCategory().getIsInActive()) {
+                        filteredTodos.add(todo);
+                    }
                 }
             } else {
                 if (todo.getDate().equals(date)) {
-                    filteredTodos.add(todo);
+                    if (!todo.getCategory().getIsInActive()) {
+                        filteredTodos.add(todo);
+                    }
                 }
             }
         }
-        return filteredTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
+        return filteredTodos.stream()
+                .filter((todo -> !todo.getIsDeleted()))
+                .map(TodoResponseDto::of)
+                .collect(Collectors.toList());
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
         //return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
    }

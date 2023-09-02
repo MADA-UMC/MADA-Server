@@ -47,7 +47,7 @@ public class TodoController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PatchMapping("/todoId/{todoId}")
+    @PatchMapping("/update/{todoId}")
     public ResponseEntity<Map<String, Object>> updateTodo(Authentication authentication, @PathVariable int todoId, @RequestBody TodoRequestDto todoRequestDto){
         // 투두 수정 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
@@ -63,7 +63,7 @@ public class TodoController {
         return ResponseEntity.ok().body(result);
     }
 
-    @DeleteMapping("/todoId/{todoId}")
+    @PatchMapping("/delete/{todoId}")
     public ResponseEntity<Map<String, Object>> deleteTodo(Authentication authentication, @PathVariable int todoId) {
         // 투두 삭제 API
         try{
