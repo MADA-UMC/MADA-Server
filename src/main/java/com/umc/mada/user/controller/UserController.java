@@ -174,8 +174,9 @@ public class UserController {
      * 화면 설정 조회 API
      */
     @GetMapping("/pageInfo")
-    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication, Map<String, Object> map) {
-        map.put("data", userService.userPageSet(authentication, map));
+    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.userPageSet(authentication));
         return ResponseEntity.ok(map);
     }
 
@@ -183,8 +184,9 @@ public class UserController {
      * 알람 설정 조회 API
      */
     @GetMapping("/alarmInfo")
-    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication, Map<String, Object> map) {
-        map.put("data", userService.userAlarmSet(authentication, map));
+    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.userAlarmSet(authentication));
         return ResponseEntity.ok(map);
     }
 
