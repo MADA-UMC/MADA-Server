@@ -29,6 +29,8 @@ application-jwt.properties
 application-oauth2.properties
 application-DB.properties
 application-s3.properties
+application-ssl.properties
+keystore.p12
 
 ### NetBeans ###
 /nbproject/private/

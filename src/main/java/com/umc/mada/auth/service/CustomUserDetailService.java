@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -55,29 +56,45 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
         if(userOptional.isPresent()){
             user = userOptional.get();
             //유저 정보 업데이트
-            user = user.update(oAuth2Attributes.getAuthId(), oAuth2Attributes.getEmail());
+            if(provider.equals("google")){
+                user = user.update(oAuth2Attributes.getAuthId(), oAuth2Attributes.getEmail(), userRequest.getAccessToken().getTokenValue());
+            }else{
+                user = user.update(oAuth2Attributes.getAuthId(), oAuth2Attributes.getEmail());
+            }
+            userRepository.save(user);
         } else{
             //첫 로그인인 경우 사용자를 회원가입(등록)한다.
             newUser = true;
-            user = createUser(oAuth2Attributes, provider);
+            user = createUser(oAuth2Attributes, provider, userRequest.getAccessToken().getTokenValue());
             //사용자의 기본 데이터를 세팅한다.
             setUserData(user);
         }
-        System.out.println("sfqwdsfqwedsahfbqewkjffqewweffqekqwefbhfewhlwqefhl");
 //
 //        return new DefaultOAuth2User(Collections.singleton(
 //                new SimpleGrantedAuthority(user.getRole().getKey())),oAuth2Attributes.getAttributes(), oAuth2Attributes.getNameAttributeKey());
         return CusomtUserDetails.create(user, oAuth2Attributes.getAttributes(), newUser);
     }
 
-    private User createUser(OAuth2Attributes oAuth2Attributes, String authProvider){
-        User user = User.builder()
-                .authId(oAuth2Attributes.getAuthId())
-                .nickname(oAuth2Attributes.getName())
-                .email(oAuth2Attributes.getEmail())
-                .role(Role.USER)
-                .provider(authProvider)
-                .build();
+    private User createUser(OAuth2Attributes oAuth2Attributes, String authProvider, String accessToken){
+        User user;
+        if(authProvider.equals("google")){
+            user = User.builder()
+                    .authId(oAuth2Attributes.getAuthId())
+                    .nickname(oAuth2Attributes.getName())
+                    .email(oAuth2Attributes.getEmail())
+                    .role(Role.USER)
+                    .provider(authProvider)
+                    .googleAccessToken(accessToken)
+                    .build();
+        }else{
+            user = User.builder()
+                    .authId(oAuth2Attributes.getAuthId())
+                    .nickname(oAuth2Attributes.getName())
+                    .email(oAuth2Attributes.getEmail())
+                    .role(Role.USER)
+                    .provider(authProvider)
+                    .build();
+        }
         return userRepository.save(user);
     }
 
@@ -89,6 +106,16 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
                 haveItemRepository.save(new HaveItem(user, basicItem, true));
                 continue;
             }
+            haveItemRepository.save(new HaveItem(user, basicItem));
+        }
+//
+        List<CustomItem> basicItemList2 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C1);
+        for(CustomItem basicItem : basicItemList2){
+            haveItemRepository.save(new HaveItem(user, basicItem));
+        }
+
+        List<CustomItem> basicItemList3 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C2);
+        for(CustomItem basicItem : basicItemList3){
             haveItemRepository.save(new HaveItem(user, basicItem));
         }
     }
