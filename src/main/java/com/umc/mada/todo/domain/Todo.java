@@ -63,6 +63,9 @@ public class Todo{
     @Column(name = "date")
     private LocalDate date; // 투두 일자
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted; // 투두 삭제 여부
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt; // 생성 시간
@@ -72,7 +75,7 @@ public class Todo{
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Todo(User userId, LocalDate date, Category category, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate) {
+    public Todo(User userId, LocalDate date, Category category, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate, Boolean isDeleted) {
         this.userId = userId;
         this.date = date;
         this.category = category;
@@ -83,5 +86,6 @@ public class Todo{
         this.repeatMonth = repeatMonth;
         this.startRepeatDate = startRepeatDate;
         this.endRepeatDate = endRepeatDate;
+        this.isDeleted = isDeleted;
     }
 }

@@ -24,4 +24,6 @@ public class TodoRequestDto {
     private RepeatMonth repeatMonth;
     private LocalDate startRepeatDate; // 반복 시작 일자
     private LocalDate endRepeatDate; // 반복 종료 일자
+    @Nullable
+    private Boolean isDeleted; // 투두 삭제 여부
 }
