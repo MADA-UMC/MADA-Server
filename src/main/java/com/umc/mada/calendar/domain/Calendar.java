@@ -1,16 +1,13 @@
 package com.umc.mada.calendar.domain;
 
 
-import com.umc.mada.global.BaseEntity;
 import com.umc.mada.user.domain.User;
 import lombok.*;
-import net.bytebuddy.asm.Advice;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -46,10 +43,15 @@ public class Calendar {
     @Column(name = "`repeat`")
     //No, Day, Week, Month, Year
     private String  repeat;
+    @Column(name = "repeat_info")
+    private String repeatInfo;
     @Column(name = "d_day")
     private Character dday;
     @Column(name = "memo")
     private String memo;
+    @Column(name="is_expired")
+    private boolean isExpired;
+    // TODO: 2023-09-01 isExpirde 데이터베이스에 컬럼 추가하기
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)

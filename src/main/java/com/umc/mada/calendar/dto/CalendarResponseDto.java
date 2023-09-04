@@ -26,4 +26,6 @@ public class CalendarResponseDto {
    private String  repeat;
    private String memo;
    private String color;
+   private String repeatInfo;
+   private boolean isExpired;
 }
