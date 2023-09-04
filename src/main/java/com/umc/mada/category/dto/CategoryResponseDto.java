@@ -13,12 +13,14 @@ public class CategoryResponseDto {
     private int id;
     private String categoryName; // 카테고리명
     private String color; // 카테고리 색상
+    private Boolean isInActive; // 카테고리 유효 여부
     private Integer iconId; //아이콘 ID
     @Builder
-    public CategoryResponseDto(int id, String categoryName, String color, Integer iconId){
+    public CategoryResponseDto(int id, String categoryName, String color, Boolean isInActive, Integer iconId){
         this.id = id;
         this.categoryName = categoryName;
         this.color = color;
+        this.isInActive = isInActive;
         this.iconId = iconId;
     }
     public static CategoryResponseDto of(Category category){
@@ -26,6 +28,7 @@ public class CategoryResponseDto {
                 .id(category.getId())
                 .categoryName(category.getCategoryName())
                 .color(category.getColor())
+                .isInActive(category.getIsInActive())
                 .iconId(category.getIcon().getId())
                 .build();
     }

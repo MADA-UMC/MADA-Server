@@ -1,6 +1,7 @@
 package com.umc.mada.category.dto;
 
 import lombok.*;
+import reactor.util.annotation.Nullable;
 
 import javax.validation.constraints.NotNull;
 
@@ -10,4 +11,8 @@ public class CategoryRequestDto {
     private String categoryName; // 카테고리명
     private String color; // 카테고리 색상
     private Integer iconId; //아이콘 ID
+    @Nullable
+    private Boolean isInActive; // 카테고리 종료 여부
+    @Nullable
+    private Boolean isDeleted; // 카테고리 삭제 여부
 }
