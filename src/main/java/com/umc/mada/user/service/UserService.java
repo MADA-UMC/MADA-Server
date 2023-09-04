@@ -79,8 +79,8 @@ public class UserService {
         return userAlarmInfos;
     }
 
-    public Map<String, Object> userPageSet(Authentication authentication, Map<String, Object> map) {
-        User user = getUser(authentication);
+    public Map<String, Object> userPageSet(Authentication authentication) {
+        User user = this.getUser(authentication);
         Map<String, Object> pageSet = new HashMap<>();
         pageSet.put("endTodoBackSetting", user.isNewTodoStartSetting());
         pageSet.put("startTodoAtMonday", user.isStartTodoAtMonday());
@@ -89,8 +89,8 @@ public class UserService {
         return pageSet;
     }
 
-    public Map<String, Object> userAlarmSet(Authentication authentication, Map<String, Object> map) {
-        User user = getUser(authentication);
+    public Map<String, Object> userAlarmSet(Authentication authentication) {
+        User user = this.getUser(authentication);
         Map<String, Object> pageSet = new HashMap<>();
         pageSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
         pageSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
