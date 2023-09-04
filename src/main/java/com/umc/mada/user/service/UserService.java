@@ -85,7 +85,6 @@ public class UserService {
         pageSet.put("endTodoBackSetting", user.isNewTodoStartSetting());
         pageSet.put("startTodoAtMonday", user.isStartTodoAtMonday());
         pageSet.put("newTodoStartSetting", user.isNewTodoStartSetting());
-        userRepository.save(user);
         return pageSet;
     }
 
@@ -95,7 +94,6 @@ public class UserService {
         pageSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
         pageSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
         pageSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
-        userRepository.save(user);
         return pageSet;
     }
 
