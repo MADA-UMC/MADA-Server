@@ -82,7 +82,7 @@ public class UserService {
     public Map<String, Object> userPageSet(Authentication authentication) {
         User user = this.getUser(authentication);
         Map<String, Object> pageSet = new HashMap<>();
-        pageSet.put("endTodoBackSetting", user.isNewTodoStartSetting());
+        pageSet.put("endTodoBackSetting", user.isEndTodoBackSetting());
         pageSet.put("startTodoAtMonday", user.isStartTodoAtMonday());
         pageSet.put("newTodoStartSetting", user.isNewTodoStartSetting());
         return pageSet;
