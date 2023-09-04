@@ -12,7 +12,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 //        OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(provider, userNameAttributeName, oAuth2User.getAttributes());
 //        Optional<User> findUser = userRepository.findByAuthId()
@@ -37,7 +36,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         //refreshtoken을 DB에 저장해야함
         Optional<User> userOptional = userRepository.findByAuthId(oAuth2User.getName());
-        User user = userOptional.get();
+        User user = userOptional.get(); //TODO: null값 체크하기
         user.setRefreshToken(refreshToken);
 
 //        tokenResponse(response, accessToken);
@@ -68,11 +67,11 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private String makeRedirectUrl(String accessToken, boolean newUser){
         if(newUser){ //회원가입한 유저라면 닉네임 입력받는 곳으로 리다이렉트
-            return UriComponentsBuilder.fromUriString("http://15.165.210.13:8080/user/signup") //"http://localhost:8080/login/oauth2/code/google"
+            return UriComponentsBuilder.fromUriString("http://www.madaumc.store/user/signup") //"http://localhost:8080/login/oauth2/code/google"
                     .queryParam("token", accessToken)
                     .build().toUriString();
         }
-        return UriComponentsBuilder.fromUriString("http://15.165.210.13:8080/user/test") //"http://localhost:8080/login/oauth2/code/google"
+        return UriComponentsBuilder.fromUriString("http://www.madaumc.store/user/test") //"http://localhost:8080/login/oauth2/code/google"
                 .queryParam("token", accessToken)
                 .build().toUriString();
     }
