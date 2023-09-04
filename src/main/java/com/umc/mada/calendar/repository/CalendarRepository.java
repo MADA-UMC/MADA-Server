@@ -23,7 +23,7 @@ public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     boolean existsCalendarByUserAndEndDateBetweenAndCalendarName(User user, Date startDate, Date endDate, String calendarName);
     @Override
     Calendar getReferenceById(Long id);
-
+    List<Calendar> findCalendarsByUserAndRepeatIsNotContaining(User user,String repeat);
 
 
 }

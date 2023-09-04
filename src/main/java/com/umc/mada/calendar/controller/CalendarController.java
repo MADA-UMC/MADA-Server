@@ -1,13 +1,9 @@
 package com.umc.mada.calendar.controller;
 
-import com.umc.mada.calendar.domain.ManyD_dayException;
-import com.umc.mada.calendar.domain.SameCalendarNameExist;
 import com.umc.mada.calendar.dto.CalendarRequestDto;
-import com.umc.mada.calendar.dto.CalendarResponseDto;
 import com.umc.mada.calendar.service.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +45,8 @@ public class CalendarController {
     }
     @DeleteMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id){
-        Map<String,Object> map = new HashMap<>();
-        Map<String,Object> data = new HashMap<>();
+        Map<String,Object> map = new LinkedHashMap<>();
+        Map<String,Object> data = new LinkedHashMap<>();
         map.put("data",data.put("calendar",calendarService.calendarDelete(authentication,id)));
         return ResponseEntity.ok(map);
     }
@@ -66,6 +62,10 @@ public class CalendarController {
     @GetMapping("/date/{date}")
     ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable Date date){
         return ResponseEntity.ok(calendarService.calendarsReadByDate(authentication,date));
+    }
+    @GetMapping("/repeat")
+    ResponseEntity<Map<String ,Object>> readRepeats(Authentication authentication){
+        return ResponseEntity.ok(calendarService.readRepeats(authentication));
     }
 
     /*@ExceptionHandler(ManyD_dayException.class)

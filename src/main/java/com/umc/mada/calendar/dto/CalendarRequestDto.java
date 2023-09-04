@@ -21,6 +21,7 @@ public class CalendarRequestDto {
     private Date startDate;
     private Date endDate;
     private String color;
+    private String repeatInfo;
     @Nullable
     private LocalTime startTime;
     private LocalTime endTime;
