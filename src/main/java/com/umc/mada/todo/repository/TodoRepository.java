@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TodoRepository extends JpaRepository<Todo, Integer> {
+public interface TodoRepository extends JpaRepository<Todo, Integer>, TodoRepositoryCustom {
 
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
@@ -73,7 +73,5 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {
             ") B on A.date = B.date\n" +
             "group by week(B.date);", nativeQuery = true)
     List<StatisticsVO> findTodosWeekAVG(@Param("uid") Long uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
-
-//    List<StatisticsVO>
 
 }
