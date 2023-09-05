@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TodoRepository extends JpaRepository<Todo, Integer> {//, TodoRepositoryCustom
+public interface TodoRepository extends JpaRepository<Todo, Integer>{//, TodoRepositoryCustom
 
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
@@ -45,13 +45,14 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {//, TodoRe
         "    FROM TODO, (SELECT @num\\:=-1) num\n" +
         "    LIMIT 31) B on A.date = B.date\n" + //TODO: limit 진짜 한달 날짜로 해야함
         "group by month(B.date);", nativeQuery = true)
-//    @Query(value = "select IFNULL(ROUND(AVG(A.complete)*100,1),0) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
+//    @Query(value = "select ROUND(IFNULL(AVG(IFNULL(A.complete, 0)) * 100, 0), 1) as completeTodoPercent, ROUND(COUNT(IFNULL(A.complete, 0)) / COUNT(*), 1) as todosPercent\n" +
 //            "from (select user_id, T.date, T.complete\n" +
 //            "      from TODO T\n" +
-//            "      where (user_id = 55) and (T.date between '2023-08-01' and '2023-08-31') and `repeat` = 'N') A right join\n" +
-//            "    (SELECT DATE_FORMAT(ADDDATE('2023-08-01', INTERVAL @num\\:=@num+1 DAY), '%Y-%m-%d') `date`\n" +
-//            "    FROM TODO, (SELECT @num\\:=-1) num\n" +
-//            "    LIMIT 31) B on A.date = B.date\n" + //TODO: limit 진짜 한달 날짜로 해야함
+//            "      where user_id = 55 and (T.date between '2023-08-01' and '2023-08-31') and `repeat` = 'N') A right join (\n" +
+//            "    SELECT DATE_FORMAT(ADDDATE('2023-08-01', INTERVAL @num:=@num+1 DAY), '%Y-%m-%d') `date`\n" +
+//            "    FROM TODO, (SELECT @num:=-1) num\n" +
+//            "    LIMIT 31\n" +
+//            ") B on A.date = B.date\n" +
 //            "group by month(B.date);", nativeQuery = true)
     List<StatisticsVO> findTodosMonthAVG(@Param("uid")Long uid,@Param("endDate") LocalDate endDate, @Param("startDate") LocalDate startDate);
 
