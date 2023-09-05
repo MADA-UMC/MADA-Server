@@ -28,4 +28,5 @@ public class CalendarRequestDto {
     private String  repeat;
     private Character dday;
     private String memo;
+    private Boolean isExpired;
 }

@@ -13,8 +13,6 @@ import java.sql.Date;
 import java.util.*;
 
 @RestController
-@Slf4j
-@Transactional
 @RequestMapping("/api/calendar")
 public class CalendarController {
     private final CalendarService calendarService;
@@ -33,30 +31,30 @@ public class CalendarController {
     ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-        map.put("data",data.put("calendar",calendarService.calendarCreate(authentication,calendarDto)));
+        map.put("data",data.put("calendars",calendarService.calendarCreate(authentication,calendarDto)));
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarEdit(Authentication authentication, @PathVariable Long id, @RequestBody CalendarRequestDto calendarRequestDto){
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-        map.put("data", data.put("calendar",calendarService.calendarEdit(authentication,id,calendarRequestDto)));
+        map.put("data", data.put("calendars",calendarService.calendarEdit(authentication,id,calendarRequestDto)));
         return ResponseEntity.ok(map);
     }
     @DeleteMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id){
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-        map.put("data",data.put("calendar",calendarService.calendarDelete(authentication,id)));
+        data.put("calendars",calendarService.calendarDelete(authentication,id));
+        map.put("data",data);
         return ResponseEntity.ok(map);
     }
     @GetMapping("/dday")
     ResponseEntity<Map<String,Object>> readD_days(Authentication authentication){
         return ResponseEntity.ok(calendarService.readDday(authentication));
     }
-    @GetMapping("/{month}")
+    @GetMapping("/?{year}&{month}")
     ResponseEntity<Map<String,Object>> readCalendarByMonth(Authentication authentication ,@PathVariable int year ,@PathVariable int month){
-
         return ResponseEntity.ok(calendarService.readMonthCalendar(authentication,year,month));
     }
     @GetMapping("/date/{date}")
