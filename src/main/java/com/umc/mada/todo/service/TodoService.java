@@ -55,7 +55,7 @@ public class TodoService {
                 todoRequestDto.getRepeatMonth(),
                 todoRequestDto.getStartRepeatDate(),
                 todoRequestDto.getEndRepeatDate(),
-                todoRequestDto.getIsDeleted()
+                todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
         );
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
