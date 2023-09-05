@@ -3,6 +3,7 @@ package com.umc.mada.todo.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.umc.mada.todo.domain.QTodo;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -11,21 +12,26 @@ import java.util.List;
 @Repository
 public class TodoRespositoryCustomImpl implements TodoRepositoryCustom{
     private JPAQueryFactory jpaQueryFactory;
+    private QTodo todo;
 
     public TodoRespositoryCustomImpl(JPAQueryFactory jpaQueryFactory){
         this.jpaQueryFactory = jpaQueryFactory;
-
+        this.todo = QTodo.todo;
     }
 
     @Override
     public List<StatisticsVO> getStatistics(Long uid, String weekOrMonth, LocalDate endDate, LocalDate startDate) {
-//        if(weekOrMonth.equals("week")){
-//
-//        }else{
-//            List<StatisticsVO> result = jpaQueryFactory
+        List<StatisticsVO> result = null;
+//        if (weekOrMonth.equals("week")) {
+////            result = jpaQueryFactory
+////                    .select()
+////                    .from()
+////                    .groupBy()
+//        } else {
+//            result = jpaQueryFactory
 //                    .select(Projections.bean(
 //                            StatisticsVO.class,
-//                            todo.
+//                            todo.complete.avg()
 //                    ))
 //                    .from(
 //                            selectDateQuery()
@@ -34,7 +40,7 @@ public class TodoRespositoryCustomImpl implements TodoRepositoryCustom{
 //                    .fetch();
 //        }
 
-        return null;
+        return result;
     }
 //
 //    private JPAQuery<String> selectDateQuery(LocalDate startDate, LocalDate endDate) {

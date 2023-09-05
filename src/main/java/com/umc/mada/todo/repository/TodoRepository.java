@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface TodoRepository extends JpaRepository<Todo, Integer>, TodoRepositoryCustom {
+public interface TodoRepository extends JpaRepository<Todo, Integer> {//, TodoRepositoryCustom
 
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
