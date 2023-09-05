@@ -37,7 +37,7 @@ public interface TodoRepository extends JpaRepository<Todo, Integer> {//, TodoRe
 //            "group by month(B.date);", nativeQuery = true)
 //    @Modifying
 //    @Transactional
-    @Query(value = "select IFNULL(ROUND(AVG(A.complete)*100,1),0) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
+    @Query(value = "select ROUND(IFNULL(AVG(IFNULL(A.complete, 0)) * 100, 0), 1) as completeTodoPercent, ROUND(COUNT(IFNULL(A.complete, 0)) / COUNT(*), 1) as todosPercent\n" +
         "from (select user_id, T.date, T.complete\n" +
         "      from TODO T\n" +
         "      where (user_id = :uid) and (T.date between :startDate and :endDate) and `repeat` = 'N') A right join\n" +
