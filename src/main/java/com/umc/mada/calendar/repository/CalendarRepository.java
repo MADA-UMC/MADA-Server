@@ -10,19 +10,15 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     //Optional<Calendar> findCalendarById(Long id); 캘린더 고유 아이디로 캘린더 조회
     List<Calendar> findAllByUser(User user);
     List<Calendar> findAllByUserAndDday(User user,char dday);
-    Calendar findCalendarByUserAndId(User user, Long id);
+    Optional<Calendar> findCalendarByUserAndId(User user, Long id);
 
-    Calendar findCalendarById(Long id);
-    void deleteCalendarById(Long id);
-    boolean existsCalendarByUserAndEndDateBetweenAndCalendarName(User user, Date startDate, Date endDate, String calendarName);
-    @Override
-    Calendar getReferenceById(Long id);
     List<Calendar> findCalendarsByUserAndRepeatIsNotContaining(User user,String repeat);
 
 
