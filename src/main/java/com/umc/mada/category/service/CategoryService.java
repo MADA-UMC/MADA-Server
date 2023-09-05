@@ -50,13 +50,7 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
-        Category category = new Category(
-                user,
-                categoryRequestDto.getCategoryName(),
-                categoryRequestDto.getColor(),
-                categoryRequestDto.getIsInActive() != null ? categoryRequestDto.getIsInActive() : false,
-                categoryRequestDto.getIsDeleted() != null ? categoryRequestDto.getIsDeleted() : false,
-                icon);
+        Category category = new Category(user, categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), categoryRequestDto.getIsInActive() != null ? categoryRequestDto.getIsInActive() : false, categoryRequestDto.getIsDeleted() != null ? categoryRequestDto.getIsDeleted() : false, icon);
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
