@@ -15,15 +15,13 @@ import java.util.List;
 public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     //Optional<Calendar> findCalendarById(Long id); 캘린더 고유 아이디로 캘린더 조회
     List<Calendar> findAllByUser(User user);
-    List<Calendar> findAllByUserAndDday(User user,char dday);
-    Calendar findCalendarByUserAndId(User user, Long id);
+    List<Calendar> findAllByUserAndDdayAndExpired(User user,char dday,boolean expired);
+    Calendar findCalendarByUserAndIdAndExpired(User user, Long id,boolean expired);
 
     Calendar findCalendarById(Long id);
     void deleteCalendarById(Long id);
-    boolean existsCalendarByUserAndEndDateBetweenAndCalendarName(User user, Date startDate, Date endDate, String calendarName);
-    @Override
-    Calendar getReferenceById(Long id);
-    List<Calendar> findCalendarsByUserAndRepeatIsNotContaining(User user,String repeat);
+    boolean existsCalendarByUserAndEndDateBetweenAndCalendarNameAndExpired(User user, Date startDate, Date endDate, String calendarName,boolean expired);
+    List<Calendar> findCalendarsByUserAndRepeatIsNotContainingAndExpired(User user,String repeat,boolean expired);
 
 
 }
