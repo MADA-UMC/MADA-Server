@@ -29,7 +29,7 @@ public class CalendarService {
 
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findAllByUserAndDdayAndExpired(user,'Y',false);
+        List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'Y').stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());;
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
 
         for (Calendar calendar: calendarList) {
@@ -45,7 +45,7 @@ public class CalendarService {
 
     public Map<String, Object> readMonthCalendar(Authentication authentication, int year,int month){
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = readCalendarsByMonth(calendarRepository.findAllByUser(user),year,month);
+        List<Calendar> calendarList = readCalendarsByMonth(calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList()),year,month);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
@@ -61,7 +61,7 @@ public class CalendarService {
     public Map<String,Object> calendarsReadByDate(Authentication authentication,Date date){
         User user = this.getUser(authentication);
 
-        List<Calendar> calendarList = readCalendarsByDate(calendarRepository.findAllByUser(user),date);
+        List<Calendar> calendarList = readCalendarsByDate(calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList()),date);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
@@ -75,7 +75,7 @@ public class CalendarService {
     }
     public Map<String,Object> readRepeats(Authentication authentication) {
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndRepeatIsNotContainingAndExpired(user,"No",false);
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndRepeatIsNotContaining(user,"No").stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());
         List<CalendarResponseDto> calendarResponseDtoList =  calendarList.stream().map(this::calendarToDto).collect(Collectors.toList());
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String ,Object> data = new LinkedHashMap<>();
@@ -86,7 +86,7 @@ public class CalendarService {
     }
     public Map<String, Object> calendarsRead(Authentication authentication) {
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findAllByUser(user);
+        List<Calendar> calendarList = calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());;
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         Map<String,Object> map = new LinkedHashMap<>();
         for (Calendar calendar: calendarList) {
@@ -115,7 +115,7 @@ public class CalendarService {
 
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarByUserAndIdAndExpired(user, id,false);
+        Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id).get();
         Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
         return this.calendarToDto(updateCalendar);
     }
@@ -123,7 +123,7 @@ public class CalendarService {
 
     public CalendarResponseDto calendarDelete(Authentication authentication, Long id){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarByUserAndIdAndExpired(user,id,false);
+        Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id).get();
         calendar.setExpired(true);
         calendarRepository.save(calendar);
 
