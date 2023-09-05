@@ -17,8 +17,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j //로그처리
-@Transactional //트렌젝션 처리
 public class CalendarService {
     private final CalendarRepository calendarRepository;
     private final UserRepository userRepository;
@@ -31,7 +29,7 @@ public class CalendarService {
 
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findAllByUserAndDday(user,'Y');
+        List<Calendar> calendarList = calendarRepository.findAllByUserAndDdayAndExpired(user,'Y',false);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
 
         for (Calendar calendar: calendarList) {
@@ -77,7 +75,7 @@ public class CalendarService {
     }
     public Map<String,Object> readRepeats(Authentication authentication) {
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndRepeatIsNotContaining(user,"No");
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndRepeatIsNotContainingAndExpired(user,"No",false);
         List<CalendarResponseDto> calendarResponseDtoList =  calendarList.stream().map(this::calendarToDto).collect(Collectors.toList());
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String ,Object> data = new LinkedHashMap<>();
@@ -117,7 +115,7 @@ public class CalendarService {
 
     public CalendarResponseDto calendarEdit(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id);
+        Calendar calendar = calendarRepository.findCalendarByUserAndIdAndExpired(user, id,false);
         Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
         return this.calendarToDto(updateCalendar);
     }
@@ -125,11 +123,11 @@ public class CalendarService {
 
     public CalendarResponseDto calendarDelete(Authentication authentication, Long id){
         User user = this.getUser(authentication);
-        Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id);
-        calendar.setExpired(false);
-        CalendarResponseDto calendarResponseDto =  this.calendarToDto(calendar);
+        Calendar calendar = calendarRepository.findCalendarByUserAndIdAndExpired(user,id,false);
+        calendar.setExpired(true);
         calendarRepository.save(calendar);
-        return calendarResponseDto;
+
+        return this.calendarToDto(calendar);
     }
 
 
@@ -152,18 +150,17 @@ public class CalendarService {
     private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList,int year, int month){
         Date date = new Date(year,month,1);
         return calendarList.stream()
-                .filter(calendar -> calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
-                        &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year
-                        ||calendar.getRepeat() == "Day"
-                        ||calendar.getRepeat() == "Week"
+                .filter(calendar -> (calendar.getRepeat() == "Day" && calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
+                        &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year)
+                        ||(calendar.getRepeat() == "Week"
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
-                        && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
-                        || calendar.getRepeat() =="Month"
+                        && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue())
+                        || (calendar.getRepeat() =="Month"
                         && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
-                        && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
-                        || calendar.getRepeat() == "Year"
+                        && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth())
+                        || (calendar.getRepeat() == "Year"
                         && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
-                        && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear())
+                        && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()))
                 .collect(Collectors.toList());
     }
     private User getUser(Authentication authentication) throws NoSuchElementException {
@@ -187,6 +184,7 @@ public class CalendarService {
                 .memo(calendar.getMemo())
                 .repeat(calendar.getRepeat())
                 .repeatInfo(calendar.getRepeatInfo())
+                .isExpired(calendar.isExpired())
                 .build();
     }
     private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
@@ -202,6 +200,7 @@ public class CalendarService {
                 .endTime(calendarRequestDto.getEndTime())
                 .color(calendarRequestDto.getColor())
                 .repeatInfo(calendarRequestDto.getRepeatInfo())
+                .isExpired(calendarRequestDto.getIsExpired())
                 .build();
     }
     private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
@@ -215,6 +214,7 @@ public class CalendarService {
         calendar.setStartTime(calendarRequestDto.getStartTime());
         calendar.setRepeat(calendarRequestDto.getRepeat());
         calendar.setRepeatInfo(calendarRequestDto.getRepeatInfo());
+        calendar.setExpired(calendarRequestDto.getIsExpired());
         calendarRepository.save(calendar);
         return calendar;
     }
