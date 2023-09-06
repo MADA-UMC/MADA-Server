@@ -21,6 +21,7 @@ public interface TodoRepository extends JpaRepository<Todo, Integer>{//, TodoRep
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
     List<Todo> findTodosByUserIdAndEndRepeatDateAfter(User userId, LocalDate date);
     List<Todo> deleteTodosByUserIdAndCategoryId(User userId, int categoryId);
+    List<Todo> findTodosByUserIdAndCategoryId(User userId, int categoryId);
     Optional<Todo> deleteTodoByUserIdAndId(User userId, int id);
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
     List<Todo> findTodosByUserIdAndDateBetweenAndRepeat(User user,LocalDate startDate, LocalDate endDate, Repeat repeat);
