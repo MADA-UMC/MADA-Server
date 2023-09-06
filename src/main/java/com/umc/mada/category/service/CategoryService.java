@@ -119,10 +119,15 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(User userId, int categoryId) {
         Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
+        List<Todo> todosToDelete = todoRepository.findTodosByUserIdAndCategoryId(userId, categoryId);
         if (optionalCategory.isPresent() && !optionalCategory.get().getIsDeleted()) {
             Category category = optionalCategory.get();
             category.setIsDeleted(true);
             categoryRepository.save(category);
+            for (Todo todo : todosToDelete) {
+                todo.setIsDeleted(true);
+            }
+            todoRepository.saveAll(todosToDelete);
         } else {
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
         }
