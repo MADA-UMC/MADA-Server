@@ -15,6 +15,7 @@ import java.time.LocalTime;
 @Getter
 @Setter
 public class CalendarRequestDto {
+    @Nullable
     private Long calendarId;
     private String calendarName;
     @Nullable
@@ -28,5 +29,6 @@ public class CalendarRequestDto {
     private String  repeat;
     private Character dday;
     private String memo;
+    @Nullable
     private Boolean isExpired;
 }
