@@ -90,11 +90,11 @@ public class UserService {
 
     public Map<String, Object> findUserAlarmSet(Authentication authentication) {
         User user = this.getUser(authentication);
-        Map<String, Object> pageSet = new HashMap<>();
-        pageSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
-        pageSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
-        pageSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
-        return pageSet;
+        Map<String, Object> alarmSet = new HashMap<>();
+        alarmSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
+        alarmSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
+        alarmSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
+        return alarmSet;
     }
 
     public void nickNameSetting(Map<String, String> nickName, User user) {
