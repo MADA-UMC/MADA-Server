@@ -119,9 +119,9 @@ public class UserController {
      * 프로필 편집창 API
      */
     @GetMapping("/profile/change")
-    public ResponseEntity<Map<String, Object>>userProfile(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>>userProfileList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.changeProfile(authentication));
+        map.put("data", userService.findUserProfile(authentication));
         return ResponseEntity.ok(map);
     }
 
@@ -129,12 +129,12 @@ public class UserController {
      * 닉네임 변경 API
      */
     @PatchMapping("/profile/change/nickname")
-    public ResponseEntity<Map<String, Object>>changeNickname(Authentication authentication,
+    public ResponseEntity<Map<String, Object>>nicknameModify(Authentication authentication,
                                                              @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.changeNickname(user, changeNicknameRequestDto));
+        map.put("data", userService.modifyNickname(user, changeNicknameRequestDto));
 //        if(bindingResult.hasErrors()){
 //            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
 //            return ResponseEntity
@@ -143,13 +143,13 @@ public class UserController {
     }
 
     /**
-     * 구독 API
+     * 구독 설정 API
      */
     @PatchMapping("/subscribe")
-    public ResponseEntity<Void> userSubscribe(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
+    public ResponseEntity<Void> subscribeToggleSave(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
 //        Map<String,Object> map = new HashMap<>();
 //        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        userService.userSubscribeSettings(authentication,is_subscribe);
+        userService.isSubscribe(authentication,is_subscribe);
         return ResponseEntity.ok().build();
     }
 
@@ -157,25 +157,25 @@ public class UserController {
      * 화면 설정 API
      */
     @PostMapping("/pageInfo/change")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map) {
-        return ResponseEntity.ok(userService.userPageSettings(authentication, map));
+    public ResponseEntity<Map<String,Object>> pageToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+        return ResponseEntity.ok(userService.saveUserPageSet(authentication, map));
     }
 
     /**
      * 알림 설정 API
      */
     @PatchMapping("/alarmInfo/change")
-    public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
-        return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
+    public ResponseEntity<Map<String, Object>> alarmToggleSave(Authentication authentication, @RequestBody Map<String, Boolean> map) {
+        return ResponseEntity.ok(userService.saveUserAlarmSet(authentication, map));
     }
 
     /**
      * 화면 설정 조회 API
      */
     @GetMapping("/pageInfo")
-    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> pageToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.userPageSet(authentication));
+        map.put("data", userService.findUserPageSet(authentication));
         return ResponseEntity.ok(map);
     }
 
@@ -183,9 +183,9 @@ public class UserController {
      * 알람 설정 조회 API
      */
     @GetMapping("/alarmInfo")
-    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> alarmToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.userAlarmSet(authentication));
+        map.put("data", userService.findUserAlarmSet(authentication));
         return ResponseEntity.ok(map);
     }
 
