@@ -1,6 +1,7 @@
 package com.umc.mada.calendar.controller;
 
 import com.umc.mada.calendar.dto.CalendarRequestDto;
+import com.umc.mada.calendar.dto.CalendarResponseDto;
 import com.umc.mada.calendar.service.CalendarService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,9 @@ public class CalendarController {
     ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-        map.put("data",data.put("calendars",calendarService.calendarCreate(authentication,calendarDto)));
+        CalendarResponseDto calendarResponseDto = calendarService.calendarCreate(authentication,calendarDto);
+        data.put("calendars",calendarResponseDto);
+        map.put("data",data );
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
