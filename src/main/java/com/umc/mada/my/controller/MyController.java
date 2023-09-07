@@ -17,9 +17,9 @@ public class MyController {
 //    public List<MyResponseDto> getAllSaying() { return myService.findAllSaying(); }
 
     @GetMapping("/my")
-    public ResponseEntity<Map<String, Object>> myInfo(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>> myPageList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", myService.myProfile(authentication));
+        map.put("data", myService.findMyProfileList(authentication));
         return ResponseEntity.ok(map);
     }
 }
