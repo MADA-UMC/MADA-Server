@@ -188,6 +188,21 @@ public class CalendarService {
                 .build();
     }
     private Calendar calendarBuilder(User user,CalendarRequestDto calendarRequestDto){
+        if (calendarRequestDto.getIsExpired() == null){
+            return Calendar.builder()
+                    .user(user)
+                    .calendarName(calendarRequestDto.getCalendarName())
+                    .dday(calendarRequestDto.getDday())
+                    .repeat(calendarRequestDto.getRepeat())
+                    .memo(calendarRequestDto.getMemo())
+                    .startDate(calendarRequestDto.getStartDate())
+                    .endDate(calendarRequestDto.getEndDate())
+                    .startTime(calendarRequestDto.getStartTime())
+                    .endTime(calendarRequestDto.getEndTime())
+                    .color(calendarRequestDto.getColor())
+                    .repeatInfo(calendarRequestDto.getRepeatInfo())
+                    .build();
+        }
         return Calendar.builder()
                 .user(user)
                 .calendarName(calendarRequestDto.getCalendarName())
@@ -204,6 +219,20 @@ public class CalendarService {
                 .build();
     }
     private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+        if(calendarRequestDto.getIsExpired() == null){
+            calendar.setMemo(calendarRequestDto.getMemo());
+            calendar.setStartDate(calendarRequestDto.getStartDate());
+            calendar.setEndDate(calendarRequestDto.getEndDate());
+            calendar.setCalendarName(calendarRequestDto.getCalendarName());
+            calendar.setDday(calendarRequestDto.getDday());
+            calendar.setColor(calendarRequestDto.getColor());
+            calendar.setEndTime(calendarRequestDto.getEndTime());
+            calendar.setStartTime(calendarRequestDto.getStartTime());
+            calendar.setRepeat(calendarRequestDto.getRepeat());
+            calendar.setRepeatInfo(calendarRequestDto.getRepeatInfo());
+            calendarRepository.save(calendar);
+            return calendar;
+        }
         calendar.setMemo(calendarRequestDto.getMemo());
         calendar.setStartDate(calendarRequestDto.getStartDate());
         calendar.setEndDate(calendarRequestDto.getEndDate());

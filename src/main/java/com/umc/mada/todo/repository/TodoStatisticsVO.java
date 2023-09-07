@@ -1,6 +1,6 @@
 package com.umc.mada.todo.repository;
 
-public interface StatisticsVO {
+public interface TodoStatisticsVO {
     Double getTodosPercent();
     Double getCompleteTodoPercent();
 }

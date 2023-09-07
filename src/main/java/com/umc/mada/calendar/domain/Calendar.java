@@ -3,8 +3,10 @@ package com.umc.mada.calendar.domain;
 
 import com.umc.mada.user.domain.User;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 import java.sql.Date;
@@ -50,6 +52,7 @@ public class Calendar {
     @Column(name = "memo")
     private String memo;
     @Column(name="is_expired")
+    @ColumnDefault("0")
     private boolean isExpired;
     // TODO: 2023-09-01 isExpirde 데이터베이스에 컬럼 추가하기
 
