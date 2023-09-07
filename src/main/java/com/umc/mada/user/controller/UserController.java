@@ -228,7 +228,7 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/statistics")
+    @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
