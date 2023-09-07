@@ -4,7 +4,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class TodoAverageRequestDto {
+public class TodoStatisticsRequestDto {
     // month, week
     private String option;
     private LocalDate date;
