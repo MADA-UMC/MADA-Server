@@ -88,7 +88,14 @@ public class TodoService {
         }
         TodoStatisticsVO todoStatisticsVO = todoRepository.findTodosMonthAVG(user.getId(), startDay, endDay, length);
         List<CategoryStatisticsVO> categoryStatisticsVOs = todoRepository.findCategoryAVG(user.getId(), startDay, endDay, length);
-
+        if(categoryStatisticsVOs.size()==0){
+//            CategoryStatisticsDto defaultCategoryStatisticsDto = new CategoryStatisticsDto()
+            List<Category> categories =  categoryRepository.findCategoriesByUserId(user);
+            List<CategoryStatisticsDto> categoryStatisticsDtos = categories.stream()
+                    .map(category -> CategoryStatisticsDto.of(category.getCategoryName(), category.getColor(), (double) 0))
+                    .collect(Collectors.toList());
+            return new TodoStatisticsResponseDto(user.getNickname(),todoStatisticsVO.getTodosPercent(), todoStatisticsVO.getCompleteTodoPercent(), categoryStatisticsDtos);
+        }
         return TodoStatisticsResponseDto.of(user.getNickname(),todoStatisticsVO.getTodosPercent(), todoStatisticsVO.getCompleteTodoPercent(), categoryStatisticsVOs);
     }
 
