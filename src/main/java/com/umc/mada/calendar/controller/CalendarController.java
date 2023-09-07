@@ -33,7 +33,8 @@ public class CalendarController {
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
         CalendarResponseDto calendarResponseDto = calendarService.calendarCreate(authentication,calendarDto);
-        map.put("data",data.put("calendars",calendarResponseDto));
+        data.put("calendars",calendarResponseDto);
+        map.put("data",data);
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
