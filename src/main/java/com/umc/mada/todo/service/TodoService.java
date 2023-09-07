@@ -285,7 +285,10 @@ public class TodoService {
     public List<TodoResponseDto> getUserRepeatTodo(User userId){
         List<Repeat> nonNRepeats = Arrays.asList(Repeat.DAY, Repeat.WEEK, Repeat.MONTH);
         List<Todo> nonNRepeatTodos = todoRepository.findByUserIdAndRepeatIn(userId, nonNRepeats);
-        return nonNRepeatTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
+        return nonNRepeatTodos.stream()
+                .filter((todo -> !todo.getIsDeleted()))
+                .map(TodoResponseDto::of)
+                .collect(Collectors.toList());
     }
 
     // 투두 이름 유효성 검사 메서드
