@@ -40,13 +40,13 @@ public class MyService {
         return optionalUser.get();
     }
 
-    public Map<String, Object> myProfile(Authentication authentication) {
+    public Map<String, Object> findMyProfileList(Authentication authentication) {
         User user = getUser(authentication);
-        Map<String, Object> userProfile = new HashMap<>();
-        userProfile.put("nickname", user.getNickname());
-        userProfile.put("saying", this.findRandomSaying());
-        userProfile.put("subscribe", user.getSubscribe());
-        return userProfile;
+        Map<String, Object> profileList = new HashMap<>();
+        profileList.put("nickname", user.getNickname());
+        profileList.put("saying", this.findRandomSaying());
+        profileList.put("subscribe", user.getSubscribe());
+        return profileList;
     }
 
 }
