@@ -34,7 +34,7 @@ public class UserService {
         return user;
     }
 
-    public Map<String, String> changeProfile(Authentication authentication) {
+    public Map<String, String> findUserProfile(Authentication authentication) {
         User user = getUser(authentication);
         Map<String, String> userProfile = new HashMap<>();
         userProfile.put("nickname", user.getNickname());
@@ -43,21 +43,21 @@ public class UserService {
         return userProfile;
     }
 
-    public NicknameResponseDto changeNickname(User userAccount, NicknameRequestDto changeNicknameRequestDto) {
+    public NicknameResponseDto modifyNickname(User userAccount, NicknameRequestDto changeNicknameRequestDto) {
         User user = userRepository.findById(userAccount.getId()).get();
         user.updateNickname(changeNicknameRequestDto.getNickname());
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
 
-    public Boolean userSubscribeSettings(Authentication authentication, Map<String,Boolean> is_subscribe){
+    public Boolean isSubscribe(Authentication authentication, Map<String,Boolean> is_subscribe) {
         User user = this.getUser(authentication);
         user.updateSubscribe(is_subscribe.get("is_subscribe"));
         userRepository.save(user);
         return user.getSubscribe();
     }
 
-    public Map<String, Object> userPageSettings(Authentication authentication, Map<String, Boolean> map) {
+    public Map<String, Object> saveUserPageSet(Authentication authentication, Map<String, Boolean> map) {
         User user = this.getUser(authentication);
         user.updatePageSetting(map.get("endTodoBackSetting"), map.get("newTodoStartSetting"), map.get("startTodoAtMonday"));
         Map<String, Object> userPageInfos = new HashMap<>();
@@ -68,7 +68,7 @@ public class UserService {
         return userPageInfos;
     }
 
-    public Map<String, Object> userAlarmSettings(Authentication authentication, Map<String, Boolean>map) {
+    public Map<String, Object> saveUserAlarmSet(Authentication authentication, Map<String, Boolean>map) {
         User user = this.getUser(authentication);
         user.updateAlarmSetting(map.get("calendarAlarmSetting"), map.get("dDayAlarmSetting"), map.get("timetableAlarmSetting"));
         Map<String, Object> userAlarmInfos = new HashMap<>();
@@ -79,7 +79,7 @@ public class UserService {
         return userAlarmInfos;
     }
 
-    public Map<String, Object> userPageSet(Authentication authentication) {
+    public Map<String, Object> findUserPageSet(Authentication authentication) {
         User user = this.getUser(authentication);
         Map<String, Object> pageSet = new HashMap<>();
         pageSet.put("endTodoBackSetting", user.isEndTodoBackSetting());
@@ -88,13 +88,13 @@ public class UserService {
         return pageSet;
     }
 
-    public Map<String, Object> userAlarmSet(Authentication authentication) {
+    public Map<String, Object> findUserAlarmSet(Authentication authentication) {
         User user = this.getUser(authentication);
-        Map<String, Object> pageSet = new HashMap<>();
-        pageSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
-        pageSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
-        pageSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
-        return pageSet;
+        Map<String, Object> alarmSet = new HashMap<>();
+        alarmSet.put("calendarAlarmSetting", user.isCalendarAlarmSetting());
+        alarmSet.put("dDayAlarmSetting", user.isDDayAlarmSetting());
+        alarmSet.put("timetableAlarmSetting", user.isTimetableAlarmSetting());
+        return alarmSet;
     }
 
     public void nickNameSetting(Map<String, String> nickName, User user) {
