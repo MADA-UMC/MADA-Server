@@ -44,18 +44,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
 
         // 투두 앤티티 생성
-        Todo todo = new Todo(
-                user,
-                todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(),
-                category,
-                todoRequestDto.getTodoName(),
-                todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false,
-                todoRequestDto.getRepeat(),
-                todoRequestDto.getRepeatWeek(),
-                todoRequestDto.getRepeatMonth(),
-                todoRequestDto.getStartRepeatDate(),
-                todoRequestDto.getEndRepeatDate(),
-                todoRequestDto.getIsDeleted()
+        Todo todo = new Todo(user, todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(), category, todoRequestDto.getTodoName(), todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false, todoRequestDto.getRepeat(), todoRequestDto.getRepeatWeek(), todoRequestDto.getRepeatMonth(), todoRequestDto.getStartRepeatDate(), todoRequestDto.getEndRepeatDate(), todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
         );
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
