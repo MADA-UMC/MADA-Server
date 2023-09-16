@@ -86,16 +86,16 @@ public class UserController {
 
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
     @PostMapping("/signup/nickName")
-    public ResponseEntity<String> signupNickName(@RequestBody Map<String, String> nickName, Authentication authentication){
+    public ResponseEntity<String> signupNickname(@RequestBody Map<String, String> nickname, Authentication authentication) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.nickNameSetting(nickName, userOptional.get());
+        userService.setNickname(nickname, userOptional.get());
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
         return ResponseEntity.ok().build();
     }
 
     @Operation(description = "로그아웃")
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(){
+    public ResponseEntity<String> logout() {
         //세션 삭제
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
@@ -103,10 +103,10 @@ public class UserController {
 
     @Operation(description = "회원탈퇴")
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<String> withdrawal(Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public ResponseEntity<String> userRemove (Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        User user = cusomtUserDetails.getUser();
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.withdrawal(userOptional.get());
+        userService.removeUser(userOptional.get());
         return ResponseEntity.ok().build();
     }
 
@@ -193,7 +193,7 @@ public class UserController {
      * 투두 일별 통계 API
      */
     @GetMapping("/statistics/day/{date}")
-    public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+    public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
