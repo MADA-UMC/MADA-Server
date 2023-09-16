@@ -97,11 +97,11 @@ public class UserService {
         return alarmSet;
     }
 
-    public void nickNameSetting(Map<String, String> nickName, User user) {
-        userRepository.save(user.setNickname(nickName.get("nickName")));
+    public void setNickname (Map<String, String> nickname, User user) {
+        userRepository.save(user.setNickname(nickname.get("nickname")));
     }
 
-    public void withdrawal(User user){
+    public void removeUser(User user){
         userRepository.save(user.expiredUserUpdate());
     }
 
