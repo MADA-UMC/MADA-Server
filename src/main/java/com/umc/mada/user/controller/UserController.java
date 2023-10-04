@@ -193,7 +193,7 @@ public class UserController {
      * 투두 일별 통계 API
      */
     @GetMapping("/statistics/day/{date}")
-    public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+    public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetableAvg(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
@@ -228,6 +228,9 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 투두 주별, 월별 통계 API
+     */
     @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
