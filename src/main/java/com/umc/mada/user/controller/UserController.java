@@ -75,7 +75,7 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
 //    }
 
-    @Operation(description = "dsfasdf")
+    @Operation(description = "회원가입 로그인")
     @GetMapping("/signup")
     public void signupToken(HttpServletResponse response, @RequestParam String token) throws IOException {//
         response.setHeader("Content-type", "text/plain");
