@@ -229,7 +229,7 @@ public class UserController {
     }
 
     /**
-     * 투두 주별, 월별 통계 API
+     * 투두 통계 API
      */
     @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
