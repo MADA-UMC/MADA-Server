@@ -156,15 +156,15 @@ public class UserController {
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo/change")
-    public ResponseEntity<Map<String,Object>> pageToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+    @PostMapping("/display/change")
+    public ResponseEntity<Map<String,Object>> displayToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
         return ResponseEntity.ok(userService.saveUserPageSet(authentication, map));
     }
 
     /**
      * 알림 설정 API
      */
-    @PatchMapping("/alarmInfo/change")
+    @PatchMapping("/alarm/change")
     public ResponseEntity<Map<String, Object>> alarmToggleSave(Authentication authentication, @RequestBody Map<String, Boolean> map) {
         return ResponseEntity.ok(userService.saveUserAlarmSet(authentication, map));
     }
@@ -172,8 +172,8 @@ public class UserController {
     /**
      * 화면 설정 조회 API
      */
-    @GetMapping("/pageInfo")
-    public ResponseEntity<Map<String, Object>> pageToggleList(Authentication authentication) {
+    @GetMapping("/display")
+    public ResponseEntity<Map<String, Object>> displayToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.findUserPageSet(authentication));
         return ResponseEntity.ok(map);
@@ -182,7 +182,7 @@ public class UserController {
     /**
      * 알람 설정 조회 API
      */
-    @GetMapping("/alarmInfo")
+    @GetMapping("/alarm")
     public ResponseEntity<Map<String, Object>> alarmToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.findUserAlarmSet(authentication));
@@ -202,7 +202,7 @@ public class UserController {
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : todos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
-            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // Category의 아이콘 ID
+            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // 카테고리의 아이콘 ID
             todoMap.put("categoryName", todo.getCategory().getCategoryName());
             todoMap.put("todoName", todo.getTodoName());
             todoMap.put("complete", todo.getComplete());
