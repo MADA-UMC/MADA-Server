@@ -95,6 +95,20 @@ public class CategoryController {
         }
     }
 
+    @PatchMapping("active/{categoryId}")
+    public ResponseEntity<Map<String, Object>> activeCategory(Authentication authentication, @PathVariable int categoryId) {
+        //종료된 카테고리 복원 API
+        try{
+            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+            User user = userOptional.get();
+            categoryService.activeCategory(user, categoryId);
+            Map<String, Object> result = new LinkedHashMap<>();
+            return ResponseEntity.ok().body(result);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping
     public ResponseEntity<Map<String, Object>> getUserCategories(Authentication authentication) {
         // 특정 유저 카테고리 목록 조회 API

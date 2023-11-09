@@ -103,9 +103,25 @@ public class CategoryService {
     @Transactional
     public void inactiveCategory(User userId, int categoryId){
         Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
-        if (optionalCategory.isPresent() && !optionalCategory.get().getIsInActive()){
+        if (!optionalCategory.get().getIsDeleted() && !optionalCategory.get().getIsInActive()){
             Category category = optionalCategory.get();
             category.setIsInActive(true);
+            categoryRepository.save(category);
+        }else {
+            throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
+        }
+    }
+
+    /**
+     * 종료된 카테고리 복원 로직
+     *
+     */
+    @Transactional
+    public void activeCategory(User userId, int categoryId){
+        Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
+        if (!optionalCategory.get().getIsDeleted() && optionalCategory.get().getIsInActive()){
+            Category category = optionalCategory.get();
+            category.setIsInActive(false);
             categoryRepository.save(category);
         }else {
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
