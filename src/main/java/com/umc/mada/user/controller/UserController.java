@@ -75,7 +75,7 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
 //    }
 
-    @Operation(description = "dsfasdf")
+    @Operation(description = "회원가입 로그인")
     @GetMapping("/signup")
     public void signupToken(HttpServletResponse response, @RequestParam String token) throws IOException {//
         response.setHeader("Content-type", "text/plain");
@@ -86,16 +86,16 @@ public class UserController {
 
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
     @PostMapping("/signup/nickName")
-    public ResponseEntity<String> signupNickName(@RequestBody Map<String, String> nickName, Authentication authentication){
+    public ResponseEntity<String> signupNickname(@RequestBody Map<String, String> nickname, Authentication authentication) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.nickNameSetting(nickName, userOptional.get());
+        userService.setNickname(nickname, userOptional.get());
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
         return ResponseEntity.ok().build();
     }
 
     @Operation(description = "로그아웃")
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(){
+    public ResponseEntity<String> logout() {
         //세션 삭제
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
@@ -103,10 +103,10 @@ public class UserController {
 
     @Operation(description = "회원탈퇴")
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<String> withdrawal(Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public ResponseEntity<String> userRemove (Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        User user = cusomtUserDetails.getUser();
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.withdrawal(userOptional.get());
+        userService.removeUser(userOptional.get());
         return ResponseEntity.ok().build();
     }
 
@@ -119,9 +119,9 @@ public class UserController {
      * 프로필 편집창 API
      */
     @GetMapping("/profile/change")
-    public ResponseEntity<Map<String, Object>>userProfile(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>>userProfileList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.changeProfile(authentication));
+        map.put("data", userService.findUserProfile(authentication));
         return ResponseEntity.ok(map);
     }
 
@@ -129,12 +129,12 @@ public class UserController {
      * 닉네임 변경 API
      */
     @PatchMapping("/profile/change/nickname")
-    public ResponseEntity<Map<String, Object>>changeNickname(Authentication authentication,
+    public ResponseEntity<Map<String, Object>>nicknameModify(Authentication authentication,
                                                              @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.changeNickname(user, changeNicknameRequestDto));
+        map.put("data", userService.modifyNickname(user, changeNicknameRequestDto));
 //        if(bindingResult.hasErrors()){
 //            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
 //            return ResponseEntity
@@ -143,49 +143,49 @@ public class UserController {
     }
 
     /**
-     * 구독 API
+     * 구독 설정 API
      */
     @PatchMapping("/subscribe")
-    public ResponseEntity<Void> userSubscribe(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
+    public ResponseEntity<Void> subscribeToggleSave(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
 //        Map<String,Object> map = new HashMap<>();
 //        map.put("data",new HashMap<>().put("is_subscribe",userService.userSubscribeSettings(authentication,is_subscribe)));
-        userService.userSubscribeSettings(authentication,is_subscribe);
+        userService.isSubscribe(authentication,is_subscribe);
         return ResponseEntity.ok().build();
     }
 
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo/change")
-    public ResponseEntity<Map<String,Object>> userPageInfo(Authentication authentication, @RequestBody Map<String,Boolean> map) {
-        return ResponseEntity.ok(userService.userPageSettings(authentication, map));
+    @PostMapping("/display/change")
+    public ResponseEntity<Map<String,Object>> displayToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+        return ResponseEntity.ok(userService.saveUserPageSet(authentication, map));
     }
 
     /**
      * 알림 설정 API
      */
-    @PatchMapping("/alarmInfo/change")
-    public ResponseEntity<Map<String, Object>> userAlarmInfo(Authentication authentication, @RequestBody Map<String, Boolean> map) {
-        return ResponseEntity.ok(userService.userAlarmSettings(authentication, map));
+    @PatchMapping("/alarm/change")
+    public ResponseEntity<Map<String, Object>> alarmToggleSave(Authentication authentication, @RequestBody Map<String, Boolean> map) {
+        return ResponseEntity.ok(userService.saveUserAlarmSet(authentication, map));
     }
 
     /**
      * 화면 설정 조회 API
      */
-    @GetMapping("/pageInfo")
-    public ResponseEntity<Map<String, Object>> pageToggleInfo(Authentication authentication) {
+    @GetMapping("/display")
+    public ResponseEntity<Map<String, Object>> displayToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.userPageSet(authentication));
+        map.put("data", userService.findUserPageSet(authentication));
         return ResponseEntity.ok(map);
     }
 
     /**
      * 알람 설정 조회 API
      */
-    @GetMapping("/alarmInfo")
-    public ResponseEntity<Map<String, Object>> alarmToggleInfo(Authentication authentication) {
+    @GetMapping("/alarm")
+    public ResponseEntity<Map<String, Object>> alarmToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
-        map.put("data", userService.userAlarmSet(authentication));
+        map.put("data", userService.findUserAlarmSet(authentication));
         return ResponseEntity.ok(map);
     }
 
@@ -193,7 +193,7 @@ public class UserController {
      * 투두 일별 통계 API
      */
     @GetMapping("/statistics/day/{date}")
-    public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+    public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetableAvg(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
@@ -202,7 +202,7 @@ public class UserController {
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : todos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
-            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // Category의 아이콘 ID
+            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // 카테고리의 아이콘 ID
             todoMap.put("categoryName", todo.getCategory().getCategoryName());
             todoMap.put("todoName", todo.getTodoName());
             todoMap.put("complete", todo.getComplete());
@@ -228,7 +228,10 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/statistics")
+    /**
+     * 투두 통계 API
+     */
+    @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();

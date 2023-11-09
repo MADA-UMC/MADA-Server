@@ -29,7 +29,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createCategory(Authentication authentication, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<Map<String, Object>> addCategory(Authentication authentication, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 생성 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
