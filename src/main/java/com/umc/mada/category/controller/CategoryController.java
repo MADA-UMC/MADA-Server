@@ -81,13 +81,13 @@ public class CategoryController {
         }
     }
 
-    @PatchMapping("active/{categoryId}")
-    public ResponseEntity<Map<String, Object>> activeCategory(Authentication authentication, @PathVariable int categoryId) {
+    @PatchMapping("inactive/{categoryId}")
+    public ResponseEntity<Map<String, Object>> inactiveCategory(Authentication authentication, @PathVariable int categoryId) {
         //카테고리 종료 API
         try{
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
-            categoryService.activeCategory(user, categoryId);
+            categoryService.inactiveCategory(user, categoryId);
             Map<String, Object> result = new LinkedHashMap<>();
             return ResponseEntity.ok().body(result);
         }catch (IllegalArgumentException e){

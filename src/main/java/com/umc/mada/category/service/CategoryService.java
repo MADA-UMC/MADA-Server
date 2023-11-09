@@ -101,7 +101,7 @@ public class CategoryService {
      *
      */
     @Transactional
-    public void activeCategory(User userId, int categoryId){
+    public void inactiveCategory(User userId, int categoryId){
         Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
         if (optionalCategory.isPresent() && !optionalCategory.get().getIsInActive()){
             Category category = optionalCategory.get();
