@@ -12,4 +12,5 @@ public enum ErrorType {
 
     private final HttpStatus errorCode;
     private final String message;
+
 }
