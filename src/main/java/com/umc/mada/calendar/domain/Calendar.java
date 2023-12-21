@@ -44,7 +44,7 @@ public class Calendar {
     private LocalTime endTime;
     @Column(name = "`repeat`")
     //No, Day, Week, Month, Year
-    private String  repeat;
+    private Character  repeat;
     @Column(name = "repeat_info")
     private String repeatInfo;
     @Column(name = "d_day")

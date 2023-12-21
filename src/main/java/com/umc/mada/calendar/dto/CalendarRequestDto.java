@@ -23,7 +23,7 @@ public class CalendarRequestDto {
     @Nullable
     private LocalTime startTime;
     private LocalTime endTime;
-    private String  repeat;
+    private Character  repeat;
     private Character dday;
     private String memo;
     @Nullable
