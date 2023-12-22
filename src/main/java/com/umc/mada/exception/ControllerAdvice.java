@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestControllerAdvice
 public class ControllerAdvice {
     @ExceptionHandler(BuyOwnedItemException.class)
@@ -15,6 +17,14 @@ public class ControllerAdvice {
     @ExceptionHandler(NotAllowToWearingException.class)
     public ResponseEntity<ErrorResponse> notAllowToWearingHandler(final NotAllowToWearingException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+    @ExceptionHandler(ServerInternalException.class)
+    public ResponseEntity<ErrorResponse> testErrorHandler(final ServerInternalException e, HttpServletRequest httpServletRequest){
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message("Test Error")
+                .url(httpServletRequest.getRequestURI())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 //    @ExceptionHandler(Exception.class)
