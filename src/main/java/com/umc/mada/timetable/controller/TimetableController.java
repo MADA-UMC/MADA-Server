@@ -37,7 +37,7 @@ public class TimetableController {
 
     @PostMapping
     public ResponseEntity<Map<String, Object>> createTimetable(Authentication authentication, @RequestBody TimetableRequestDto timetableRequestDto){
-        // 시간표 생성 API
+        // 캘린더 일정 생성 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         TimetableResponseDto newTimetable = timetableService.createTimetable(user, timetableRequestDto);
@@ -51,9 +51,9 @@ public class TimetableController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PatchMapping("/scheduleId/{scheduleId}")
+    @PatchMapping("/update/{scheduleId}")
     public ResponseEntity<Map<String, Object>> updateTimetable(Authentication authentication, @PathVariable int scheduleId, @RequestBody TimetableRequestDto timetableRequestDto){
-        // 시간표 수정 API
+        // 캘린더 일정 수정 API
         try{
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
@@ -71,9 +71,9 @@ public class TimetableController {
         }
     }
 
-    @DeleteMapping("/scheduleId/{scheduleId}")
+    @PatchMapping("/delete/{scheduleId}")
     public ResponseEntity<Map<String, Object>> deleteTimetable(Authentication authentication, @PathVariable int scheduleId) {
-        // 시간표 삭제 API
+        // 캘린더 일정 삭제 API
         try{
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
@@ -109,7 +109,7 @@ public class TimetableController {
     }
 
     @GetMapping("search/date/{date}")
-    // 시간표 추가 시, 특정 유저 일정과 투두 조회 API
+    // 시간표 추가 시, 특정 유저 일정(캘린더)과 투두 조회 API
     public ResponseEntity<Map<String, Object>> getTodoAndCalendar(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();

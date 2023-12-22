@@ -22,4 +22,5 @@ public class TimetableResponseDto {
     private LocalTime endTime; // 일정 종료 시간
     private String memo; // 메모
     private String comment; //comment
+    private Boolean isDeleted; // 삭제 여부
 }
