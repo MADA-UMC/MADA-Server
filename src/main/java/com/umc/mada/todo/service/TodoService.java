@@ -36,7 +36,6 @@ public class TodoService {
 
     // 투두 생성 로직
     public TodoResponseDto createTodo(User user, TodoRequestDto todoRequestDto) {
-        // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
         validateUserId(user);
         validateCategoryId(todoRequestDto.getCategory().getId());
         validateTodoName(todoRequestDto.getTodoName());
@@ -103,12 +102,11 @@ public class TodoService {
     @Transactional
     // 투두 수정 로직
     public TodoResponseDto updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
-        // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
         validateUserId(user);
 
-        // 주어진 todoId를 이용하여 카테고리 엔티티 조회
         Todo todo = todoRepository.findTodoByUserIdAndId(user, todoId)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        validateCategoryId(todo.getCategory().getId());
 
         // 투두 반복 변경 처리
         Repeat repeat;
@@ -219,9 +217,13 @@ public class TodoService {
     // 투두 삭제 로직
     public void deleteTodo(User userId, int todoId) {
         // 주어진 투두 ID를 이용하여 투두 엔티티 조회
-        Optional<Todo> optionalTodo = todoRepository.findTodoByUserIdAndId(userId, todoId);
-        if (optionalTodo.isPresent() && !optionalTodo.get().getIsDeleted()) {
-            Todo todo = optionalTodo.get();
+        //Optional<Todo> optionalTodo = todoRepository.findTodoByUserIdAndId(userId, todoId);
+        Todo todo = todoRepository.findTodoByUserIdAndId(userId, todoId)
+                        .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        validateCategoryId(todo.getCategory().getId());
+
+        if (!todo.getIsDeleted()) {
+            //Todo todo = optionalTodo.get();
             todo.setIsDeleted(true);
             todoRepository.save(todo);
         } else {
@@ -238,15 +240,11 @@ public class TodoService {
         for (Todo todo : userTodos){
             if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
                 if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
-                    if (!todo.getCategory().getIsInActive()) {
-                        filteredTodos.add(todo);
-                    }
+                    filteredTodos.add(todo);
                 }
             } else {
                 if (todo.getDate().equals(date)) {
-                    if (!todo.getCategory().getIsInActive()) {
-                        filteredTodos.add(todo);
-                    }
+                    filteredTodos.add(todo);
                 }
             }
         }
@@ -288,6 +286,10 @@ public class TodoService {
         Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
         if (optionalCategory.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 카테고리 ID입니다.");
+        }
+        Category category = optionalCategory.get();
+        if (category.getIsInActive()) {
+            throw new IllegalArgumentException("종료된 카테고리에는 투두를 생성,수정,삭제할 수 없습니다.");
         }
     }
 
