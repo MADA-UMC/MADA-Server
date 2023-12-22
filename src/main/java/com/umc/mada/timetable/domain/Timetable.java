@@ -28,10 +28,10 @@ public class Timetable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
-    private User userId; // 유저 ID
+    private User userId;
 
     @Column(name = "schedule_name", nullable = false)
-    private String scheduleName; // 일정 이름
+    private String scheduleName;
 
     @Column(name = "color", nullable = false)
     private String color;
@@ -51,16 +51,19 @@ public class Timetable {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name= "is_deleted", nullable = false)
+    private Boolean isDeleted;
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
-    private LocalDateTime createdAt; // 생성 시간
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updatedAt; // 수정 시간
+    private LocalDateTime updatedAt;
 
-    // 생성자 (필수 필드)
-    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo, String comment){
+    // 생성자
+    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo, String comment, Boolean isDeleted){
         this.userId = userId;
         this.date = date;
         this.scheduleName = scheduleName;
@@ -69,5 +72,6 @@ public class Timetable {
         this.endTime = endTime;
         this.memo = memo;
         this.comment = comment;
+        this.isDeleted = isDeleted;
     }
 }

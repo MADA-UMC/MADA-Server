@@ -1,16 +1,19 @@
 package com.umc.mada.timetable.service;
 
+import com.umc.mada.category.domain.Category;
 import com.umc.mada.global.BaseResponseStatus;
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.repository.TimetableRepository;
+import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +30,7 @@ public class TimetableService {
         this.timetableRepository = timetableRepository;
     }
 
-    // 시간표 생성 로직
+    // 시간표 일정 생성 로직
     public TimetableResponseDto createTimetable(User user, TimetableRequestDto timetableRequestDto){
         // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
         validateUserId(user);
@@ -35,15 +38,16 @@ public class TimetableService {
 
         // 시간표 앤티티 생성
         Timetable timetable = new Timetable(user, timetableRequestDto.getDate(), timetableRequestDto.getScheduleName(), timetableRequestDto.getColor(),
-                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo(), timetableRequestDto.getComment());
+                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo(), timetableRequestDto.getComment(), timetableRequestDto.getIsDeleted());
 
         // 시간표를 저장하고 저장된 시간표 앤티티 반환
         Timetable savedTimetable = timetableRepository.save(timetable);
 
         // 저장된 시간표 정보를 기반으로 TimetalbeResponseDto 생성 후 반환
         return new TimetableResponseDto(savedTimetable.getId(), savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
-                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getComment());
+                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getComment(), savedTimetable.getIsDeleted());
     }
+
     @Transactional
     // 시간표 수정 로직
     public TimetableResponseDto updateTimetable(User user, int scheduleId, TimetableRequestDto timetableRequestDto){
@@ -89,16 +93,19 @@ public class TimetableService {
 
         // 저장된 투두 정보를 기반으로 timetableRepository 생성하여 반환
         return new TimetableResponseDto(updatedTimetable.getId(), updatedTimetable.getDate(), updatedTimetable.getScheduleName(), updatedTimetable.getColor(),
-                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo(), updatedTimetable.getComment());
+                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo(), updatedTimetable.getComment(), updatedTimetable.getIsDeleted());
     }
 
     @Transactional
-    // 시간표 삭제 로직
+    // 시간표 일정 삭제 로직
     public void deleteTimetable(User userId, int scheduleId){
         // 주어진 scheduleId를 이용하여 투두 엔티티 조회
-        Optional<Timetable> optionalTimetable = timetableRepository.deleteTimetableByUserIdAndId(userId, scheduleId);
-        if (optionalTimetable.isPresent()){
-            timetableRepository.deleteTimetableByUserIdAndId(userId, scheduleId);
+        Optional<Timetable> optionalTimetable = timetableRepository.findTimetableByUserIdAndId(userId, scheduleId);
+        Timetable timetable = timetableRepository.findTimetableByUserIdAndId(userId, scheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        if (optionalTimetable.isPresent() && !timetable.getIsDeleted()){
+            timetable.setIsDeleted(true);
+            timetableRepository.save(timetable);
         } else {
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
         }
@@ -109,7 +116,7 @@ public class TimetableService {
         List<Timetable> userTimetables = timetableRepository.findTimetablesByUserIdAndDateIs(userId, date);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
         return userTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
-                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment())).collect(Collectors.toList());
+                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment(), timetable.getIsDeleted())).collect(Collectors.toList());
     }
 
     // 투두 이름 유효성 검사 메서드
