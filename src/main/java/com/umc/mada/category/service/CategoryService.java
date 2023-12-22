@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.umc.mada.global.BaseResponseStatus;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,7 +52,14 @@ public class CategoryService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이콘 ID입니다."));
 
         // Category 엔티티 생성
-        Category category = new Category(user, categoryRequestDto.getCategoryName(), categoryRequestDto.getColor(), categoryRequestDto.getIsInActive() != null ? categoryRequestDto.getIsInActive() : false, categoryRequestDto.getIsDeleted() != null ? categoryRequestDto.getIsDeleted() : false, icon);
+        Category category = new Category(
+                user,
+                categoryRequestDto.getCategoryName(),
+                categoryRequestDto.getColor(),
+                categoryRequestDto.getIsInActive() != null ? categoryRequestDto.getIsInActive() : false,
+                categoryRequestDto.getIsInActive() != null && categoryRequestDto.getIsInActive() ? LocalDateTime.now() : null,
+                categoryRequestDto.getIsDeleted() != null ? categoryRequestDto.getIsDeleted() : false,
+                icon);
         // 카테고리를 저장하고 저장된 카테고리 엔티티 반환
         Category savedCategory = categoryRepository.save(category);
         // 저장된 카테고리 정보를 기반으로 CategoryResponseDto 생성하여 반환
@@ -101,11 +110,29 @@ public class CategoryService {
      *
      */
     @Transactional
-    public void activeCategory(User userId, int categoryId){
+    public void inactiveCategory(User userId, int categoryId){
         Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
-        if (optionalCategory.isPresent() && !optionalCategory.get().getIsInActive()){
+        if (optionalCategory.isPresent() && !optionalCategory.get().getIsDeleted() && !optionalCategory.get().getIsInActive()){
             Category category = optionalCategory.get();
             category.setIsInActive(true);
+            category.setInActiveTime(LocalDateTime.now());
+            categoryRepository.save(category);
+        }else {
+            throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
+        }
+    }
+
+    /**
+     * 종료된 카테고리 복원 로직
+     *
+     */
+    @Transactional
+    public void activeCategory(User userId, int categoryId){
+        Optional<Category> optionalCategory = categoryRepository.findCategoryByUserIdAndId(userId, categoryId);
+        if (optionalCategory.isPresent() && !optionalCategory.get().getIsDeleted() && optionalCategory.get().getIsInActive()){
+            Category category = optionalCategory.get();
+            category.setIsInActive(false);
+            category.setInActiveTime(null);
             categoryRepository.save(category);
         }else {
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
@@ -133,20 +160,36 @@ public class CategoryService {
         }
     }
 
-
     /**
-     * 사용자 카테고리 목록 조회 로직
+     * 사용자 카테고리 목록 조회 로직 (카테고리 목록)
      *
      */
-    public List<CategoryResponseDto> getUserCategories(User userId) {
+    public List<CategoryResponseDto> getAllCategories(User userId) {
         // 모든 카테고리 엔티티 조회
-        List<Category> userCategories = categoryRepository.findCategoriesByUserId(userId);
+        List<Category> allCategories = categoryRepository.findCategoriesByUserId(userId);
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
-        return userCategories.stream()
+        return allCategories.stream()
                 .filter(category -> !category.getIsDeleted())
                 .map(CategoryResponseDto::of)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 사용자 카테고리 목록 조회 로직 (home)
+     *
+     */
+    public List<CategoryResponseDto> getHomeCategories(User userId, LocalDate date) {
+        // home에 표시될 카테고리 엔티티 조회 (종료 카테고리는 제외)
+        List<Category> homeCategories = categoryRepository.findCategoriesByUserId(userId);
+
+        // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
+        return homeCategories.stream()
+                .filter(category -> !category.getIsDeleted())
+                .filter(category -> !category.getIsInActive() || (category.getInActiveTime() != null && !category.getInActiveTime().toLocalDate().isBefore(date)))
+                .map(CategoryResponseDto::of)
+                .collect(Collectors.toList());
+    }
+
 
     // 유저 ID 유효성 검사 메서드
     private void validateUserId(User userId) {

@@ -35,14 +35,14 @@ public class TimetableService {
 
         // 시간표 앤티티 생성
         Timetable timetable = new Timetable(user, timetableRequestDto.getDate(), timetableRequestDto.getScheduleName(), timetableRequestDto.getColor(),
-                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo());
+                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo(), timetableRequestDto.getComment());
 
         // 시간표를 저장하고 저장된 시간표 앤티티 반환
         Timetable savedTimetable = timetableRepository.save(timetable);
 
         // 저장된 시간표 정보를 기반으로 TimetalbeResponseDto 생성 후 반환
         return new TimetableResponseDto(savedTimetable.getId(), savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
-                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo());
+                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getComment());
     }
     @Transactional
     // 시간표 수정 로직
@@ -79,12 +79,17 @@ public class TimetableService {
             timetable.setMemo(timetableRequestDto.getMemo());
         }
 
+        //comment 내용 변경 처리
+        if (timetableRequestDto.getComment() != null){
+            timetable.setComment(timetableRequestDto.getComment());
+        }
+
         // 수정된 시간표를 저장하고 저장된 투두 엔티티 반환
         Timetable updatedTimetable = timetableRepository.save(timetable);
 
         // 저장된 투두 정보를 기반으로 timetableRepository 생성하여 반환
         return new TimetableResponseDto(updatedTimetable.getId(), updatedTimetable.getDate(), updatedTimetable.getScheduleName(), updatedTimetable.getColor(),
-                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo());
+                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo(), updatedTimetable.getComment());
     }
 
     @Transactional
@@ -104,7 +109,7 @@ public class TimetableService {
         List<Timetable> userTimetables = timetableRepository.findTimetablesByUserIdAndDateIs(userId, date);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
         return userTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
-                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo())).collect(Collectors.toList());
+                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment())).collect(Collectors.toList());
     }
 
     // 투두 이름 유효성 검사 메서드

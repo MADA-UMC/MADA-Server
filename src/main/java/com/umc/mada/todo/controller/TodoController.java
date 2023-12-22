@@ -63,18 +63,14 @@ public class TodoController {
     @PatchMapping("/delete/{todoId}")
     public ResponseEntity<Map<String, Object>> deleteTodo(Authentication authentication, @PathVariable int todoId) {
         // 투두 삭제 API
-        try{
-            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-            User user = userOptional.get();
-            todoService.deleteTodo(user, todoId);
-            Map<String, Object> result = new LinkedHashMap<>();
-            //result.put("status", 200);
-            //result.put("success", true);
-            //result.put("message", "투두 삭제가 완료되었습니다.");
-            return ResponseEntity.ok().body(result);
-        } catch (IllegalArgumentException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        todoService.deleteTodo(user, todoId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "투두 삭제가 완료되었습니다.");
+        return ResponseEntity.ok().body(result);
     }
 
     @GetMapping("/date/{date}")

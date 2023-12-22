@@ -45,6 +45,9 @@ public class Timetable {
     @Column(name = "memo")
     private String memo;
 
+    @Column(name = "comment")
+    private String comment;
+
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
@@ -57,7 +60,7 @@ public class Timetable {
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo){
+    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo, String comment){
         this.userId = userId;
         this.date = date;
         this.scheduleName = scheduleName;
@@ -65,5 +68,6 @@ public class Timetable {
         this.startTime = startTime;
         this.endTime = endTime;
         this.memo = memo;
+        this.comment = comment;
     }
 }
