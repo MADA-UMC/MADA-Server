@@ -6,6 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
@@ -35,9 +37,9 @@ public class Calendar {
     @Column(name = "color")
     private String color;
     @Column(name = "start_date")
-    private Date startDate;
+    private LocalDate startDate;
     @Column(name = "end_date")
-    private Date endDate;
+    private LocalDate endDate;
     @Column(name ="start_time")
     private LocalTime startTime;
     @Column(name = "end_time")
@@ -46,7 +48,7 @@ public class Calendar {
     //No, Day, Week, Month, Year
     private Character  repeat;
     @Column(name = "repeat_info")
-    private String repeatInfo;
+    private Integer repeatInfo;
     @Column(name = "d_day")
     private Character dday;
     @Column(name = "memo")
