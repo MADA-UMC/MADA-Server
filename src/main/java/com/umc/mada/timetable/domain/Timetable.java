@@ -2,6 +2,7 @@ package com.umc.mada.timetable.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.umc.mada.timetable.domain.DayOfWeek;
 import com.umc.mada.user.domain.User;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -54,6 +55,10 @@ public class Timetable {
     @Column(name= "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "day_of_week")
+    @Enumerated(EnumType.STRING)
+    private DayOfWeek dayOfWeek;
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;
@@ -63,7 +68,7 @@ public class Timetable {
     private LocalDateTime updatedAt;
 
     // 생성자
-    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo, String comment, Boolean isDeleted){
+    public Timetable(User userId, LocalDate date, String scheduleName, String color, LocalTime startTime, LocalTime endTime, String memo, String comment, Boolean isDeleted, DayOfWeek dayOfWeek){
         this.userId = userId;
         this.date = date;
         this.scheduleName = scheduleName;
@@ -73,5 +78,6 @@ public class Timetable {
         this.memo = memo;
         this.comment = comment;
         this.isDeleted = isDeleted;
+        this.dayOfWeek = dayOfWeek;
     }
 }

@@ -7,9 +7,11 @@ import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.repository.TimetableRepository;
 import com.umc.mada.todo.domain.Todo;
+import com.umc.mada.timetable.domain.DayOfWeek;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -38,14 +40,14 @@ public class TimetableService {
 
         // 시간표 앤티티 생성
         Timetable timetable = new Timetable(user, timetableRequestDto.getDate(), timetableRequestDto.getScheduleName(), timetableRequestDto.getColor(),
-                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo(), timetableRequestDto.getComment(), timetableRequestDto.getIsDeleted());
+                timetableRequestDto.getStartTime(), timetableRequestDto.getEndTime(), timetableRequestDto.getMemo(), timetableRequestDto.getComment(), timetableRequestDto.getIsDeleted(), timetableRequestDto.getDayOfWeek());
 
         // 시간표를 저장하고 저장된 시간표 앤티티 반환
         Timetable savedTimetable = timetableRepository.save(timetable);
 
         // 저장된 시간표 정보를 기반으로 TimetalbeResponseDto 생성 후 반환
         return new TimetableResponseDto(savedTimetable.getId(), savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
-                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getComment(), savedTimetable.getIsDeleted());
+                savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getComment(), savedTimetable.getIsDeleted(), savedTimetable.getDayOfWeek());
     }
 
     @Transactional
@@ -88,12 +90,17 @@ public class TimetableService {
             timetable.setComment(timetableRequestDto.getComment());
         }
 
+        //요일 변경 처리
+        if (timetableRequestDto.getDayOfWeek() != null){
+            timetable.setDayOfWeek(timetableRequestDto.getDayOfWeek());
+        }
+
         // 수정된 시간표를 저장하고 저장된 투두 엔티티 반환
         Timetable updatedTimetable = timetableRepository.save(timetable);
 
         // 저장된 투두 정보를 기반으로 timetableRepository 생성하여 반환
         return new TimetableResponseDto(updatedTimetable.getId(), updatedTimetable.getDate(), updatedTimetable.getScheduleName(), updatedTimetable.getColor(),
-                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo(), updatedTimetable.getComment(), updatedTimetable.getIsDeleted());
+                updatedTimetable.getStartTime(), updatedTimetable.getEndTime(), updatedTimetable.getMemo(), updatedTimetable.getComment(), updatedTimetable.getIsDeleted(), updatedTimetable.getDayOfWeek());
     }
 
     @Transactional
@@ -111,12 +118,63 @@ public class TimetableService {
         }
     }
 
-    // 특정 유저 시간표 조회 로직
-    public List<TimetableResponseDto> getUserTimetable(User userId, LocalDate date) {
-        List<Timetable> userTimetables = timetableRepository.findTimetablesByUserIdAndDateIs(userId, date);
+    // 특정 유저 일일시간표 조회 로직
+    public List<TimetableResponseDto> getDailyTimetable(User userId, LocalDate date) {
+        List<Timetable> DailyTimetables = timetableRepository.findTimetablesByUserIdAndDateIsAndDayOfWeek(userId, date, DayOfWeek.DAILY);
         // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-        return userTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
-                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment(), timetable.getIsDeleted())).collect(Collectors.toList());
+        return DailyTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
+                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment(), timetable.getIsDeleted(), timetable.getDayOfWeek())).collect(Collectors.toList());
+    }
+
+    // 특정 유저 주간시간표 조회 로직
+    public List<TimetableResponseDto> getWeeklyTimetable(User userId) {
+        List<Timetable> WeeklyTimetables = timetableRepository.findTimetablesByUserIdAndDayOfWeekIsNot(userId, DayOfWeek.DAILY);
+        // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
+        return WeeklyTimetables.stream().map(timetable -> new TimetableResponseDto(timetable.getId(), timetable.getDate(), timetable.getScheduleName(),
+                timetable.getColor(), timetable.getStartTime(), timetable.getEndTime(), timetable.getMemo(), timetable.getComment(), timetable.getIsDeleted(), timetable.getDayOfWeek())).collect(Collectors.toList());
+    }
+
+
+    // 자정에 주간 시간표의 일정을 일일 시간표로 추가하는 메서드
+    @Scheduled(cron="0 0 0 * * ?")
+    public void scheduleCheckAndLoadDailyData() {
+        List<User> allUsers = userRepository.findAll();
+
+        for (User user : allUsers) {
+            checkAndLoadDailyData(user);
+        }
+    }
+
+    // 주간 시간표의 일정을 기반으로 한 일일 시간표 생성 메서드
+    public void checkAndLoadDailyData(User user) {
+        // 해당 사용자의 주간 시간표 조회
+        List<Timetable> weeklyTimetable = timetableRepository.findTimetablesByUserIdAndDayOfWeekIsNot(user, DayOfWeek.DAILY);
+
+        // 주간 시간표를 기반으로 한 일일 시간표 생성
+        for (Timetable weeklyEntry : weeklyTimetable) {
+            LocalDate dailyDate = weeklyEntry.getDate();
+
+            // 생성할 일일 시간표의 날짜가 이미 존재하는지 확인
+            if (timetableRepository.existsByUserIdAndDateAndDayOfWeek(user, dailyDate, DayOfWeek.DAILY)) {
+                continue;
+            }
+
+            // 주간 시간표를 기반으로 한 일일 시간표 생성
+            Timetable dailyTimetable = Timetable.builder()
+                    .userId(user)
+                    .date(dailyDate)
+                    .scheduleName(weeklyEntry.getScheduleName())
+                    .color(weeklyEntry.getColor())
+                    .startTime(weeklyEntry.getStartTime())
+                    .endTime(weeklyEntry.getEndTime())
+                    .memo(weeklyEntry.getMemo())
+                    .comment(weeklyEntry.getComment())
+                    .isDeleted(weeklyEntry.getIsDeleted())
+                    .dayOfWeek(DayOfWeek.DAILY)
+                    .build();
+
+            timetableRepository.save(dailyTimetable);
+        }
     }
 
     // 투두 이름 유효성 검사 메서드
