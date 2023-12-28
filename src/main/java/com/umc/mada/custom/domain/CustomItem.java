@@ -19,6 +19,9 @@ public class CustomItem {
 
     private String name;
 
+    @Column(nullable = false, length = 40)
+    private String category;
+
     @Column(name = "file_path")
     private String filePath;
 
