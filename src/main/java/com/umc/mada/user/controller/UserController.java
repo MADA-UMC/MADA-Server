@@ -58,8 +58,8 @@ public class UserController {
         //httpServletResponse 방법
         response.setHeader("Content-type", "text/plain");
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+token);
-        PrintWriter writer = response.getWriter();
-        writer.println("ok");
+//        PrintWriter writer = response.getWriter();
+//        writer.println("ok");
 
         //responseEntity 방법
 //        HttpHeaders headers = new HttpHeaders();
