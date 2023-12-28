@@ -7,12 +7,14 @@ import com.umc.mada.category.service.CategoryService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -29,7 +31,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createCategory(Authentication authentication, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+    public ResponseEntity<Map<String, Object>> addCategory(Authentication authentication, @Valid @RequestBody CategoryRequestDto categoryRequestDto) {
         // 카테고리 생성 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
@@ -64,7 +66,7 @@ public class CategoryController {
         }
     }
 
-    @PatchMapping("delete/{categoryId}")
+    @PatchMapping("/delete/{categoryId}")
     public ResponseEntity<Map<String, Object>> deleteCategory(Authentication authentication, @PathVariable int categoryId) {
         // 카테고리 삭제 API
         try{
@@ -81,9 +83,23 @@ public class CategoryController {
         }
     }
 
-    @PatchMapping("active/{categoryId}")
-    public ResponseEntity<Map<String, Object>> activeCategory(Authentication authentication, @PathVariable int categoryId) {
+    @PatchMapping("/inactive/{categoryId}")
+    public ResponseEntity<Map<String, Object>> inactiveCategory(Authentication authentication, @PathVariable int categoryId) {
         //카테고리 종료 API
+        try{
+            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+            User user = userOptional.get();
+            categoryService.inactiveCategory(user, categoryId);
+            Map<String, Object> result = new LinkedHashMap<>();
+            return ResponseEntity.ok().body(result);
+        }catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PatchMapping("/active/{categoryId}")
+    public ResponseEntity<Map<String, Object>> activeCategory(Authentication authentication, @PathVariable int categoryId) {
+        //종료된 카테고리 복원 API
         try{
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
@@ -95,20 +111,40 @@ public class CategoryController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<Map<String, Object>> getUserCategories(Authentication authentication) {
-        // 특정 유저 카테고리 목록 조회 API
+    @GetMapping("/all")
+    public ResponseEntity<Map<String, Object>> getAllCategories(Authentication authentication) {
+        // 특정 유저 카테고리 목록 조회 API (카테고리 목록)
         try {
             Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
             User user = userOptional.get();
-            List<CategoryResponseDto> userCategories = categoryService.getUserCategories(user);
+            List<CategoryResponseDto> allCategories = categoryService.getAllCategories(user);
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("CategoryList", userCategories);
+            data.put("CategoryList", allCategories);
             Map<String, Object> result = new LinkedHashMap<>();
             result.put("data", data);
             //result.put("status", 200);
             //result.put("success", true);
             //result.put("message", "카테고리가 정상적으로 조회되었습니다.");
+            return ResponseEntity.ok().body(result);
+        } catch (IllegalArgumentException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<Map<String, Object>> getHomeCategories(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        // 특정 유저 카테고리 목록 조회 API (home)
+        try {
+            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+            User user = userOptional.get();
+            List<CategoryResponseDto> homeCategories = categoryService.getHomeCategories(user, date);
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("CategoryList", homeCategories);
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("data", data);
+            //result.put("status", 200);
+            //result.put("success", true);
+            //result.put("message", "카테고리(home)가 정상적으로 조회되었습니다.");
             return ResponseEntity.ok().body(result);
         } catch (IllegalArgumentException e){
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

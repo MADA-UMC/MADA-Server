@@ -75,7 +75,7 @@ public class UserController {
 //        return ResponseEntity.status(HttpStatus.OK).body(response.getHeader(HttpHeaders.AUTHORIZATION));
 //    }
 
-    @Operation(description = "dsfasdf")
+    @Operation(description = "회원가입 로그인")
     @GetMapping("/signup")
     public void signupToken(HttpServletResponse response, @RequestParam String token) throws IOException {//
         response.setHeader("Content-type", "text/plain");
@@ -86,16 +86,16 @@ public class UserController {
 
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
     @PostMapping("/signup/nickName")
-    public ResponseEntity<String> signupNickName(@RequestBody Map<String, String> nickName, Authentication authentication){
+    public ResponseEntity<String> signupNickname(@RequestBody Map<String, String> nickname, Authentication authentication) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.nickNameSetting(nickName, userOptional.get());
+        userService.setNickname(nickname, userOptional.get());
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
         return ResponseEntity.ok().build();
     }
 
     @Operation(description = "로그아웃")
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(){
+    public ResponseEntity<String> logout() {
         //세션 삭제
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok().build();
@@ -103,10 +103,10 @@ public class UserController {
 
     @Operation(description = "회원탈퇴")
     @DeleteMapping("/withdrawal")
-    public ResponseEntity<String> withdrawal(Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
+    public ResponseEntity<String> userRemove (Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        User user = cusomtUserDetails.getUser();
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.withdrawal(userOptional.get());
+        userService.removeUser(userOptional.get());
         return ResponseEntity.ok().build();
     }
 
@@ -156,15 +156,15 @@ public class UserController {
     /**
      * 화면 설정 API
      */
-    @PostMapping("/pageInfo/change")
-    public ResponseEntity<Map<String,Object>> pageToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
+    @PostMapping("/display/change")
+    public ResponseEntity<Map<String,Object>> displayToggleSave(Authentication authentication, @RequestBody Map<String,Boolean> map) {
         return ResponseEntity.ok(userService.saveUserPageSet(authentication, map));
     }
 
     /**
      * 알림 설정 API
      */
-    @PatchMapping("/alarmInfo/change")
+    @PatchMapping("/alarm/change")
     public ResponseEntity<Map<String, Object>> alarmToggleSave(Authentication authentication, @RequestBody Map<String, Boolean> map) {
         return ResponseEntity.ok(userService.saveUserAlarmSet(authentication, map));
     }
@@ -172,8 +172,8 @@ public class UserController {
     /**
      * 화면 설정 조회 API
      */
-    @GetMapping("/pageInfo")
-    public ResponseEntity<Map<String, Object>> pageToggleList(Authentication authentication) {
+    @GetMapping("/display")
+    public ResponseEntity<Map<String, Object>> displayToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.findUserPageSet(authentication));
         return ResponseEntity.ok(map);
@@ -182,7 +182,7 @@ public class UserController {
     /**
      * 알람 설정 조회 API
      */
-    @GetMapping("/alarmInfo")
+    @GetMapping("/alarm")
     public ResponseEntity<Map<String, Object>> alarmToggleList(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.findUserAlarmSet(authentication));
@@ -193,7 +193,7 @@ public class UserController {
      * 투두 일별 통계 API
      */
     @GetMapping("/statistics/day/{date}")
-    public ResponseEntity<Map<String, Object>> getTodoAndTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+    public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetableAvg(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
@@ -202,7 +202,7 @@ public class UserController {
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : todos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
-            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // Category의 아이콘 ID
+            //todoMap.put("iconId", todo.getCategoryId().getIconId()); // 카테고리의 아이콘 ID
             todoMap.put("categoryName", todo.getCategory().getCategoryName());
             todoMap.put("todoName", todo.getTodoName());
             todoMap.put("complete", todo.getComplete());
@@ -228,6 +228,9 @@ public class UserController {
         return ResponseEntity.ok().body(result);
     }
 
+    /**
+     * 투두 통계 API
+     */
     @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());

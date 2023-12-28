@@ -23,7 +23,7 @@ public class CalendarResponseDto {
    private Character dday;
    private LocalTime startTime;
    private LocalTime endTime;
-   private String  repeat;
+   private Character  repeat;
    private String memo;
    private String color;
    private String repeatInfo;

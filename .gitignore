@@ -30,6 +30,7 @@ application-oauth2.properties
 application-DB.properties
 application-s3.properties
 application-ssl.properties
+application.properties
 keystore.p12
 /src/main/generated/
 

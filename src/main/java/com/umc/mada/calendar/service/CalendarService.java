@@ -26,6 +26,10 @@ public class CalendarService {
         this.calendarRepository = calendarRepository;
         this.userRepository = userRepository;
     }
+//
+//    public Map<String ,Object> getCalendar(Authentication authentication,CalendarRequestDto calendarRequestDto){
+//        calendarRepository.find
+//    }
 
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
@@ -102,12 +106,6 @@ public class CalendarService {
     //캘린더 생성코드
     public CalendarResponseDto calendarCreate(Authentication authentication, CalendarRequestDto calendarRequestDto) {
         User user = this.getUser(authentication);
-       /* if (calendarRequestDto.getDday() == 'Y' && tooManyD_dayExists(authentication)) {
-            throw new ManyD_dayException("D_day가 3개 이상 존재합니다");
-        }
-        if(calendarNameExist(authentication,calendarRequestDto)){
-            throw new SameCalendarNameExist("기간 중에 동일한 이름의 캘린더가 존재합니다");
-        }*/
         Calendar calendar = this.calendarBuilder(user,calendarRequestDto);
         calendarRepository.save(calendar);
         return this.calendarToDto(calendar);
@@ -133,14 +131,15 @@ public class CalendarService {
 
     public List<Calendar> readCalendarsByDate(List<Calendar> calendarList, Date date){
         return calendarList.stream()
-                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0 ||calendar.getRepeat() == "Day"
-                        ||calendar.getRepeat() == "Week"
+                .filter(calendar ->  calendar.getDday() =='N' &&calendar.getStartDate().compareTo(date)<=0 &&calendar.getEndDate().compareTo(date)>=0
+                        ||calendar.getRepeat() == 'D'
+                        ||calendar.getRepeat() == 'W'
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
                         && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue()
-                        || calendar.getRepeat() =="Month"
+                        || calendar.getRepeat() =='M'
                         && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
                         && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth()
-                        || calendar.getRepeat()=="Year"
+                        || calendar.getRepeat()== 'Y'
                         && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
                         && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()
                 )
@@ -150,15 +149,15 @@ public class CalendarService {
     private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList,int year, int month){
         Date date = new Date(year,month,1);
         return calendarList.stream()
-                .filter(calendar -> (calendar.getRepeat() == "Day" && calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
+                .filter(calendar -> (calendar.getRepeat() == 'D' && calendar.getStartDate().toLocalDate().getMonthValue()<=month&&calendar.getEndDate().toLocalDate().getMonthValue()>=month
                         &&calendar.getStartDate().toLocalDate().getYear()<=year&&calendar.getEndDate().toLocalDate().getYear()>=year)
-                        ||(calendar.getRepeat() == "Week"
+                        ||(calendar.getRepeat() == 'W'
                         && date.toLocalDate().getDayOfWeek().getValue()<=calendar.getStartDate().toLocalDate().getDayOfWeek().getValue()
                         && date.toLocalDate().getDayOfWeek().getValue()>=calendar.getEndDate().toLocalDate().getDayOfWeek().getValue())
-                        || (calendar.getRepeat() =="Month"
+                        || (calendar.getRepeat() =='M'
                         && date.toLocalDate().getDayOfMonth() <= calendar.getStartDate().toLocalDate().getDayOfMonth()
                         && date.toLocalDate().getDayOfMonth() >= calendar.getEndDate().toLocalDate().getDayOfMonth())
-                        || (calendar.getRepeat() == "Year"
+                        || (calendar.getRepeat() == 'Y'
                         && date.toLocalDate().getDayOfYear()<=calendar.getStartDate().toLocalDate().getDayOfYear()
                         && date.toLocalDate().getDayOfYear() >= calendar.getEndDate().toLocalDate().getDayOfYear()))
                 .collect(Collectors.toList());

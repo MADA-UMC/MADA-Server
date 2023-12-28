@@ -1,6 +1,7 @@
 package com.umc.mada.timetable.dto;
 
 import lombok.Data;
+import reactor.util.annotation.Nullable;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,4 +14,6 @@ public class TimetableRequestDto {
     private LocalTime startTime; // 일정 시작 시간
     private LocalTime endTime; // 일정 종료 시간
     private String memo; // 메모
+    private String comment; // comment
+    private Boolean isDeleted; // 삭제 여부
 }
