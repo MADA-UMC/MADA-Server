@@ -2,9 +2,9 @@ package com.umc.mada.custom.domain;
 
 
 public enum ItemUnlockCondition {
-    C0("기본 제공"),
-    C1("미션"),
-    C2("프리미엄 구독");
+    basic("기본 제공"),
+    mission("미션"),
+    initialValue("초기 값");
 
     private final String itemUnlockCondition;
 

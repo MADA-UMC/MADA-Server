@@ -12,11 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ItemElementResponseDto {
     private int id;
+    private String itemType;
     private String category;
 
     public static ItemElementResponseDto of(CustomItem customItem){
         return ItemElementResponseDto.builder()
                 .id(customItem.getId())
+                .itemType(customItem.getItemType().getItemType())
                 .category(customItem.getCategory())
                 .build();
     }
