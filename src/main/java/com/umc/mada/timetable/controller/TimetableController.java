@@ -134,7 +134,7 @@ public class TimetableController {
         List<Map<String, Object>> calendarList = new ArrayList<>();
         for (Calendar calendar : calendars) {
             // 시작일과 종료일 사이에 date가 있는 경우만 추가
-            if (!date.isBefore(calendar.getStartDate().toLocalDate()) && !date.isAfter(calendar.getEndDate().toLocalDate())) {
+            if (!date.isBefore(calendar.getStartDate()) && !date.isAfter(calendar.getEndDate())) {
                 Map<String, Object> calendarMap = new LinkedHashMap<>();
                 calendarMap.put("CalendarName", calendar.getCalendarName());
                 calendarMap.put("color", calendar.getColor());
