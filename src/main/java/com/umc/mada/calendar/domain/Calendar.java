@@ -6,12 +6,10 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.joda.time.DateTime;
-import org.joda.time.LocalDate;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+import java.time.LocalDate;
+
 
 import javax.persistence.*;
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -19,9 +17,10 @@ import java.time.LocalTime;
 @Entity
 @Getter
 @Setter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+
 @Table(name = "CALENDAR")
 public class Calendar {
     @Id

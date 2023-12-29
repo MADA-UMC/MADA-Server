@@ -1,17 +1,15 @@
 package com.umc.mada.calendar.dto;
 
 import lombok.*;
-import org.joda.time.DateTime;
 import reactor.util.annotation.Nullable;
 
-import java.sql.Date;
-import org.joda.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+
 @Getter
 @Setter
 public class CalendarRequestDto {

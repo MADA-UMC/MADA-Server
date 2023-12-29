@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
-import org.joda.time.LocalDate;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+
 @Getter
 @Setter
 public class CalendarResponseDto {
