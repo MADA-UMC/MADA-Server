@@ -139,7 +139,10 @@ public class CalendarService {
         Map<String ,Object> data = new LinkedHashMap<>();
         data.put("startTodoAtMonday",user.isStartTodoAtMonday());
         data.put("calendars",calendarResponseDtoList);
-        data.put("repeat_calendars",repeatCalendarList);
+        if(repeatCalendarList.isEmpty())
+            data.put("repeat_calendars" , "error");
+        else
+            data.put("repeat_calendars",repeatCalendarResponseDtoList);
         map.put("data",data);
         return map;
     }
@@ -160,7 +163,9 @@ public class CalendarService {
         Map<String ,Object> data = new LinkedHashMap<>();
         data.put("startTodoAtMonday",user.isStartTodoAtMonday());
         data.put("calendars",calendarResponseDtoList);
-        data.put("repeat_calendars",repeatCalendarList);
+        if(repeatCalendarList.isEmpty())
+            data.put("repeat_calendars" , "error");
+        data.put("repeat_calendars",repeatCalendarResponseDtoList);
         map.put("data",data);
         return map;
     }

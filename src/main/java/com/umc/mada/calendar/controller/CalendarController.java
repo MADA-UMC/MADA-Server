@@ -5,6 +5,7 @@ import com.umc.mada.calendar.dto.CalendarResponseDto;
 import com.umc.mada.calendar.service.CalendarService;
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class CalendarController {
         return ResponseEntity.ok(calendarService.readMonthCalendar(authentication,year,month));
     }
     @GetMapping("/date/{date}")
-    ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable LocalDate date){
+    ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyyMMDD") LocalDate date){
         return ResponseEntity.ok(calendarService.readDayCalendars(authentication,date));
     }
 //    @GetMapping("/repeat")
