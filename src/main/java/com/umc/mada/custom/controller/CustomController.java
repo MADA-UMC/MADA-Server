@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +41,16 @@ public class CustomController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(description = "아이템 목록 반환(출석미션 아이템의 경우는 소유하고 있는 아이템만 포함한다)")
+    @GetMapping("/item")
+    public ResponseEntity<Map<String, Object>> getItemList(Authentication authentication){
+        User user = findUser(authentication);
+        CustomItemsResponse customItemsResponse = customService.getItemList(user);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("data", customItemsResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @Operation(description = "현재 화면의 아이템 타입에 맞는 아이템 조회하기/ 해당 타입의 아이템 목록, 사용자의 소유 여부 반환")
     @GetMapping("/item/{item_type}")
     public ResponseEntity<Map<String, Object>> findItemsByItemType(@PathVariable String item_type, Authentication authentication){
@@ -54,19 +63,25 @@ public class CustomController {
 
     @Operation(description = "사용자 캐릭터 착용 아이템 변경")
     @PatchMapping("/change") ///{item_id}
-    public ResponseEntity<Void> changeCharacter(Authentication authentication, @RequestParam(value="item_id") List<String> items_id){ // @RequestParam(value="items_id[]") List<String> items_id
+    public ResponseEntity<Map<String, Object>> changeCharacter(Authentication authentication, @RequestParam(value="item_id") List<String> items_id){ // @RequestParam(value="items_id[]") List<String> items_id
         User user = findUser(authentication);
         //String[] items_id = request.getParameterValues("item_id");
-        customService.changeUserItem(user, items_id);
-        return ResponseEntity.ok().build();
+        UserCharacterResponse userCharacterResponse = customService.changeUserItem(user, items_id);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("success", true);
+        response.put("data", userCharacterResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(description = "캐릭터 초기화")
     @GetMapping("/reset")
-    public ResponseEntity<Void> resetCharacter(Authentication authentication){
+    public ResponseEntity<Map<String, Object>> resetCharacter(Authentication authentication){
         User user = findUser(authentication);
-        customService.resetCharcter(user);
-        return ResponseEntity.ok().build();
+        UserCharacterResponse userCharacterResponse = customService.resetCharcter(user);
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("success", true);
+        response.put("data", userCharacterResponse);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(description = "아이템 구매")

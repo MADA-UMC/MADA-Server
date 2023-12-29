@@ -9,16 +9,21 @@ import java.util.stream.Collectors;
 
 @Getter
 public class TodoStatisticsResponseDto {
+//    private final String nickName;
+//    private final Double todosPercent;
+//    private final Double completeTodoPercent;
+//    private final List<CategoryStatisticsDto> categoryStatistics;
     private final String nickName;
-    private final Double todosPercent;
-    private final Double completeTodoPercent;
+    private final String todosPercent;
+    private final String completeTodoPercent;
     private final List<CategoryStatisticsDto> categoryStatistics;
+
 
     @Builder
     public TodoStatisticsResponseDto(String nickName, Double todosPercent, Double completeTodoPercent, List<CategoryStatisticsDto> categoryStatistics){
         this.nickName = nickName;
-        this.todosPercent = todosPercent;
-        this.completeTodoPercent = completeTodoPercent;
+        this.todosPercent = String.valueOf(todosPercent);
+        this.completeTodoPercent = String.valueOf(completeTodoPercent);
         this.categoryStatistics = categoryStatistics;
     }
 

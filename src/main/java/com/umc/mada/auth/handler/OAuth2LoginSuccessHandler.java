@@ -15,7 +15,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Optional;
 
 @Component
@@ -46,8 +45,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setHeader("Content-type", "text/plain");
         response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer "+accessToken);
         response.sendRedirect(redirectUrl);
-        PrintWriter writer = response.getWriter();
-        writer.println("ok");
+//        PrintWriter writer = response.getWriter();
+//        writer.println("ok");
 //        @Async
 //        response.setContentType("text/html;charset=UTF-8");
 //        response.setHeader("Content-type", "text/plain");
