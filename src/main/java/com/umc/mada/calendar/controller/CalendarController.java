@@ -58,10 +58,7 @@ public class CalendarController {
     ResponseEntity<Map<String,Object>> readCalendarByMonth(Authentication authentication ,@PathVariable int year ,@PathVariable int month){
         return ResponseEntity.ok(calendarService.readMonthCalendar(authentication,year,month));
     }
-    @GetMapping("/date/{date}")
-    ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyyMMDD") LocalDate date){
-        return ResponseEntity.ok(calendarService.readDayCalendars(authentication,date));
-    }
+
 //    @GetMapping("/repeat")
 //    ResponseEntity<Map<String ,Object>> readRepeats(Authentication authentication){
 //        return ResponseEntity.ok(calendarService.readRepeats(authentication));
