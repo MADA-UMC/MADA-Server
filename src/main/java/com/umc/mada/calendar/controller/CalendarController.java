@@ -39,15 +39,14 @@ public class CalendarController {
     ResponseEntity<Map<String,Object>> calendarEdit(Authentication authentication, @PathVariable Long id, @RequestBody CalendarRequestDto calendarRequestDto){
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-        map.put("data", data.put("calendars",calendarService.editCalendar(authentication,id,calendarRequestDto)));
+        data = calendarService.editCalendar(authentication,id,calendarRequestDto);
+        map.put("data", data);
         return ResponseEntity.ok(map);
     }
     @DeleteMapping("/edit/{id}")
     ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id){
         Map<String,Object> map = new LinkedHashMap<>();
-        Map<String,Object> data = new LinkedHashMap<>();
-        data.put("calendars",calendarService.deleteCalendar(authentication,id));
-        map.put("data",data);
+        map.put("data",calendarService.deleteCalendar(authentication,id));
         return ResponseEntity.ok(map);
     }
     @GetMapping("/dday")
@@ -58,7 +57,10 @@ public class CalendarController {
     ResponseEntity<Map<String,Object>> readCalendarByMonth(Authentication authentication ,@PathVariable int year ,@PathVariable int month){
         return ResponseEntity.ok(calendarService.readMonthCalendar(authentication,year,month));
     }
-
+    @GetMapping("/?{date}")
+    ResponseEntity<Map<String,Object>> readCalendarByDate(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-DD") LocalDate date){
+        return ResponseEntity.ok(calendarService.readDayCalendars(authentication,date));
+    }
 //    @GetMapping("/repeat")
 //    ResponseEntity<Map<String ,Object>> readRepeats(Authentication authentication){
 //        return ResponseEntity.ok(calendarService.readRepeats(authentication));
