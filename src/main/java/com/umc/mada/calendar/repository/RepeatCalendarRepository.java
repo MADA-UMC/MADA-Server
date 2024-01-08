@@ -7,5 +7,6 @@ import java.util.List;
 
 
 public interface RepeatCalendarRepository extends JpaRepository<RepeatCalendar,Long > {
-    List<RepeatCalendar> readRepeatCalendarsByCalendarId(Calendar calendarId);
+    List<RepeatCalendar> readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(Calendar calendarId);
+
 }

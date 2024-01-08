@@ -16,12 +16,10 @@ public class CalendarRequestDto {
     @Nullable
     private Long calendarId;
     private String calendarName;
-    @Nullable
     private LocalDate startDate;
     private LocalDate endDate;
     private String color;
     private Integer repeatInfo;
-    @Nullable
     private LocalTime startTime;
     private LocalTime endTime;
     private Character  repeat;
