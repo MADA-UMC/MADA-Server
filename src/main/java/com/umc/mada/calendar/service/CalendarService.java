@@ -36,7 +36,7 @@ public class CalendarService {
 //        calendarRepository.find
 //    }
 
-    public Map<String,Object> createRepeatCalendar( Calendar calendar){
+    public List<RepeatCalendarResponseDto> createRepeatCalendar( Calendar calendar){
 
         LocalDate startDate = calendar.getStartDate();
         LocalDate endDate = calendar.getEndDate();
@@ -52,9 +52,9 @@ public class CalendarService {
             int dayOfWeek = startDate.getDayOfWeek().getValue();
             startDate = startDate.minusDays(dayOfWeek);
             startDate=startDate.plusDays(calendar.getRepeatInfo());
-            if(calendar.getStartDate().isBefore(startDate)){
-                dates.add(startDate);
-            }
+//            if(calendar.getStartDate().isBefore(startDate)){
+//                dates.add(startDate);
+//            }
             while (!startDate.isAfter(endDate)) {
                 dates.add(startDate);
                 startDate = startDate.plusWeeks(1);
@@ -66,9 +66,9 @@ public class CalendarService {
             int dayOfMonth = startDate.getDayOfMonth();
             startDate = startDate.minusDays(dayOfMonth);
             startDate=startDate.plusDays(calendar.getRepeatInfo());
-            if(calendar.getStartDate().isBefore(startDate)){
-                dates.add(startDate);
-            }
+//            if(calendar.getStartDate().isBefore(startDate)){
+//                dates.add(startDate);
+//            }
             while (!startDate.isAfter(endDate)) {
                 dates.add(startDate);
                 startDate = startDate.plusMonths(1);
@@ -80,9 +80,7 @@ public class CalendarService {
             int dayOfYear = startDate.getDayOfYear();
             startDate = startDate.minusDays(dayOfYear);
             startDate = startDate.plusDays(calendar.getRepeatInfo());
-            if(calendar.getStartDate().isBefore(startDate)){
-                dates.add(startDate);
-            }
+
             while (!startDate.isAfter(endDate)) {
                 dates.add(startDate);
                 startDate = startDate.plusYears(1);
@@ -94,17 +92,17 @@ public class CalendarService {
             RepeatCalendar repeatCalendar = RepeatCalendar.builder()
                     .calendarId(calendar)
                     .date(date)
+                    .isExpired(false)
                     .build();
             repeatCalendarRepository.save((repeatCalendar));
             repeatCalendars.add(repeatCalendar);
 
         }
-
-        Map<String ,Object> data = new LinkedHashMap<>();
-
-        data.put("repeat_calendars",repeatCalendars);
-
-        return data;
+        List<RepeatCalendarResponseDto> result= new ArrayList<>();
+        for (RepeatCalendar repeatCalendar: repeatCalendars){
+            result.add(repeatCalendarToDto(repeatCalendar));
+        }
+        return result;
     }
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
@@ -163,9 +161,7 @@ public class CalendarService {
         Map<String ,Object> data = new LinkedHashMap<>();
         data.put("startTodoAtMonday",user.isStartTodoAtMonday());
         data.put("calendars",calendarResponseDtoList);
-        if(repeatCalendarList.isEmpty())
-            data.put("repeat_calendars" , "error");
-        data.put("repeat_calendars",repeatCalendarResponseDtoList);
+        data.put("repeats",repeatCalendarResponseDtoList);
         map.put("data",data);
         return map;
     }
@@ -186,13 +182,21 @@ public class CalendarService {
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());;
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
+        List<RepeatCalendarResponseDto> repeatCalendarResponseDtoList = new ArrayList<>();
         Map<String,Object> map = new LinkedHashMap<>();
         for (Calendar calendar: calendarList) {
             calendarResponseDtoList.add(this.calendarToDto(calendar));
+            if (calendar.getRepeat() != 'N'){
+                List<RepeatCalendar> repeats = repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar);
+                for (RepeatCalendar r: repeats){
+                    repeatCalendarResponseDtoList.add(repeatCalendarToDto(r));
+                }
+            }
         }
         Map<String ,Object> data = new LinkedHashMap<>();
         data.put("startTodoAtMonday",user.isStartTodoAtMonday());
         data.put("calendars",calendarResponseDtoList);
+        data.put("repeats",repeatCalendarResponseDtoList);
         map.put("data",data);
         return map;
     }
@@ -203,33 +207,65 @@ public class CalendarService {
         Calendar calendar = this.calendarBuilder(user,calendarRequestDto);
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String,Object> data = new LinkedHashMap<>();
-
+        List<RepeatCalendarResponseDto> repeatCalendarResponseDtoList = new ArrayList<>();
         calendarRepository.save(calendar);
         if(calendar.getRepeat()!='N'){
-            data = createRepeatCalendar(calendar);
+            repeatCalendarResponseDtoList = createRepeatCalendar(calendar);
         }
         CalendarResponseDto calendarResponseDto = this.calendarToDto(calendar);
-        data.put("calendars",calendarResponseDto);
-        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
+        data.put("repeats" ,repeatCalendarResponseDtoList);
+        data.put("calendar", calendarResponseDto);
         map.put("data",data);
         return map;
     }
 
-    public CalendarResponseDto editCalendar(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
+    public Map<String,Object> editCalendar(Authentication authentication, Long id, CalendarRequestDto calendarRequestDto){
         User user = this.getUser(authentication);
+        Map<String,Object> data = new LinkedHashMap<>();
+        Calendar updateCalendar;
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id).get();
-        Calendar updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
-        return this.calendarToDto(updateCalendar);
+        if(calendar.getStartDate().isEqual(calendarRequestDto.getStartDate())  && calendar.getEndDate().isEqual(calendarRequestDto.getEndDate())){
+            updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
+            data.put("calendars", this.calendarToDto(calendar));
+            return data;
+        }
+        else{
+            List<RepeatCalendar> repeats = repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar);
+            List<RepeatCalendarResponseDto> old = new ArrayList<>();
+            List<RepeatCalendarResponseDto> updated;
+            for (RepeatCalendar r: repeats){
+                r.setIsExpired(true);
+                repeatCalendarRepository.save(r);
+                old.add(repeatCalendarToDto(r));
+            }
+            updated= createRepeatCalendar(calendar);
+            data.put("calendars", this.calendarToDto(calendar));
+            data.put("old",old);
+            data.put("update",updated);
+            return data;
+        }
+
     }
 
 
-    public CalendarResponseDto deleteCalendar(Authentication authentication, Long id){
+    public Map<String,Object> deleteCalendar(Authentication authentication, Long id){
         User user = this.getUser(authentication);
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id).get();
+        List<RepeatCalendar> repeatCalendarList = new ArrayList<>();
+        List<RepeatCalendarResponseDto> repeatCalendarResponseDtoList = new ArrayList<>();
+        repeatCalendarList=repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar);
+        Map<String,Object> data = new LinkedHashMap<>();
         calendar.setExpired(true);
+        for(RepeatCalendar r: repeatCalendarList){
+            r.setIsExpired(true);
+            repeatCalendarRepository.save(r);
+            repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
+        }
         calendarRepository.save(calendar);
+        data.put("calendars",this.calendarToDto(calendar));
+        data.put("repeats", repeatCalendarResponseDtoList);
+        return data;
 
-        return this.calendarToDto(calendar);
     }
 
 
@@ -259,7 +295,7 @@ public class CalendarService {
         }
         List<RepeatCalendar> repeats = new ArrayList<>();
         for (Calendar calendar:repeatsInfo) {
-            repeats.addAll(repeatCalendarRepository.readRepeatCalendarsByCalendarId(calendar));
+            repeats.addAll(repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar));
         }
         return repeats;
     }
@@ -277,6 +313,7 @@ public class CalendarService {
         return RepeatCalendarResponseDto.builder()
                 .calendarId(repeatCalendar.getCalendarId().getId())
                 .date(repeatCalendar.getDate())
+                .isExpired(repeatCalendar.getIsExpired())
                 .build();
     }
     private CalendarResponseDto calendarToDto(Calendar calendar){
@@ -327,6 +364,7 @@ public class CalendarService {
                 .build();
     }
     private Calendar updateCalendar(Calendar calendar, CalendarRequestDto calendarRequestDto){
+
         if(calendarRequestDto.getIsExpired() == null){
             calendar.setMemo(calendarRequestDto.getMemo());
             calendar.setStartDate(calendarRequestDto.getStartDate());
