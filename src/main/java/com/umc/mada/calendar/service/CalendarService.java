@@ -122,7 +122,10 @@ public class CalendarService {
 
     public Map<String, Object> readMonthCalendar(Authentication authentication, int year,int month){
         User user = this.getUser(authentication);
-        List<Calendar> calendarList = readCalendarsByMonth(calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList()),year,month);
+        LocalDate start_date = LocalDate.of(year,month,1);
+        int days = start_date.lengthOfMonth();
+        LocalDate end_date = LocalDate.of(year,month,days);
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqual(user,start_date,end_date);
         List<RepeatCalendar> repeatCalendarList = readRepeatCalendars(calendarList);
 
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
@@ -226,7 +229,7 @@ public class CalendarService {
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id).get();
         if(calendar.getStartDate().isEqual(calendarRequestDto.getStartDate())  && calendar.getEndDate().isEqual(calendarRequestDto.getEndDate())){
             updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
-            data.put("calendars", this.calendarToDto(calendar));
+            data.put("calendars", this.calendarToDto(updateCalendar));
             return data;
         }
         else{
@@ -276,15 +279,7 @@ public class CalendarService {
         return calendars;
     }
 
-    private List<Calendar> readCalendarsByMonth(List<Calendar> calendarList,int year, int month){
 
-        LocalDate date = LocalDate.of(year,month,1);
-
-        List<Calendar> calendars = calendarList.stream()
-                .filter(calendar -> calendar.getStartDate().isBefore(date)&&calendar.getEndDate().isAfter(date))
-                .collect(Collectors.toList());
-        return calendars;
-    }
 
     private List<RepeatCalendar> readRepeatCalendars(List<Calendar> calendarList){
         List<Calendar> repeatsInfo = calendarList.stream()
