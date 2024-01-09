@@ -43,7 +43,7 @@ public class RepeatCalendar {
     private LocalDateTime updatedAt; // 수정 시간
 
     public RepeatCalendar setIsExpired(Boolean b){
-        isExpired= b;
+        isExpired = b;
         return this;
     }
 }

@@ -229,7 +229,7 @@ public class CalendarService {
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user, id).get();
         if(calendar.getStartDate().isEqual(calendarRequestDto.getStartDate())  && calendar.getEndDate().isEqual(calendarRequestDto.getEndDate())){
             updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
-            data.put("calendars", this.calendarToDto(calendar));
+            data.put("calendars", this.calendarToDto(updateCalendar));
             return data;
         }
         else{
