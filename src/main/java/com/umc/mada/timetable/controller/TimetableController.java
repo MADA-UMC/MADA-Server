@@ -2,6 +2,8 @@ package com.umc.mada.timetable.controller;
 
 import com.umc.mada.calendar.domain.Calendar;
 import com.umc.mada.calendar.repository.CalendarRepository;
+import com.umc.mada.timetable.dto.CommentRequestDto;
+import com.umc.mada.timetable.dto.CommentResponseDto;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.service.TimetableService;
@@ -34,6 +36,48 @@ public class TimetableController {
         this.calendarRepository = calendarRepository;
         this.timetableService = timetableService;
         this.userRepository = userRepository;
+    }
+
+    /**
+     * COMMENT
+     *
+     */
+    @PostMapping("/comment")
+    public ResponseEntity<Map<String, Object>> createTimetableComment(Authentication authentication, @RequestBody CommentRequestDto commentRequestDto){
+        // comment 생성 API
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        CommentResponseDto newComment = timetableService.createComment(user, commentRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Comment", newComment);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PatchMapping("/comment/update/{date}")
+    public ResponseEntity<Map<String, Object>> updateTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestBody CommentRequestDto commentRequestDto){
+        // comment 수정 API
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        CommentResponseDto updatedComment = timetableService.updateComment(user, date, commentRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Comment", updatedComment);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/comment/date/{date}")
+    public ResponseEntity<Map<String, Object>> getUserTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        CommentResponseDto userComment = timetableService.getUserComment(user, date);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Comment", userComment);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
+        return ResponseEntity.ok().body(result);
     }
 
     /**
