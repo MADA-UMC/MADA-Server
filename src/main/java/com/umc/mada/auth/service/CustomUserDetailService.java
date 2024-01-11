@@ -1,11 +1,10 @@
 package com.umc.mada.auth.service;
 
 import com.umc.mada.auth.dto.OAuth2Attributes;
-import com.umc.mada.custom.domain.CustomItem;
-import com.umc.mada.custom.domain.HaveItem;
-import com.umc.mada.custom.domain.ItemUnlockCondition;
+import com.umc.mada.custom.domain.WearingItem;
 import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
+import com.umc.mada.custom.repository.WearingItemRepository;
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.Role;
 import com.umc.mada.user.domain.User;
@@ -25,6 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomUserDetailService extends DefaultOAuth2UserService{ // implements OAuth2UserService<OAuth2UserRequest, OAuth2User>
     private final UserRepository userRepository;
+    private final WearingItemRepository wearingItemRepository;
     private final CustomRepository customRepository;
     private final HaveItemRepository haveItemRepository;
 
@@ -102,24 +102,31 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
     }
 
     private void setUserData(User user){
-        //사용자 기본 제공 커스텀 아이템 세팅하기
-        List<CustomItem> basicItemList = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C0);
-        for(CustomItem basicItem : basicItemList){
-            if(basicItem.getId() == 10){
-                haveItemRepository.save(new HaveItem(user, basicItem, true));
-                continue;
-            }
-            haveItemRepository.save(new HaveItem(user, basicItem));
-        }
-//
-        List<CustomItem> basicItemList2 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C1);
-        for(CustomItem basicItem : basicItemList2){
-            haveItemRepository.save(new HaveItem(user, basicItem));
-        }
+        //사용자 캐릭터 디폴트 설정하기
+        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(10).get()));
+        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(48).get()));
+        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(49).get()));
+        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(50).get()));
 
-        List<CustomItem> basicItemList3 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C2);
-        for(CustomItem basicItem : basicItemList3){
-            haveItemRepository.save(new HaveItem(user, basicItem));
-        }
+
+        //사용자 기본 제공 커스텀 아이템 세팅하기
+//        List<CustomItem> basicItemList = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C0);
+//        for(CustomItem basicItem : basicItemList){
+//            if(basicItem.getId() == 10){
+//                haveItemRepository.save(new HaveItem(user, basicItem, true));
+//                continue;
+//            }
+//            haveItemRepository.save(new HaveItem(user, basicItem));
+//        }
+////
+//        List<CustomItem> basicItemList2 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C1);
+//        for(CustomItem basicItem : basicItemList2){
+//            haveItemRepository.save(new HaveItem(user, basicItem));
+//        }
+//
+//        List<CustomItem> basicItemList3 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C2);
+//        for(CustomItem basicItem : basicItemList3){
+//            haveItemRepository.save(new HaveItem(user, basicItem));
+//        }
     }
 }

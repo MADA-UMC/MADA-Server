@@ -101,7 +101,7 @@ public class TodoService {
 //            CategoryStatisticsDto defaultCategoryStatisticsDto = new CategoryStatisticsDto()
             List<Category> categories =  categoryRepository.findCategoriesByUserId(user);
             List<CategoryStatisticsDto> categoryStatisticsDtos = categories.stream()
-                    .map(category -> CategoryStatisticsDto.of(category.getCategoryName(), category.getColor(), (double) 0))
+                    .map(category -> CategoryStatisticsDto.of(category.getCategoryName(), category.getColor(), (float) 0))
                     .collect(Collectors.toList());
             return new TodoStatisticsResponseDto(user.getNickname(),todoStatisticsVO.getTodosPercent(), todoStatisticsVO.getCompleteTodoPercent(), categoryStatisticsDtos);
         }
