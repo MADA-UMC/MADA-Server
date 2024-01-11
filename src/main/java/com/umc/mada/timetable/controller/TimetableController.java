@@ -7,6 +7,7 @@ import com.umc.mada.timetable.dto.CommentResponseDto;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.service.TimetableService;
+import com.umc.mada.todo.domain.RepeatTodo;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.user.domain.User;
@@ -217,46 +218,7 @@ public class TimetableController {
     public ResponseEntity<Map<String, Object>> getTodoAndCalendar(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        List<Todo> todos = todoRepository.findTodosByUserId(user);
-        List<Calendar> calendars = calendarRepository.findAllByUser(user);
-        List<Map<String, Object>> todoList = new ArrayList<>();
-        for (Todo todo : todos) {
-            Map<String, Object> todoMap = new LinkedHashMap<>();
-            todoMap.put("iconId", todo.getCategory().getIcon().getId()); // Category의 아이콘 ID
-            todoMap.put("todoName", todo.getTodoName());
-            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null){
-                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())){
-                    todoList.add(todoMap);
-                }
-            } else {
-                if (todo.getDate().equals(date)) {
-                    todoList.add(todoMap);
-                }
-            }
-        }
-
-        List<Map<String, Object>> calendarList = new ArrayList<>();
-        for (Calendar calendar : calendars) {
-            // 시작일과 종료일 사이에 date가 있는 경우만 추가
-            if (!date.isBefore(calendar.getStartDate().toLocalDate()) && !date.isAfter(calendar.getEndDate().toLocalDate())) {
-                Map<String, Object> calendarMap = new LinkedHashMap<>();
-                calendarMap.put("CalendarName", calendar.getCalendarName());
-                calendarMap.put("color", calendar.getColor());
-                calendarMap.put("startTime", calendar.getStartTime()); // 시작 시간
-                calendarMap.put("endTime", calendar.getEndTime());     // 종료 시간
-                calendarMap.put("d-day", calendar.getDday());
-                calendarList.add(calendarMap);
-            }
-        }
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("calendarList", calendarList);
-        data.put("todoList", todoList);
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        //result.put("status", 200);
-        //result.put("success", true);
-        //result.put("message", "Calendar와 Todo 정보 조회 완료");
-        result.put("data",data);
-        return ResponseEntity.ok().body(result);
+        Map<String, Object> map = timetableService.getTodoAndCalendar(user, date);
+        return ResponseEntity.ok().body(map);
     }
 }

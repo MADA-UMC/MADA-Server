@@ -1,5 +1,7 @@
 package com.umc.mada.timetable.service;
 
+import com.umc.mada.calendar.domain.Calendar;
+import com.umc.mada.calendar.repository.CalendarRepository;
 import com.umc.mada.category.domain.Category;
 import com.umc.mada.global.BaseResponseStatus;
 import com.umc.mada.timetable.domain.Comment;
@@ -10,8 +12,12 @@ import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.repository.CommentRepository;
 import com.umc.mada.timetable.repository.TimetableRepository;
+import com.umc.mada.todo.domain.RepeatTodo;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.timetable.domain.DayOfWeek;
+import com.umc.mada.todo.dto.RepeatTodoResponseDto;
+import com.umc.mada.todo.repository.RepeatTodoRepository;
+import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.sql.Time;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,12 +35,18 @@ public class TimetableService {
     private final TimetableRepository timetableRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final TodoRepository todoRepository;
+    private final CalendarRepository calendarRepository;
+    private final RepeatTodoRepository repeatTodoRepository;
 
     @Autowired
-    public TimetableService(UserRepository userRepository, TimetableRepository timetableRepository, CommentRepository commentRepository) {
+    public TimetableService(UserRepository userRepository, TimetableRepository timetableRepository, CommentRepository commentRepository, TodoRepository todoRepository, CalendarRepository calendarRepository, RepeatTodoRepository repeatTodoRepository) {
         this.userRepository = userRepository;
         this.timetableRepository = timetableRepository;
         this.commentRepository = commentRepository;
+        this.todoRepository = todoRepository;
+        this.calendarRepository = calendarRepository;
+        this.repeatTodoRepository = repeatTodoRepository;
     }
 
     // 시간표 일정 생성 로직
@@ -54,6 +65,60 @@ public class TimetableService {
         // 저장된 시간표 정보를 기반으로 TimetalbeResponseDto 생성 후 반환
         return new TimetableResponseDto(savedTimetable.getId(), savedTimetable.getDate(), savedTimetable.getScheduleName(), savedTimetable.getColor(),
                 savedTimetable.getStartTime(), savedTimetable.getEndTime(), savedTimetable.getMemo(), savedTimetable.getIsDeleted(), savedTimetable.getDayOfWeek());
+    }
+
+    // 시간표 추가 시, 특정 유저 일정(캘린더)과 투두 조회 로직
+    public Map<String, Object> getTodoAndCalendar (User user, LocalDate date){
+        validateUserId(user);
+        List<Todo> userTodos = todoRepository.findTodosByUserIdAndIsDeletedIsFalse(user);
+        List<RepeatTodo> repeatTodos = repeatTodoRepository.findRepeatTodosByDateIsAndIsDeletedIsFalse(date);
+        List<Calendar> calendars = calendarRepository.findAllByUser(user);
+        List<Map<String, Object>> todoList = new ArrayList<>();
+        for (Todo todo : userTodos) {
+            Map<String, Object> todoMap = new LinkedHashMap<>();
+            todoMap.put("iconId", todo.getCategory().getIcon().getId()); // Category의 아이콘 ID
+            todoMap.put("todoName", todo.getTodoName());
+            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null){
+                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())){
+                    todoList.add(todoMap);
+                }
+            } else {
+                if (todo.getDate().equals(date)) {
+                    todoList.add(todoMap);
+                }
+            }
+        }
+        List<Map<String, Object>> repeatTodoList = new ArrayList<>();
+        for (RepeatTodo repeatTodo : repeatTodos){
+            Map<String, Object> repeatTodoMap = new LinkedHashMap<>();
+            if(repeatTodo.getTodoId().getUserId() == user){
+                repeatTodoMap.put("iconId", repeatTodo.getTodoId().getCategory().getIcon().getId());
+                repeatTodoMap.put("todoName", repeatTodo.getTodoId().getTodoName());
+                repeatTodoList.add(repeatTodoMap);
+            }
+        }
+
+        List<Map<String, Object>> calendarList = new ArrayList<>();
+        for (Calendar calendar : calendars) {
+            // 시작일과 종료일 사이에 date가 있는 경우만 추가
+            if (!date.isBefore(calendar.getStartDate().toLocalDate()) && !date.isAfter(calendar.getEndDate().toLocalDate())) {
+                Map<String, Object> calendarMap = new LinkedHashMap<>();
+                calendarMap.put("CalendarName", calendar.getCalendarName());
+                calendarMap.put("color", calendar.getColor());
+                calendarMap.put("startTime", calendar.getStartTime()); // 시작 시간
+                calendarMap.put("endTime", calendar.getEndTime());     // 종료 시간
+                calendarMap.put("d-day", calendar.getDday());
+                calendarList.add(calendarMap);
+            }
+        }
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("calendarList", calendarList);
+        data.put("todoList", todoList);
+        data.put("repeatTodoList", repeatTodoList);
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data",data);
+        return data;
     }
 
     @Transactional
