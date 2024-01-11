@@ -3,6 +3,7 @@ package com.umc.mada.todo.service;
 import com.umc.mada.todo.domain.*;
 import com.umc.mada.todo.dto.*;
 import com.umc.mada.todo.repository.CategoryStatisticsVO;
+import com.umc.mada.todo.repository.RepeatTodoRepository;
 import com.umc.mada.todo.repository.TodoStatisticsVO;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.global.BaseResponseStatus;
@@ -23,35 +24,44 @@ import java.time.temporal.TemporalAdjusters;
 @Service
 public class TodoService {
     private final TodoRepository todoRepository;
+    private final RepeatTodoRepository repeatTodoRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
 
     @Autowired
-    public TodoService(UserRepository userRepository, TodoRepository todoRepository, CategoryRepository categoryRepository) {
+    public TodoService(UserRepository userRepository, TodoRepository todoRepository, RepeatTodoRepository repeatTodoRepository, CategoryRepository categoryRepository) {
         this.userRepository = userRepository;
         this.todoRepository = todoRepository;
+        this.repeatTodoRepository = repeatTodoRepository;
         this.categoryRepository = categoryRepository;
     }
 
     // 투두 생성 로직
-    public TodoResponseDto createTodo(User user, TodoRequestDto todoRequestDto) {
+    public Map<String, Object> createTodo(User user, TodoRequestDto todoRequestDto) {
         validateUserId(user);
         validateCategoryId(todoRequestDto.getCategory().getId());
         validateTodoName(todoRequestDto.getTodoName());
 
         Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategory().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
-
         // 투두 앤티티 생성
-        Todo todo = new Todo(user, todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(), category, todoRequestDto.getTodoName(), todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false, todoRequestDto.getRepeat(), todoRequestDto.getRepeatWeek(), todoRequestDto.getRepeatMonth(), todoRequestDto.getStartRepeatDate(), todoRequestDto.getEndRepeatDate(), todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
+        Todo todo = new Todo(user, todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(), category, todoRequestDto.getTodoName(), todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false, todoRequestDto.getRepeat(), todoRequestDto.getRepeatInfo(), todoRequestDto.getStartRepeatDate(), todoRequestDto.getEndRepeatDate(), todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
         );
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
         Todo savedTodo = todoRepository.save(todo);
-
+        List<RepeatTodoResponseDto> repeatTodoResponseDtoList = new ArrayList<>();
+        if(todo.getRepeat()!=Repeat.N){
+            repeatTodoResponseDtoList = createRepeatTodos(savedTodo);
+        }
+        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Todo", TodoResponseDto.of(savedTodo));
+        data.put("RepeatTodos", repeatTodoResponseDtoList);
+        map.put("data", data);
         // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
-        return TodoResponseDto.of(savedTodo);
+        return map;
     }
 
     /**
@@ -108,69 +118,16 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
         validateCategoryId(todo.getCategory().getId());
 
-        // 투두 반복 변경 처리
-        Repeat repeat;
-
+        // 반복 변경 처리
         if (todoRequestDto.getRepeat() != null){
-            repeat = Repeat.valueOf(todoRequestDto.getRepeat().name());
-            todo.setRepeat(repeat);
-        }else{
-            repeat = todo.getRepeat();
-        }
-
-        // 투두 매주 반복 변경 처리
-        RepeatWeek repeatWeek = null;
-        if(todoRequestDto.getRepeatWeek() != null){
-            repeatWeek = RepeatWeek.valueOf(todoRequestDto.getRepeatWeek().name());
-            todo.setRepeatWeek(repeatWeek);
-            if(todo.getRepeat() != Repeat.WEEK){
-                throw new IllegalArgumentException("매주 반복이 아닌 경우 반복 요일을 설정할 수 없습니다.");
-            }
-        }else{
-            repeatWeek = todo.getRepeatWeek();
-        }
-
-        // 투두 매달 반복 변경 처리
-        RepeatMonth repeatMonth = null;
-        if(todoRequestDto.getRepeatMonth() != null){
-            repeatMonth = RepeatMonth.fromValue(todoRequestDto.getRepeatMonth().getDayOfMonth());
-            todo.setRepeatMonth(repeatMonth);
-            if(todo.getRepeat() != Repeat.MONTH){
-                throw new IllegalArgumentException("매달 반복이 아닌 경우 반복 날짜를 설정할 수 없습니다.");
-            }
-        }else{
-            repeatMonth = todo.getRepeatMonth();
-        }
-
-        if (todoRequestDto.getRepeat() == Repeat.N){
-            repeatWeek = null;
-            repeatMonth = null;
-            todo.setRepeatWeek(repeatWeek);
-            todo.setRepeatMonth(repeatMonth);
-            todo.setStartRepeatDate(null);
-            todo.setEndRepeatDate(null);
-            if (todoRequestDto.getRepeatWeek() != null || todoRequestDto.getRepeatMonth() != null || todoRequestDto.getStartRepeatDate() != null || todoRequestDto.getEndRepeatDate() != null) {
-                throw new IllegalArgumentException("repeat 값이 N인 경우 repeatWeek, repeatMonth, startRepeatDate, endRepeatDate는 모두 null이어야 합니다.");
-            }
-        } else if (todoRequestDto.getRepeat() == Repeat.DAY) {
-            repeatWeek = null;
-            repeatMonth = null;
-            todo.setRepeatWeek(repeatWeek);
-            todo.setRepeatMonth(repeatMonth);
-            if (todoRequestDto.getRepeatWeek() != null || todoRequestDto.getRepeatMonth() != null) {
-                throw new IllegalArgumentException("repeat 값이 DAY인 경우 repeatWeek, repeatMonth는 null이어야 합니다.");
-            }
-        } else if (todoRequestDto.getRepeat() == Repeat.WEEK) {
-            repeatMonth = null;
-            todo.setRepeatMonth(repeatMonth);
-            if (todoRequestDto.getRepeatWeek() == null || todoRequestDto.getRepeatMonth() != null) {
-                throw new IllegalArgumentException("repeatWeek 값은 null이 될 수 없으며, repeatMonth는 null이어야 합니다.");
-            }
-        } else if (todoRequestDto.getRepeat() == Repeat.MONTH){
-            repeatWeek = null;
-            todo.setRepeatWeek(repeatWeek);
-            if (todoRequestDto.getRepeatMonth() == null || todoRequestDto.getRepeatWeek() != null) {
-                throw new IllegalArgumentException("repeatMonth 값은 null이 될 수 없으며, repeatWeek는 null이어야 합니다.");
+            if (todoRequestDto.getRepeat() == Repeat.DAY){
+                todo.setRepeat(Repeat.DAY);
+            } else if (todoRequestDto.getRepeat() == Repeat.WEEK){
+                todo.setRepeat(Repeat.WEEK);
+                todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
+            } else if (todoRequestDto.getRepeat() == Repeat.MONTH){
+                todo.setRepeat(Repeat.MONTH);
+                todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
             }
         }
 
@@ -206,6 +163,11 @@ public class TodoService {
             }
         }
 
+        // 투두 날짜 변경 처리
+        if (todoRequestDto.getDate() != null){
+            todo.setDate((todoRequestDto.getDate()));
+        }
+
         // 수정된 Todo를 저장하고 저장된 투두 엔티티 반환
         Todo updatedTodo = todoRepository.save(todo);
 
@@ -232,28 +194,33 @@ public class TodoService {
     }
 
     // 특정 유저 투두 조회 로직
-    public List<TodoResponseDto> getUserTodo(User userId, LocalDate date) {
+    public Map<String, Object> getUserTodo(User userId, LocalDate date) {
         /* List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);*/
-        List<Todo> userTodos = todoRepository.findTodosByUserId(userId);
-        List<Todo> filteredTodos = new ArrayList<>();
-
+        List<Todo> userTodos = todoRepository.findTodosByUserIdAndIsDeletedIsFalse(userId);
+        List<RepeatTodo> repeatTodos = repeatTodoRepository.findRepeatTodosByDateIsAndIsDeletedIsFalse(date);
+        List<RepeatTodoResponseDto> filteredRepeatTodos = new ArrayList<>();
+        List<TodoResponseDto> filteredTodos = new ArrayList<>();
+        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
         for (Todo todo : userTodos){
             if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
                 if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
-                    filteredTodos.add(todo);
+                    filteredTodos.add(TodoResponseDto.of(todo));
                 }
-            } else {
-                if (todo.getDate().equals(date)) {
-                    filteredTodos.add(todo);
-                }
+            } else if(todo.getDate().equals(date)) {
+                filteredTodos.add(TodoResponseDto.of(todo));
             }
         }
-        return filteredTodos.stream()
-                .filter((todo -> !todo.getIsDeleted()))
-                .map(TodoResponseDto::of)
-                .collect(Collectors.toList());
-        // 조회 결과가 존재하는 경우에는 해당 할 일을 TodoResponseDto로 매핑하여 반환
-        //return userTodos.stream().map(TodoResponseDto::of).collect(Collectors.toList());
+        for (RepeatTodo repeatTodo : repeatTodos){
+            if(repeatTodo.getTodoId().getUserId() == userId){
+                filteredRepeatTodos.add(RepeatTodoResponseDto.of(repeatTodo));
+            }
+        }
+        data.put("nickname", userId.getNickname());
+        data.put("TodoList", filteredTodos);
+        data.put("RepeatTodoList", filteredRepeatTodos);
+        map.put("data", data);
+        return map;
    }
 
    // 특정 유저 반복 투두 조회 로직
@@ -264,6 +231,66 @@ public class TodoService {
                 .filter((todo -> !todo.getIsDeleted()))
                 .map(TodoResponseDto::of)
                 .collect(Collectors.toList());
+    }
+
+    // 반복 투두 생성 로직
+    public List<RepeatTodoResponseDto> createRepeatTodos(Todo todo) {
+        LocalDate startRepeatDate = todo.getStartRepeatDate();
+        LocalDate endRepeatDate = todo.getEndRepeatDate();
+
+        List<LocalDate> dates = new ArrayList<>();
+        List<RepeatTodo> repeatTodos = new ArrayList<>();
+
+        if (todo.getRepeat() == Repeat.DAY){
+            while(!startRepeatDate.isAfter(endRepeatDate)){
+                dates.add(startRepeatDate);
+                startRepeatDate = startRepeatDate.plusDays(1);
+            }
+
+        } else if (todo.getRepeat() == Repeat.WEEK) {
+            int dayOfWeek = todo.getRepeatInfo();
+            startRepeatDate = startRepeatDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.of(dayOfWeek)));
+            while (!startRepeatDate.isAfter(endRepeatDate)) {
+                dates.add(startRepeatDate);
+                startRepeatDate = startRepeatDate.plusWeeks(1);
+            }
+        } else if (todo.getRepeat() == Repeat.MONTH){
+            int dayOfMonth = todo.getRepeatInfo();
+            // 반복 시작일이 반복 종료일 이후인 경우 반복 중지
+            while (!startRepeatDate.isAfter(endRepeatDate) && !startRepeatDate.isBefore(todo.getStartRepeatDate())) {
+                if (dayOfMonth != 0) {
+                    // repeatInfo가 0이 아닌 경우
+                    int startDay = startRepeatDate.getDayOfMonth();
+
+                    if (dayOfMonth < startDay) {
+                        startRepeatDate = startRepeatDate.plusMonths(1).withDayOfMonth(dayOfMonth);
+                    } else {
+                        startRepeatDate = startRepeatDate.withDayOfMonth(dayOfMonth);
+                    }
+                } else {
+                    // repeatInfo가 0인 경우
+                    startRepeatDate = startRepeatDate.withDayOfMonth(startRepeatDate.lengthOfMonth());
+                }
+                dates.add(startRepeatDate);
+                startRepeatDate = startRepeatDate.plusMonths(1);
+            }
+        }
+
+        for (LocalDate date : dates){
+            RepeatTodo repeatTodo = RepeatTodo.builder()
+                    .todoId(todo)
+                    .date(date)
+                    .complete(false)
+                    .isDeleted(false)
+                    .build();
+            repeatTodoRepository.save((repeatTodo));
+            repeatTodos.add(repeatTodo);
+        }
+        List<RepeatTodoResponseDto> result = new ArrayList<>();
+        for(RepeatTodo repeatTodo: repeatTodos){
+            result.add(repeatTodoToDto(repeatTodo));
+        }
+        return result;
     }
 
     // 투두 이름 유효성 검사 메서드
@@ -291,6 +318,13 @@ public class TodoService {
         if (category.getIsInActive()) {
             throw new IllegalArgumentException("종료된 카테고리에는 투두를 생성,수정,삭제할 수 없습니다.");
         }
+    }
+
+    public RepeatTodoResponseDto repeatTodoToDto(RepeatTodo repeatTodo){
+        return RepeatTodoResponseDto.builder()
+                .todoId(repeatTodo.getTodoId().getId())
+                .date(repeatTodo.getDate())
+                .build();
     }
 
 }
