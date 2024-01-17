@@ -243,7 +243,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
-        if (todoUser.getId() == userId.getId()) {
+        if (todoUser.getId().equals(userId.getId())) {
             repeatTodo.setIsDeleted(true);
             repeatTodoRepository.save(repeatTodo);
         }
@@ -256,7 +256,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
-        if (todoUser.getId() == userId.getId()) {
+        if (todoUser.getId().equals(userId.getId())) {
             List<RepeatTodo> futureRepeatTodos = repeatTodoRepository.findAllByTodoIdAndDateGreaterThanEqual(todo, repeatTodo.getDate());
 
             for (RepeatTodo futureRepeatTodo : futureRepeatTodos) {
@@ -273,7 +273,7 @@ public class TodoService {
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
-        if (todoUser.getId() == userId.getId()) {
+        if (todoUser.getId().equals(userId.getId())) {
             List<RepeatTodo> allRepeatTodos = repeatTodoRepository.findAllByTodoId(todo);
 
             for (RepeatTodo repeatTodos : allRepeatTodos) {
