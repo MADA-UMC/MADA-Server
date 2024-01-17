@@ -53,15 +53,16 @@ public class TodoController {
         // 투두 수정 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        TodoResponseDto updatedTodo = todoService.updateTodo(user, todoId, todoRequestDto);
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("Todo", updatedTodo);
-        Map<String, Object> result = new LinkedHashMap<>();
+        Map<String, Object> map = todoService.updateTodo(user, todoId, todoRequestDto);
+        //TodoResponseDto updatedTodo = todoService.updateTodo(user, todoId, todoRequestDto);
+        //Map<String, Object> data = new LinkedHashMap<>();
+        //data.put("Todo", updatedTodo);
+        //Map<String, Object> result = new LinkedHashMap<>();
         //result.put("status", 200);
         //result.put("success", true);
         //result.put("message", "투두 수정이 완료되었습니다.");
-        result.put("data", data);
-        return ResponseEntity.ok().body(result);
+        //result.put("data", data);
+        return ResponseEntity.ok().body(map);
     }
 
     @PatchMapping("/delete/{todoId}")
@@ -74,6 +75,39 @@ public class TodoController {
         //result.put("status", 200);
         //result.put("success", true);
         result.put("message", "투두 삭제가 완료되었습니다.");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PatchMapping("/repeat/delete/{repeatTodoId}")
+    public ResponseEntity<Map<String, Object>> deleteRepeatTodo(Authentication authentication, @PathVariable int repeatTodoId) {
+        // 반복 투두 삭제 API (이 반복 투두)
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        todoService.deleteRepeatTodo(user, repeatTodoId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("message", "반복 투두 삭제가 완료되었습니다.");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PatchMapping("/repeat/delete-all-future/{repeatTodoId}")
+    public ResponseEntity<Map<String, Object>> deleteRepeatTodoAndFuture(Authentication authentication, @PathVariable int repeatTodoId) {
+        // 반복 투두 삭제 API (이 반복 투두 및 향후 반복 투두)
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        todoService.deleteRepeatTodoAndFuture(user, repeatTodoId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("message", "해당 반복 투두 및 향후 반복 투두 삭제가 완료되었습니다.");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PatchMapping("/repeat/delete-all/{repeatTodoId}")
+    public ResponseEntity<Map<String, Object>> deleteAllRepeatTodos(Authentication authentication, @PathVariable int repeatTodoId) {
+        // 반복 투두 삭제 API (모든 반복 투두)
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        todoService.deleteAllRepeatTodos(user, repeatTodoId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("message", "모든 반복 투두 삭제가 완료되었습니다.");
         return ResponseEntity.ok().body(result);
     }
 
@@ -106,21 +140,4 @@ public class TodoController {
         result.put("data", data);
         return ResponseEntity.ok().body(result);
     }
-
-//    @PostMapping("/repeat")
-//    // 반복 투두 생성 API
-//    public ResponseEntity<Map<String, Object>> createRepeatTodo(Authentication authentication, @RequestBody TodoRequestDto todoRequestDto) {
-//        // 투두 생성 API
-//        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-//        User user = userOptional.get();
-//        TodoResponseDto newRepeatTodo = todoService.createRepeatTodos(user, todoRequestDto);
-//        Map<String, Object> data = new LinkedHashMap<>();
-//        data.put("RepeatTodo", newRepeatTodo);
-//        Map<String, Object> result = new LinkedHashMap<>();
-//        //result.put("status", 200);
-//        //result.put("success", true);
-//        //result.put("message", "반복 투두 생성이 완료되었습니다.");
-//        result.put("data", data);
-//        return ResponseEntity.ok().body(result);
-//    }
 }

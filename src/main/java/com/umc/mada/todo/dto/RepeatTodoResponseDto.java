@@ -1,16 +1,13 @@
 package com.umc.mada.todo.dto;
 
-import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.todo.domain.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
 
 @Data
+@Builder
 @NoArgsConstructor
-@Getter
 public class RepeatTodoResponseDto {
     private int id;
     private int todoId;
@@ -27,6 +24,7 @@ public class RepeatTodoResponseDto {
 
     public static RepeatTodoResponseDto of(RepeatTodo repeatTodo) {
         return RepeatTodoResponseDto.builder()
+                .id(repeatTodo.getId())
                 .todoId(repeatTodo.getTodoId().getId())
                 .date(repeatTodo.getDate())
                 .complete(repeatTodo.getComplete())

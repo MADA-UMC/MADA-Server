@@ -15,6 +15,9 @@ import java.util.Optional;
 @Repository
 public interface RepeatTodoRepository extends JpaRepository<RepeatTodo, Integer> {
     List<RepeatTodo> readRepeatTodosByTodoId(Todo todoId);
-    List<RepeatTodo> findRepeatTodosByTodoIdAndIsDeletedIsFalse(Todo todoId);
+    List<RepeatTodoResponseDto> findRepeatTodosByTodoIdAndIsDeletedIsFalse(Todo todoId);
     List<RepeatTodo> findRepeatTodosByDateIsAndIsDeletedIsFalse(LocalDate date);
+    List<RepeatTodo> findAllByTodoIdAndDateGreaterThanEqual(Todo todoId, LocalDate date);
+    List<RepeatTodo> findAllByTodoId(Todo todoId);
+    Optional<RepeatTodo> findRepeatTodoByTodoIdAndId(User userId, int Id);
 }

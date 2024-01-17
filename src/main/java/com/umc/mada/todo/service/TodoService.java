@@ -60,7 +60,6 @@ public class TodoService {
         data.put("Todo", TodoResponseDto.of(savedTodo));
         data.put("RepeatTodos", repeatTodoResponseDtoList);
         map.put("data", data);
-        // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
         return map;
     }
 
@@ -111,23 +110,70 @@ public class TodoService {
 
     @Transactional
     // 투두 수정 로직
-    public TodoResponseDto updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
+    public Map<String, Object> updateTodo(User user, int todoId, TodoRequestDto todoRequestDto) {
         validateUserId(user);
 
         Todo todo = todoRepository.findTodoByUserIdAndId(user, todoId)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        List <RepeatTodo> repeatTodos = repeatTodoRepository.readRepeatTodosByTodoId(todo);
         validateCategoryId(todo.getCategory().getId());
 
         // 반복 변경 처리
         if (todoRequestDto.getRepeat() != null){
+            for(RepeatTodo repeatTodo : repeatTodos){
+                repeatTodo.setIsDeleted(true);
+            }
             if (todoRequestDto.getRepeat() == Repeat.DAY){
                 todo.setRepeat(Repeat.DAY);
+                todo.setRepeatInfo(null);
+                todoRepository.save(todo);
+                createRepeatTodos(todo);
             } else if (todoRequestDto.getRepeat() == Repeat.WEEK){
                 todo.setRepeat(Repeat.WEEK);
                 todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
+                todoRepository.save(todo);
+                createRepeatTodos(todo);
             } else if (todoRequestDto.getRepeat() == Repeat.MONTH){
                 todo.setRepeat(Repeat.MONTH);
                 todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
+                todoRepository.save(todo);
+                createRepeatTodos(todo);
+            }
+        }
+
+        // 투두 반복 시작일 / 종료일 변경 처리
+        if (todoRequestDto.getStartRepeatDate() != null || todoRequestDto.getEndRepeatDate() != null){
+            for (RepeatTodo repeatTodo : repeatTodos) {
+                LocalDate repeatTodoDate = repeatTodo.getDate();
+                if (repeatTodoDate.isAfter(todoRequestDto.getEndRepeatDate()) || repeatTodoDate.isBefore(todoRequestDto.getStartRepeatDate())) {
+                    repeatTodo.setIsDeleted(true);
+                }
+            }
+            Set<LocalDate> existingRepeatDates = repeatTodos.stream()
+                    .filter(repeatTodo -> !repeatTodo.getIsDeleted())
+                    .map(RepeatTodo::getDate)
+                    .collect(Collectors.toSet());
+
+            for (LocalDate currentDate = todoRequestDto.getStartRepeatDate();
+                 !currentDate.isAfter(todoRequestDto.getEndRepeatDate());
+                 currentDate = currentDate.plusDays(1)) {
+                if (!existingRepeatDates.contains(currentDate)) {
+                    // 기존 반복 투두에 없는 날짜에 대해 새로운 반복 투두 생성
+                    RepeatTodo newRepeatTodo = RepeatTodo.builder()
+                            .todoId(todo)
+                            .date(currentDate)
+                            .complete(false)
+                            .isDeleted(false)
+                            .build();
+                    repeatTodoRepository.save(newRepeatTodo);
+                    repeatTodos.add(newRepeatTodo);
+                }
+            }
+
+            todo.setStartRepeatDate(todoRequestDto.getStartRepeatDate());
+            todo.setEndRepeatDate(todoRequestDto.getEndRepeatDate());
+            if(todo.getRepeat() == Repeat.N){
+                throw new IllegalArgumentException("반복 투두가 아닌 경우 반복 시작일을 설정할 수 없습니다.");
             }
         }
 
@@ -148,21 +194,6 @@ public class TodoService {
             todo.setComplete(todoRequestDto.getComplete());
         }
 
-        // 투두 반복 시작일 / 종료일 변경 처리
-        if (todoRequestDto.getStartRepeatDate() != null){
-            todo.setStartRepeatDate(todoRequestDto.getStartRepeatDate());
-            if(todo.getRepeat() == Repeat.N){
-                throw new IllegalArgumentException("반복 투두가 아닌 경우 반복 시작일을 설정할 수 없습니다.");
-            }
-        }
-
-        if (todoRequestDto.getEndRepeatDate() != null){
-            todo.setEndRepeatDate(todoRequestDto.getEndRepeatDate());
-            if(todo.getRepeat() == Repeat.N){
-                throw new IllegalArgumentException("반복 투두가 아닌 경우 반복 종료일을 설정할 수 없습니다.");
-            }
-        }
-
         // 투두 날짜 변경 처리
         if (todoRequestDto.getDate() != null){
             todo.setDate((todoRequestDto.getDate()));
@@ -170,9 +201,15 @@ public class TodoService {
 
         // 수정된 Todo를 저장하고 저장된 투두 엔티티 반환
         Todo updatedTodo = todoRepository.save(todo);
+        List<RepeatTodoResponseDto> updatedRepeatTodos = repeatTodoRepository.findRepeatTodosByTodoIdAndIsDeletedIsFalse(updatedTodo);
 
         // 저장된 투두 정보를 기반으로 TodoResponseDto 생성하여 반환
-        return TodoResponseDto.of(updatedTodo);
+        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Todo", TodoResponseDto.of(updatedTodo));
+        data.put("RepeatTodos", updatedRepeatTodos);
+        map.put("data", data);
+        return map;
     }
 
     @Transactional
@@ -182,6 +219,7 @@ public class TodoService {
         //Optional<Todo> optionalTodo = todoRepository.findTodoByUserIdAndId(userId, todoId);
         Todo todo = todoRepository.findTodoByUserIdAndId(userId, todoId)
                         .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        List <RepeatTodo> repeatTodos = repeatTodoRepository.readRepeatTodosByTodoId(todo);
         validateCategoryId(todo.getCategory().getId());
 
         if (!todo.getIsDeleted()) {
@@ -190,6 +228,58 @@ public class TodoService {
             todoRepository.save(todo);
         } else {
             throw new IllegalArgumentException(BaseResponseStatus.NOT_FOUND.getMessage());
+        }
+
+        for(RepeatTodo repeatTodo: repeatTodos){
+            repeatTodo.setIsDeleted(true);
+            repeatTodoRepository.save(repeatTodo);
+        }
+    }
+
+    @Transactional
+    // 반복 투두 삭제 로직 (이 반복 투두)
+    public void deleteRepeatTodo(User userId, int repeatTodoId) {
+        RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        Todo todo = repeatTodo.getTodoId();
+        User todoUser = todo.getUserId();
+        if (todoUser.getId() == userId.getId()) {
+            repeatTodo.setIsDeleted(true);
+            repeatTodoRepository.save(repeatTodo);
+        }
+    }
+
+    @Transactional
+    // 반복 투두 삭제 로직 (이 반복 투두 및 향후 반복 투두)
+    public void deleteRepeatTodoAndFuture(User userId, int repeatTodoId){
+        RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        Todo todo = repeatTodo.getTodoId();
+        User todoUser = todo.getUserId();
+        if (todoUser.getId() == userId.getId()) {
+            List<RepeatTodo> futureRepeatTodos = repeatTodoRepository.findAllByTodoIdAndDateGreaterThanEqual(todo, repeatTodo.getDate());
+
+            for (RepeatTodo futureRepeatTodo : futureRepeatTodos) {
+                futureRepeatTodo.setIsDeleted(true);
+                repeatTodoRepository.save(futureRepeatTodo);
+            }
+        }
+    }
+
+    @Transactional
+    // 반복 투두 삭제 로직 (모든 반복 투두)
+    public void deleteAllRepeatTodos(User userId, int repeatTodoId){
+        RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        Todo todo = repeatTodo.getTodoId();
+        User todoUser = todo.getUserId();
+        if (todoUser.getId() == userId.getId()) {
+            List<RepeatTodo> allRepeatTodos = repeatTodoRepository.findAllByTodoId(todo);
+
+            for (RepeatTodo repeatTodos : allRepeatTodos) {
+                repeatTodos.setIsDeleted(true);
+                repeatTodoRepository.save(repeatTodos);
+            }
         }
     }
 
@@ -283,7 +373,7 @@ public class TodoService {
                     .complete(false)
                     .isDeleted(false)
                     .build();
-            repeatTodoRepository.save((repeatTodo));
+            repeatTodoRepository.save(repeatTodo);
             repeatTodos.add(repeatTodo);
         }
         List<RepeatTodoResponseDto> result = new ArrayList<>();
@@ -322,8 +412,10 @@ public class TodoService {
 
     public RepeatTodoResponseDto repeatTodoToDto(RepeatTodo repeatTodo){
         return RepeatTodoResponseDto.builder()
+                .id(repeatTodo.getId())
                 .todoId(repeatTodo.getTodoId().getId())
                 .date(repeatTodo.getDate())
+                .complete(repeatTodo.getComplete())
                 .build();
     }
 
