@@ -82,4 +82,4 @@ clean {
 
 jar{
 	enabled = false
-}정
+}
