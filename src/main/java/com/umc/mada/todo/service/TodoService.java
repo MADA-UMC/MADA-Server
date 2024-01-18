@@ -46,7 +46,9 @@ public class TodoService {
         Category category = categoryRepository.findCategoryByUserIdAndId(user, todoRequestDto.getCategory().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리 ID입니다."));
         // 투두 앤티티 생성
-        Todo todo = new Todo(user, todoRequestDto.getDate() != null ? todoRequestDto.getDate() : LocalDate.now(), category, todoRequestDto.getTodoName(), todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false, todoRequestDto.getRepeat(), todoRequestDto.getRepeatInfo(), todoRequestDto.getStartRepeatDate(), todoRequestDto.getEndRepeatDate(), todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
+        Todo todo = new Todo(user, (todoRequestDto.getRepeat() != Repeat.N) ? null :
+                (todoRequestDto.getDate() != null) ? todoRequestDto.getDate() : LocalDate.now(),
+                category, todoRequestDto.getTodoName(), todoRequestDto.getComplete() != null ? todoRequestDto.getComplete() : false, todoRequestDto.getRepeat(), todoRequestDto.getRepeatInfo(), todoRequestDto.getStartRepeatDate(), todoRequestDto.getEndRepeatDate(), todoRequestDto.getIsDeleted() != null ? todoRequestDto.getIsDeleted() : false
         );
 
         // 투두를 저장하고 저장된 투두 앤티티 반환
@@ -241,6 +243,7 @@ public class TodoService {
     public void deleteRepeatTodo(User userId, int repeatTodoId) {
         RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        validateCategoryId(repeatTodo.getTodoId().getCategory().getId());
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
         if (todoUser.getId().equals(userId.getId())) {
@@ -254,6 +257,7 @@ public class TodoService {
     public void deleteRepeatTodoAndFuture(User userId, int repeatTodoId){
         RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        validateCategoryId(repeatTodo.getTodoId().getCategory().getId());
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
         if (todoUser.getId().equals(userId.getId())) {
@@ -271,6 +275,7 @@ public class TodoService {
     public void deleteAllRepeatTodos(User userId, int repeatTodoId){
         RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
                 .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        validateCategoryId(repeatTodo.getTodoId().getCategory().getId());
         Todo todo = repeatTodo.getTodoId();
         User todoUser = todo.getUserId();
         if (todoUser.getId().equals(userId.getId())) {
@@ -293,11 +298,14 @@ public class TodoService {
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String, Object> data = new LinkedHashMap<>();
         for (Todo todo : userTodos){
-            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
-                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
-                    filteredTodos.add(TodoResponseDto.of(todo));
-                }
-            } else if(todo.getDate().equals(date)) {
+//            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
+//                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
+//                    filteredTodos.add(TodoResponseDto.of(todo));
+//                }
+//            } else if(todo.getDate().equals(date)) {
+//                filteredTodos.add(TodoResponseDto.of(todo));
+//            }
+            if(todo.getDate()!= null && todo.getDate().equals(date) && todo.getRepeat().equals(Repeat.N)){
                 filteredTodos.add(TodoResponseDto.of(todo));
             }
         }
