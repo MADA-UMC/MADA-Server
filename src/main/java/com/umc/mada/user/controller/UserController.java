@@ -110,11 +110,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-//    private User findUser(Authentication authentication){
-//        return userRepository.findByAuthId(authentication.getName())
-//                .orElseThrow()
-//    }
-
     /**
      * 프로필 편집창 API
      */
@@ -139,6 +134,13 @@ public class UserController {
 //            ObjectError objectError = bindingResult.getAllErrors().stream().findFirst().get();
 //            return ResponseEntity
 //        }
+        return ResponseEntity.ok(map);
+    }
+
+    @PatchMapping("/attendance")
+    public ResponseEntity<Map<String, Object>>totalAttendanceCount(Authentication authentication) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.calcAttendance(authentication));
         return ResponseEntity.ok(map);
     }
 
