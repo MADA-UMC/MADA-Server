@@ -2,6 +2,8 @@ package com.umc.mada.timetable.controller;
 
 import com.umc.mada.calendar.domain.Calendar;
 import com.umc.mada.calendar.repository.CalendarRepository;
+import com.umc.mada.timetable.dto.CommentRequestDto;
+import com.umc.mada.timetable.dto.CommentResponseDto;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.service.TimetableService;
