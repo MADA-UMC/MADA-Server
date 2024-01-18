@@ -9,6 +9,7 @@ import javax.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -42,14 +43,8 @@ public class Todo{
     @Enumerated(value = EnumType.STRING)
     private Repeat repeat; // 반복 설정 (N: 반복 안함, day: 매일 반복, week: 매주 반복, month: 매월 반복)
 
-    @Column(name = "repeat_week", length = 10)
-    @Enumerated(value = EnumType.STRING)
-    private RepeatWeek repeatWeek; // 매주 반복 요일 (null 또는 "mon", "tue", "wed", "thu", "fri", "sat", "sun")
-
-    //@Enumerated(value = EnumType.STRING)
-    @Column(name = "repeat_month")
-    @Convert(converter = RepeatMonthConverter.class)
-    private RepeatMonth repeatMonth;
+    @Column(name = "repeat_info")
+    private Integer repeatInfo; // 반복 정보
 
     @Column(name = "complete", nullable = false)
     private Boolean complete; // 완료 여부 (y: 오늘 할 일 완료, n: 오늘 할 일 미완료)
@@ -60,7 +55,7 @@ public class Todo{
     @Column(name = "end_repeat_date")
     private LocalDate endRepeatDate; // 반복 종료 일자
 
-    @Column(name = "date")
+    @Column(name = "date", nullable = false)
     private LocalDate date; // 투두 일자
 
     @Column(name = "is_deleted", nullable = false)
@@ -75,15 +70,14 @@ public class Todo{
     private LocalDateTime updatedAt; // 수정 시간
 
     // 생성자 (필수 필드)
-    public Todo(User userId, LocalDate date, Category category, String todoName, boolean complete, Repeat repeat, RepeatWeek repeatWeek, RepeatMonth repeatMonth, LocalDate startRepeatDate, LocalDate endRepeatDate, Boolean isDeleted) {
+    public Todo(User userId, LocalDate date, Category category, String todoName, boolean complete, Repeat repeat, Integer repeatInfo, LocalDate startRepeatDate, LocalDate endRepeatDate, Boolean isDeleted) {
         this.userId = userId;
         this.date = date;
         this.category = category;
         this.todoName = todoName;
         this.complete = complete;
         this.repeat = repeat;
-        this.repeatWeek = repeatWeek;
-        this.repeatMonth = repeatMonth;
+        this.repeatInfo = repeatInfo;
         this.startRepeatDate = startRepeatDate;
         this.endRepeatDate = endRepeatDate;
         this.isDeleted = isDeleted;

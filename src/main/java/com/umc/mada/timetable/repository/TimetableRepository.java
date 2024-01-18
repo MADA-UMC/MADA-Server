@@ -4,6 +4,7 @@ import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.umc.mada.timetable.domain.DayOfWeek;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,4 +16,9 @@ public interface TimetableRepository extends JpaRepository<Timetable, Integer> {
     List<Timetable> findTimetablesByUserIdAndDateIs(User userId, LocalDate date);
     Optional<Timetable> deleteTimetableByUserIdAndId(User userId, int id);
     Optional<Timetable> findTimetableByUserIdAndId(User userId, int id);
+    List<Timetable> findTimetablesByUserIdAndDayOfWeekIsNot(User userId, DayOfWeek dayOfWeek);
+    List<Timetable> findTimetablesByUserIdAndDateIsAndDayOfWeek(User userId, LocalDate date, DayOfWeek dayOfWeek);
+    List<Timetable> findTimetablesByUserIdAndDayOfWeek(User userId, DayOfWeek dayOfWeek);
+    boolean existsByUserIdAndDateAndDayOfWeek(User user, LocalDate date, DayOfWeek dayOfWeek);
+    List<Timetable> findTimetablesByUserId(User userId);
 }
