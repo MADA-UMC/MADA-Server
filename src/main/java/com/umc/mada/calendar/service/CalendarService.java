@@ -123,10 +123,11 @@ public class CalendarService {
     public Map<String, Object> readMonthCalendar(Authentication authentication, int year,int month){
         User user = this.getUser(authentication);
         LocalDate start_date = LocalDate.of(year,month,1);
+
         int days = start_date.lengthOfMonth();
         LocalDate end_date = LocalDate.of(year,month,days);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqual(user,start_date,end_date);
-        List<RepeatCalendar> repeatCalendarList = readRepeatCalendars(calendarList);
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqualAndExpired(user,start_date,end_date,false);
+        List<RepeatCalendar> repeatCalendarList = readRepeatCalendars(calendarList).stream().filter(repeatCalendar -> repeatCalendar.getDate().getMonthValue() == month).collect(Collectors.toList());
 
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
         List<RepeatCalendarResponseDto> repeatCalendarResponseDtoList = new ArrayList<>();
@@ -233,6 +234,7 @@ public class CalendarService {
             return data;
         }
         else{
+            updateCalendar = this.updateCalendar(calendar,calendarRequestDto);
             List<RepeatCalendar> repeats = repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar);
             List<RepeatCalendarResponseDto> old = new ArrayList<>();
             List<RepeatCalendarResponseDto> updated;
@@ -251,19 +253,55 @@ public class CalendarService {
     }
 
 
-    public Map<String,Object> deleteCalendar(Authentication authentication, Long id){
+    public Map<String,Object> deleteCalendar(Authentication authentication, Long id,Long option,LocalDate date){
         User user = this.getUser(authentication);
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id).get();
-        List<RepeatCalendar> repeatCalendarList = new ArrayList<>();
+        List<RepeatCalendar> repeatCalendarList;
         List<RepeatCalendarResponseDto> repeatCalendarResponseDtoList = new ArrayList<>();
         repeatCalendarList=repeatCalendarRepository.readRepeatCalendarsByCalendarIdAndIsExpiredIsFalse(calendar);
         Map<String,Object> data = new LinkedHashMap<>();
-        calendar.setExpired(true);
-        for(RepeatCalendar r: repeatCalendarList){
-            r.setIsExpired(true);
-            repeatCalendarRepository.save(r);
-            repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
+
+        if(repeatCalendarList.isEmpty() || repeatCalendarList.size() == 1){
+            calendar.setExpired(true);
         }
+
+        //모두 제거
+        if(option == 0){
+            calendar.setExpired(true);
+            for(RepeatCalendar r: repeatCalendarList){
+                r.setIsExpired(true);
+                repeatCalendarRepository.save(r);
+                repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
+            }
+
+        }
+        //향후 모두 제거
+        if (option == 1){
+            for(RepeatCalendar r: repeatCalendarList){
+                if(r.getDate().isAfter(date)){
+                    r.setIsExpired(true);
+                    repeatCalendarRepository.save(r);
+                    repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
+                }
+                else {
+                    continue;
+                }
+            }
+        }
+        //단일 제거
+        if (option == 2){
+            for(RepeatCalendar r: repeatCalendarList){
+                if(r.getDate().isEqual(date)){
+                    r.setIsExpired(true);
+                    repeatCalendarRepository.save(r);
+                    repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
+                }
+                else{
+                    continue;
+                }
+            }
+        }
+
         calendarRepository.save(calendar);
         data.put("calendars",this.calendarToDto(calendar));
         data.put("repeats", repeatCalendarResponseDtoList);
