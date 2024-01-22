@@ -138,7 +138,9 @@ public class CalendarService {
             if(repeatCalendar.getDate().isAfter(end_date) && repeatCalendar.getDate().isBefore(start_date)){
                 continue;
             }
-            repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(repeatCalendar));
+            else {
+                repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(repeatCalendar));
+            }
         }
         Map<String,Object> map = new LinkedHashMap<>();
         Map<String ,Object> data = new LinkedHashMap<>();
