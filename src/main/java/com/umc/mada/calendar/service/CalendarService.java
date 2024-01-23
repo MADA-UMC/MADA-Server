@@ -126,7 +126,7 @@ public class CalendarService {
 
         int days = start_date.lengthOfMonth();
         LocalDate end_date = LocalDate.of(year,month,days);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqualAndExpired(user,start_date,end_date,false);
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqual(user,start_date,end_date);
         List<RepeatCalendar> repeatCalendarList = readRepeatCalendars(calendarList).stream().filter(repeatCalendar -> repeatCalendar.getDate().getMonthValue() == month).collect(Collectors.toList());
 
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
