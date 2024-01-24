@@ -326,7 +326,7 @@ public class TodoService {
         List<Repeat> nonNRepeats = Arrays.asList(Repeat.DAY, Repeat.WEEK, Repeat.MONTH);
         List<Todo> nonNRepeatTodos = todoRepository.findByUserIdAndRepeatIn(userId, nonNRepeats);
         return nonNRepeatTodos.stream()
-                .filter((todo -> !todo.getIsDeleted()))
+                .filter((todo -> !todo.getIsDeleted()&& !todo.getCategory().getIsInActive()))
                 .map(TodoResponseDto::of)
                 .collect(Collectors.toList());
     }
