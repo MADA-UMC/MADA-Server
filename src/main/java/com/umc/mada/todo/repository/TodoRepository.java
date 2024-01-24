@@ -17,15 +17,10 @@ public interface TodoRepository extends JpaRepository<Todo, Integer>{//, TodoRep
 
     List<Todo> findByUserIdAndRepeatIn(User userId, List<Repeat> repeats);
     List<Todo> findTodosByUserIdAndDateIs(User userId, LocalDate date);
-    List<Todo> findTodosByUserIdAndEndRepeatDateAfter(User userId, LocalDate date);
-    List<Todo> deleteTodosByUserIdAndCategoryId(User userId, int categoryId);
     List<Todo> findTodosByUserIdAndCategoryId(User userId, int categoryId);
-    Optional<Todo> deleteTodoByUserIdAndId(User userId, int id);
     Optional<Todo> findTodoByUserIdAndId(User userId, int id);
-    List<Todo> findTodosByUserIdAndDateBetweenAndRepeat(User user,LocalDate startDate, LocalDate endDate, Repeat repeat);
-    List<Todo> findTodosByUserIdAndRepeat(User user, Repeat repeat);
-    List<Todo> findTodosByUserId(User user);
     List<Todo> findTodosByUserIdAndIsDeletedIsFalse(User user);
+    List<Todo> findTodosByUserIdAndCategoryIdAndIsDeletedIsFalse(User userId, int categoryId);
 
     @Query(value = "select ROUND(IFNULL(AVG(A.complete) * 100, 0), 1) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
             "from (select T.user_id, T.date, T.complete\n" +
