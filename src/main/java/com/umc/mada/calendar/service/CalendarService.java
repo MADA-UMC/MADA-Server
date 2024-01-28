@@ -126,7 +126,8 @@ public class CalendarService {
 
         int days = start_date.lengthOfMonth();
         LocalDate end_date = LocalDate.of(year,month,days);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqual(user,start_date,end_date);
+        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqual(user,start_date,start_date);
+        calendarList = calendarList.stream().filter(calendar->!calendar.isExpired()).collect(Collectors.toList());
         List<RepeatCalendar> repeatCalendarList = readRepeatCalendars(calendarList).stream().filter(repeatCalendar -> repeatCalendar.getDate().getMonthValue() == month).collect(Collectors.toList());
 
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
@@ -249,7 +250,7 @@ public class CalendarService {
                 old.add(repeatCalendarToDto(r));
             }
             updated= createRepeatCalendar(calendar);
-            data.put("calendars", this.calendarToDto(calendar));
+            data.put("calendars", this.calendarToDto(updateCalendar));
             data.put("old",old);
             data.put("update",updated);
             return data;
@@ -258,7 +259,7 @@ public class CalendarService {
     }
 
 
-    public Map<String,Object> deleteCalendar(Authentication authentication, Long id,Long option,LocalDate date){
+    public Map<String,Object> deleteCalendar(Authentication authentication, Long id,Long option, LocalDate date){
         User user = this.getUser(authentication);
         Calendar calendar = calendarRepository.findCalendarByUserAndId(user,id).get();
         List<RepeatCalendar> repeatCalendarList;
@@ -288,9 +289,7 @@ public class CalendarService {
                     repeatCalendarRepository.save(r);
                     repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
                 }
-                else {
-                    continue;
-                }
+
             }
         }
         //단일 제거
@@ -301,9 +300,7 @@ public class CalendarService {
                     repeatCalendarRepository.save(r);
                     repeatCalendarResponseDtoList.add(this.repeatCalendarToDto(r));
                 }
-                else{
-                    continue;
-                }
+
             }
         }
 
