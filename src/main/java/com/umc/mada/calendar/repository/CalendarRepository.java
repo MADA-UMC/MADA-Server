@@ -15,7 +15,7 @@ public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     List<Calendar> findAllByUser(User user);
     List<Calendar> findAllByUserAndDday(User user,char dday);
     Optional<Calendar> findCalendarByUserAndId(User user, Long id);
-    List<Calendar> findCalendarsByUserAndStartDateGreaterThanEqualAndEndDateLessThanEqual(User user, LocalDate start_date, LocalDate end_date);
+    List<Calendar> findCalendarsByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqual(User user, LocalDate start_date, LocalDate end_date);
     List<Calendar> findCalendarsByUserAndRepeatIsNotContaining(User user,String repeat);
 
 
