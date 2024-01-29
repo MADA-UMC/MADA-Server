@@ -109,6 +109,12 @@ public class UserService {
         return attendanceCount;
     }
 
+    public int findAttendanceCount(Authentication authentication) {
+        User user = this.getUser(authentication);
+        int totalAttendanceCount = user.getAttendanceCount();
+        return totalAttendanceCount;
+    }
+
     public void removeUser(User user){
         userRepository.save(user.expiredUserUpdate());
     }

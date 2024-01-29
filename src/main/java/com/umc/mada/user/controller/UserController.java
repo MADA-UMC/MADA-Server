@@ -138,9 +138,16 @@ public class UserController {
     }
 
     @PatchMapping("/attendance")
-    public ResponseEntity<Map<String, Object>>totalAttendanceCount(Authentication authentication) {
+    public ResponseEntity<Map<String, Object>>attendanceCount(Authentication authentication) {
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.calcAttendance(authentication));
+        return ResponseEntity.ok(map);
+    }
+
+    @GetMapping("/attendance/total")
+    public ResponseEntity<Map<String, Object>>totalAttendanceCount(Authentication authentication) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("data", userService.findAttendanceCount(authentication));
         return ResponseEntity.ok(map);
     }
 
