@@ -201,46 +201,65 @@ public class TimetableService {
 
 
     // 자정에 주간 시간표의 일정을 일일 시간표로 추가하는 메서드
-    @Scheduled(cron="0 0 0 * * ?")
-    public void scheduleCheckAndLoadDailyData() {
-        List<User> allUsers = userRepository.findAll();
-
-        DayOfWeek today = DayOfWeek.valueOf(LocalDate.now().getDayOfWeek().name());
-
-        for (User user : allUsers) {
-            checkAndLoadDailyData(user, today);
-        }
-    }
+//    @Scheduled(cron="0 0 0 * * ?")
+//    public void scheduleCheckAndLoadDailyData() {
+//        List<User> allUsers = userRepository.findAll();
+//
+//        DayOfWeek today = DayOfWeek.valueOf(LocalDate.now().getDayOfWeek().name());
+//
+//        for (User user : allUsers) {
+//            checkAndLoadDailyData(user, today);
+//        }
+//    }
 
     // 주간 시간표의 일정을 기반으로 한 일일 시간표 생성 메서드
-    public void checkAndLoadDailyData(User user, DayOfWeek targetDayOfWeek) {
-        // 해당 사용자의 주간 시간표 조회
-        List<Timetable> weeklyTimetable = timetableRepository.findTimetablesByUserIdAndDayOfWeek(user, targetDayOfWeek);
+    public Map<String, Object> checkAndLoadDailyData(User user, LocalDate date) {
+        java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
+        DayOfWeek targetDayOfWeek = DayOfWeek.valueOf(dayOfWeek.name());
 
+        // 현재 존재하는 일일 시간표 조회
+        List<Timetable> dailyTimetable = timetableRepository.findTimetablesByUserIdAndDateIs(user, date);
+        // 해당 사용자의 주간 시간표 조회
+        List<Timetable> weeklyTimetable = timetableRepository.findTimetablesByUserIdAndDayOfWeekAndIsDeletedIsFalse(user, targetDayOfWeek);
+        List<Timetable> dailyTimetableList = new ArrayList<>();
         // 주간 시간표를 기반으로 한 일일 시간표 생성
         for (Timetable weeklyEntry : weeklyTimetable) {
-            LocalDate dailyDate = weeklyEntry.getDate();
-
-            // 생성할 일일 시간표의 날짜가 이미 존재하는지 확인
-            if (timetableRepository.existsByUserIdAndDateAndDayOfWeek(user, dailyDate, DayOfWeek.DAILY)) {
-                continue;
+//            // 생성할 일일 시간표의 날짜가 이미 존재하는지 확인
+//            if (timetableRepository.existsByUserIdAndDateAndDayOfWeek(user, dailyDate, DayOfWeek.DAILY)) {
+//                continue;
+//            }
+            // 주간 시간표의 각 일정과 현재 일일 시간표 비교
+            boolean existsInDaily = dailyTimetable.stream()
+                    .anyMatch(dailyEntry -> isSameSchedule(dailyEntry, weeklyEntry));
+            if (!existsInDaily){
+                // 주간 시간표를 기반으로 한 일일 시간표 생성
+                Timetable newDailyTimetable = Timetable.builder()
+                        .userId(user)
+                        .date(date)
+                        .scheduleName(weeklyEntry.getScheduleName())
+                        .color(weeklyEntry.getColor())
+                        .startTime(weeklyEntry.getStartTime())
+                        .endTime(weeklyEntry.getEndTime())
+                        .memo(weeklyEntry.getMemo())
+                        .isDeleted(weeklyEntry.getIsDeleted())
+                        .dayOfWeek(DayOfWeek.DAILY)
+                        .build();
+                Timetable savedTimetable = timetableRepository.save(newDailyTimetable);
+                dailyTimetableList.add(savedTimetable);
             }
-
-            // 주간 시간표를 기반으로 한 일일 시간표 생성
-            Timetable dailyTimetable = Timetable.builder()
-                    .userId(user)
-                    .date(dailyDate)
-                    .scheduleName(weeklyEntry.getScheduleName())
-                    .color(weeklyEntry.getColor())
-                    .startTime(weeklyEntry.getStartTime())
-                    .endTime(weeklyEntry.getEndTime())
-                    .memo(weeklyEntry.getMemo())
-                    .isDeleted(weeklyEntry.getIsDeleted())
-                    .dayOfWeek(DayOfWeek.DAILY)
-                    .build();
-
-            timetableRepository.save(dailyTimetable);
         }
+        dailyTimetable.stream()
+                .filter(dailyEntry -> weeklyTimetable.stream()
+                        .noneMatch(weeklyEntry -> isSameSchedule(dailyEntry, weeklyEntry)))
+                .forEach(dailyEntry -> {
+                    dailyEntry.setIsDeleted(true);
+                    timetableRepository.save(dailyEntry);
+                });
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("dailyTimetableList", dailyTimetableList);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data",data);
+        return result;
     }
 
     // comment 생성 로직
@@ -299,5 +318,13 @@ public class TimetableService {
         if (optionalUser.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 유저 ID입니다.");
         }
+    }
+
+    private boolean isSameSchedule(Timetable dailyEntry, Timetable weeklyEntry) {
+        return dailyEntry.getScheduleName().equals(weeklyEntry.getScheduleName()) &&
+                dailyEntry.getStartTime().equals(weeklyEntry.getStartTime()) &&
+                dailyEntry.getEndTime().equals(weeklyEntry.getEndTime()) &&
+                dailyEntry.getColor().equals(weeklyEntry.getColor()) &&
+                Objects.equals(dailyEntry.getMemo(), weeklyEntry.getMemo());
     }
 }

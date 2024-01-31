@@ -2,6 +2,7 @@ package com.umc.mada.timetable.controller;
 
 import com.umc.mada.calendar.domain.Calendar;
 import com.umc.mada.calendar.repository.CalendarRepository;
+import com.umc.mada.timetable.domain.DayOfWeek;
 import com.umc.mada.timetable.dto.CommentRequestDto;
 import com.umc.mada.timetable.dto.CommentResponseDto;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
@@ -18,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -99,6 +99,18 @@ public class TimetableController {
         //result.put("success", true);
         //result.put("message", "시간표 생성이 완료되었습니다.");
         return ResponseEntity.ok().body(result);
+    }
+
+    @PostMapping("/daily/loadWeekly/{date}")
+    public ResponseEntity<Map<String, Object>> loadDailyTimetableFromWeekly(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        // 주간시간표 불러오기 API
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        Map<String, Object> map = timetableService.checkAndLoadDailyData(user, date);
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "주간시간표 일정 불러오기가 완료되었습니다");
+        return ResponseEntity.ok().body(map);
     }
 
     @PatchMapping("/daily/update/{scheduleId}")
