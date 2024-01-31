@@ -290,7 +290,6 @@ public class TodoService {
 
     // 특정 유저 투두 조회 로직
     public Map<String, Object> getUserTodo(User userId, LocalDate date) {
-        /* List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);*/
         List<Todo> userTodos = todoRepository.findTodosByUserIdAndIsDeletedIsFalse(userId);
         List<RepeatTodo> repeatTodos = repeatTodoRepository.findRepeatTodosByDateIsAndIsDeletedIsFalse(date);
         List<RepeatTodoResponseDto> filteredRepeatTodos = new ArrayList<>();
