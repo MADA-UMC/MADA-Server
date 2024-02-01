@@ -290,7 +290,6 @@ public class TodoService {
 
     // 특정 유저 투두 조회 로직
     public Map<String, Object> getUserTodo(User userId, LocalDate date) {
-        /* List<Todo> userTodos = todoRepository.findTodosByUserIdAndDateIs(userId, date);*/
         List<Todo> userTodos = todoRepository.findTodosByUserIdAndIsDeletedIsFalse(userId);
         List<RepeatTodo> repeatTodos = repeatTodoRepository.findRepeatTodosByDateIsAndIsDeletedIsFalse(date);
         List<RepeatTodoResponseDto> filteredRepeatTodos = new ArrayList<>();
@@ -326,7 +325,7 @@ public class TodoService {
         List<Repeat> nonNRepeats = Arrays.asList(Repeat.DAY, Repeat.WEEK, Repeat.MONTH);
         List<Todo> nonNRepeatTodos = todoRepository.findByUserIdAndRepeatIn(userId, nonNRepeats);
         return nonNRepeatTodos.stream()
-                .filter((todo -> !todo.getIsDeleted()))
+                .filter((todo -> !todo.getIsDeleted()&& !todo.getCategory().getIsInActive()))
                 .map(TodoResponseDto::of)
                 .collect(Collectors.toList());
     }

@@ -12,13 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface TimetableRepository extends JpaRepository<Timetable, Integer> {
-    Optional<Timetable> findTimetableById(int scheduleId);
     List<Timetable> findTimetablesByUserIdAndDateIs(User userId, LocalDate date);
-    Optional<Timetable> deleteTimetableByUserIdAndId(User userId, int id);
     Optional<Timetable> findTimetableByUserIdAndId(User userId, int id);
     List<Timetable> findTimetablesByUserIdAndDayOfWeekIsNot(User userId, DayOfWeek dayOfWeek);
     List<Timetable> findTimetablesByUserIdAndDateIsAndDayOfWeek(User userId, LocalDate date, DayOfWeek dayOfWeek);
-    List<Timetable> findTimetablesByUserIdAndDayOfWeek(User userId, DayOfWeek dayOfWeek);
-    boolean existsByUserIdAndDateAndDayOfWeek(User user, LocalDate date, DayOfWeek dayOfWeek);
-    List<Timetable> findTimetablesByUserId(User userId);
+    List<Timetable> findTimetablesByUserIdAndDayOfWeekAndIsDeletedIsFalse(User userId, DayOfWeek dayOfWeek);
+
 }

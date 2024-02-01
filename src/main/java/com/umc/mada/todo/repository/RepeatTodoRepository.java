@@ -19,5 +19,4 @@ public interface RepeatTodoRepository extends JpaRepository<RepeatTodo, Integer>
     List<RepeatTodo> findRepeatTodosByDateIsAndIsDeletedIsFalse(LocalDate date);
     List<RepeatTodo> findAllByTodoIdAndDateGreaterThanEqual(Todo todoId, LocalDate date);
     List<RepeatTodo> findAllByTodoId(Todo todoId);
-    Optional<RepeatTodo> findRepeatTodoByTodoIdAndId(User userId, int Id);
 }
