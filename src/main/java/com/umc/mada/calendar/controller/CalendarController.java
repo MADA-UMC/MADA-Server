@@ -43,10 +43,10 @@ public class CalendarController {
         map.put("data", data);
         return ResponseEntity.ok(map);
     }
-    @DeleteMapping("/edit/{id}/{option}/{date}")
-    ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id , @PathVariable Long option,@PathVariable @DateTimeFormat(pattern = "yyyy-MM-DD") LocalDate date){
+    @DeleteMapping("/edit/{id}")
+    ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id ){
         Map<String,Object> map = new LinkedHashMap<>();
-        map.put("data",calendarService.deleteCalendar(authentication,id,option,date));
+        map.put("data",calendarService.deleteCalendar(authentication,id));
         return ResponseEntity.ok(map);
     }
     @GetMapping("/dday")

@@ -19,10 +19,10 @@ public class CalendarRequestDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private String color;
-    private Integer repeatInfo;
+
     private LocalTime startTime;
     private LocalTime endTime;
-    private Character  repeat;
+
     private Character dday;
     private String memo;
     @Nullable

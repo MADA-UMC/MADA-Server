@@ -26,9 +26,9 @@ public class CalendarResponseDto {
    private Character dday;
    private LocalTime startTime;
    private LocalTime endTime;
-   private Character repeat;
+
    private String memo;
    private String color;
-   private Integer repeatInfo;
+
    private boolean isExpired;
 }
