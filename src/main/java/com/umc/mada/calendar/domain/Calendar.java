@@ -43,11 +43,6 @@ public class Calendar {
     private LocalTime startTime;
     @Column(name = "end_time")
     private LocalTime endTime;
-    @Column(name = "`repeat`")
-    //No, Day, Week, Month, Year
-    private Character  repeat;
-    @Column(name = "repeat_info")
-    private Integer repeatInfo;
     @Column(name = "d_day")
     private Character dday;
     @Column(name = "memo")
