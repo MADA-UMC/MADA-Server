@@ -256,7 +256,7 @@ public class TimetableService {
                     timetableRepository.save(dailyEntry);
                 });
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("dailyTimetableList", dailyTimetableList);
+        data.put("DailyTimetableList", dailyTimetableList);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("data",data);
         return result;
