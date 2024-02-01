@@ -36,6 +36,11 @@ public class User {
     @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private Role role;
+
+    // Attendance 출석
+    @Column(name = "attendance_count", nullable = false)
+    private int attendanceCount;
+
     @Column(name = "start_todo_at_monday") //TODO: Cannot resolve column 'start_todo_at_monday'
     private boolean startTodoAtMonday;
     @Column(name = "end_todo_back_setting") //TODO: Cannot resolve column
@@ -46,7 +51,6 @@ public class User {
     private String refreshToken;
     @Column(name = "google_access_token")
     private String googleAccessToken; //TODO: 테이블 분리하기
-
     @Column(nullable = false, name = "is_alarm") //TODO: Cannot resolve column
     private boolean isAlarm;
     @Column(name = "calendar_alarm_setting") //TODO: Cannot resolve column
@@ -68,13 +72,14 @@ public class User {
     private List<HaveItem> haveItems = new ArrayList<>();
 
     @Builder
-    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role, boolean isAlarm, String googleAccessToken) {
+    public User(String authId, String nickname, String email, boolean subscribe, String provider, Role role, int attendanceCount , boolean isAlarm, String googleAccessToken) {
         this.authId = authId;
         this.nickname = nickname;
         this.email = email;
         this.subscribe = subscribe;
         this.provider = provider;
         this.role = role;
+        this.attendanceCount = attendanceCount;
         this.isAlarm = isAlarm;
         this.googleAccessToken = googleAccessToken;
     }
@@ -110,6 +115,11 @@ public class User {
         this.nickname = nickname;
         return this;
     }
+
+    public void setAttendanceCount(int attendanceCount) {
+        this.attendanceCount = attendanceCount;
+    }
+
     public User updatePageSetting(boolean endTodoBackSetting, boolean newTodoStartSetting, boolean startTodoAtMonday) {
         this.startTodoAtMonday = startTodoAtMonday;
         this.endTodoBackSetting = endTodoBackSetting;

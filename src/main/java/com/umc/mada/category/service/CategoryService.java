@@ -5,6 +5,8 @@ import com.umc.mada.category.domain.Icon;
 import com.umc.mada.category.dto.CategoryRequestDto;
 import com.umc.mada.category.dto.CategoryResponseDto;
 import com.umc.mada.category.repository.CategoryRepository;
+import com.umc.mada.todo.domain.RepeatTodo;
+import com.umc.mada.todo.repository.RepeatTodoRepository;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.category.repository.IconRepository;
 import com.umc.mada.todo.domain.Todo;
@@ -25,12 +27,14 @@ import java.util.stream.Collectors;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final TodoRepository todoRepository;
+    private final RepeatTodoRepository repeatTodoRepository;
     private final IconRepository iconRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public CategoryService(UserRepository userRepository, TodoRepository todoRepository, CategoryRepository categoryRepository, IconRepository iconRepository) {
+    public CategoryService(UserRepository userRepository, TodoRepository todoRepository, RepeatTodoRepository repeatTodoRepository, CategoryRepository categoryRepository, IconRepository iconRepository) {
         this.todoRepository = todoRepository;
+        this.repeatTodoRepository = repeatTodoRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.iconRepository = iconRepository;
@@ -179,13 +183,19 @@ public class CategoryService {
      *
      */
     public List<CategoryResponseDto> getHomeCategories(User userId, LocalDate date) {
-        // home에 표시될 카테고리 엔티티 조회 (종료 카테고리는 제외)
+        // home에 표시될 카테고리 엔티티 조회
         List<Category> homeCategories = categoryRepository.findCategoriesByUserId(userId);
-
         // 각 카테고리 엔티티를 CategoryResponseDto로 매핑하여 리스트로 반환
         return homeCategories.stream()
                 .filter(category -> !category.getIsDeleted())
-                .filter(category -> !category.getIsInActive() || (category.getInActiveTime() != null && !category.getInActiveTime().toLocalDate().isBefore(date)))
+                .filter(category -> {
+                    List<Todo> todoList = todoRepository.findTodosByUserIdAndCategoryIdAndIsDeletedIsFalse(userId, category.getId());
+                    return !category.getIsInActive() ||
+                            todoList.stream().anyMatch(todo -> !todo.getIsDeleted() && (todo.getDate() != null && todo.getDate().equals(date) ||
+                                    todo.getDate() == null && repeatTodoRepository.findRepeatTodosByTodoIdAndIsDeletedIsFalse(todo).stream()
+                                            .anyMatch(repeatTodo -> repeatTodo.getDate() != null && repeatTodo.getDate().equals(date)))
+                            );
+                })
                 .map(CategoryResponseDto::of)
                 .collect(Collectors.toList());
     }

@@ -101,6 +101,20 @@ public class UserService {
         userRepository.save(user.setNickname(nickname.get("nickname")));
     }
 
+    public int calcAttendance(Authentication authentication) {
+        User user = this.getUser(authentication);
+        int attendanceCount = user.getAttendanceCount() + 1;
+        user.setAttendanceCount(attendanceCount);
+        userRepository.save(user);
+        return attendanceCount;
+    }
+
+    public int findAttendanceCount(Authentication authentication) {
+        User user = this.getUser(authentication);
+        int totalAttendanceCount = user.getAttendanceCount();
+        return totalAttendanceCount;
+    }
+
     public void removeUser(User user){
         userRepository.save(user.expiredUserUpdate());
     }
