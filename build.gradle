@@ -80,6 +80,9 @@ clean {
 //   useJUnitPlatform()
 //}
 
+bootJar {
+	archiveBaseName.set('trelloServer')
+}
 jar{
-	enabled = false
+	archiveBaseName.set('trelloServer')
 }
