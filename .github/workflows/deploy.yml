@@ -64,14 +64,14 @@ jobs:
 
     # 위의 빌드작업한 JAR 파일 = 아티팩트를 다운로드
     steps:
-      - name: Download build artifact
+      - name: Download Docker Container
         uses: appleboy/ssh-action@master
         id: deploy-prod
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          scripts: |
+          script: |
             sudo docker ps
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/mada-project
             sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/mada-project
