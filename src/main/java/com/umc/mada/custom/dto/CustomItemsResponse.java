@@ -6,14 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Builder
 public class CustomItemsResponse {
-    private final List<ItemElementResponseDto> itemList;
+    private final List<ItemElementResponse> itemList = new ArrayList<>();
 
-    public CustomItemsResponse(){
-        this.itemList = new ArrayList<>();
-    }
+//    public CustomItemsResponse(){
+//        this.itemList = new ArrayList<>();
+//    }
 
-    public void addItem(ItemElementResponseDto item){
+    public void addItem(ItemElementResponse item){
         itemList.add(item);
     }
 //    public CustomItemsResponse of(List<CustomItem> customItems, boolean haveItem){

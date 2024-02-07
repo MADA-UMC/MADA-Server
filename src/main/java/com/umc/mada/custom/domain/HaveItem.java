@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Getter
+@Builder
 @Entity
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,21 +24,8 @@ public class HaveItem {
     @JoinColumn(name = "item_id")
     private CustomItem customItem;
 
-    @Column(name = "wearing")
+    @Column(name = "wearing") //TODO: wearingItem 테이블로 분리했기에 바꿔야 함 => 헌데 분리하는게 더 좋을지는 생각해보고 수정다시 해야할 듯
     private boolean wearing;
-
-    @Builder
-    public HaveItem(User user, CustomItem customItem){
-        this.user = user;
-        this.customItem = customItem;
-    }
-
-    @Builder
-    public HaveItem(User user, CustomItem customItem, boolean wearing) {
-        this.user = user;
-        this.customItem = customItem;
-        this.wearing = wearing;
-    }
 
     public void updateHaveItemWearing(boolean wearing){
         this.wearing = wearing;

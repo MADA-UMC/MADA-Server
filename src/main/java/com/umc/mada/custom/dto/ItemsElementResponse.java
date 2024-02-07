@@ -27,7 +27,7 @@ public class ItemsElementResponse {
                 .id(customItem.getId())
                 .name(customItem.getName())
                 .itemType(customItem.getItemType().getItemType())
-                .itemUnlockCondition(customItem.getUnlockCondition().getItemUnlockCondition())
+                .itemUnlockCondition(customItem.getUnlockCondition().name())
                 .filePath(customItem.getFilePath())
                 .have(have)
                 .build();

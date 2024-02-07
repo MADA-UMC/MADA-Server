@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -41,11 +42,8 @@ public class CustomItem {
     @Column(name = "update_at")
     private LocalDateTime updatedAt; // 수정 시간
 
-    @Builder
-    public CustomItem(ItemType itemType, ItemUnlockCondition unlock_condition){
-        this.itemType = itemType;
-        this.unlockCondition = unlock_condition;
+    public enum ItemUnlockCondition {
+        DEFAULT,BASIC, ATTENDANCE, PREMINUM;
     }
-
 
 }
