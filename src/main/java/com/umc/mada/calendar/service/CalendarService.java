@@ -51,14 +51,8 @@ public class CalendarService {
 
     public Map<String, Object> readMonthCalendar(Authentication authentication, int year,int month){
         User user = this.getUser(authentication);
-        LocalDate start_date = LocalDate.of(year,month,1);
 
-        int days = start_date.lengthOfMonth();
-        LocalDate end_date = LocalDate.of(year,month,days);
-        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqual(user,start_date,start_date);
-        calendarList = calendarList.stream().filter(calendar->!calendar.isExpired()).collect(Collectors.toList());
-
-
+        List<Calendar> calendarList = calendarRepository.findCalendarMonth(user,year,month);
         List<CalendarResponseDto> calendarResponseDtoList = new ArrayList<>();
 
         for (Calendar calendar: calendarList) {
