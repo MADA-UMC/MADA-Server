@@ -13,14 +13,16 @@ public class RepeatTodoResponseDto {
     private int id;
     private int todoId;
     private int categoryId;
+    private String repeatTodoName;
     private LocalDate date;
     private Boolean complete;
 
     @Builder
-    public RepeatTodoResponseDto(int id, int todoId, int categoryId, LocalDate date, Boolean complete){
+    public RepeatTodoResponseDto(int id, int todoId, int categoryId, String repeatTodoName, LocalDate date, Boolean complete){
         this.id = id;
         this.todoId = todoId;
         this.categoryId = categoryId;
+        this.repeatTodoName = repeatTodoName;
         this.date = date;
         this.complete = complete;
     }
@@ -30,6 +32,7 @@ public class RepeatTodoResponseDto {
                 .id(repeatTodo.getId())
                 .todoId(repeatTodo.getTodoId().getId())
                 .categoryId(repeatTodo.getTodoId().getCategory().getId())
+                .repeatTodoName(repeatTodo.getTodoId().getTodoName())
                 .date(repeatTodo.getDate())
                 .complete(repeatTodo.getComplete())
                 .build();
