@@ -23,16 +23,13 @@ public class CalendarController {
 
     @GetMapping("/")
     ResponseEntity<Map<String,Object>> calendarRead(Authentication authentication){
-
         return ResponseEntity.ok(calendarService.readCalendars(authentication));
     }
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
     ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
-        Map<String,Object> map ;
-        Map<String,Object> data = new LinkedHashMap<>();
+        Map<String,Object> map;
         map = calendarService.createCalendar(authentication,calendarDto);
-
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")
@@ -43,10 +40,10 @@ public class CalendarController {
         map.put("data", data);
         return ResponseEntity.ok(map);
     }
-    @DeleteMapping("/edit/{id}/{option}/{date}")
-    ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id , @PathVariable Long option,@PathVariable @DateTimeFormat(pattern = "yyyy-MM-DD") LocalDate date){
+    @DeleteMapping("/edit/{id}")
+    ResponseEntity<Map<String,Object>> calendarDelete(Authentication authentication, @PathVariable Long id ){
         Map<String,Object> map = new LinkedHashMap<>();
-        map.put("data",calendarService.deleteCalendar(authentication,id,option,date));
+        map.put("data",calendarService.deleteCalendar(authentication,id));
         return ResponseEntity.ok(map);
     }
     @GetMapping("/dday")
