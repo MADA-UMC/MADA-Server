@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ChartRepository extends JpaRepository<Todo, Integer> {
-    @Query(value = "select A.category_id, A.category_name, A.color, COUNT(A.category_name) as count, ROUND(COUNT(A.category_name) / (SELECT COUNT(*) FROM TODO WHERE user_id = :uid and complete = 1 and (date between :startDate and :endDate))*100, 0)as rate\n" +
+    @Query(value = "select A.category_id as categoryId, A.category_name as categoryName, A.color, COUNT(A.category_name) as count, ROUND(COUNT(A.category_name) / (SELECT COUNT(*) FROM TODO WHERE user_id = :uid and complete = 1 and (date between :startDate and :endDate))*100, 0)as rate\n" +
             "from (select T.user_id, T.date, T.complete, C.category_name, C.id as category_id, C.color as color\n" +
             "    from TODO T join CATEGORY C on C.id = T.category_id\n" +
             "    where T.user_id = :uid and (T.date between :startDate and :endDate)) A\n" +
@@ -31,7 +31,7 @@ public interface ChartRepository extends JpaRepository<Todo, Integer> {
             "GROUP BY category_id;", nativeQuery = true)
     PreviousCategoryStatisticsVO statisticsOnPreviousCategories(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate, @Param("categoryId") int categoryId);
 
-    @Query(value = "select date, COUNT(*) as count\n" +
+    @Query(value = "select date as todoDate, COUNT(*) as count\n" +
             "from TODO\n" +
             "where user_id = :uid and date between :startDate and :endDate and complete = 1\n" +
             "GROUP BY date\n" +

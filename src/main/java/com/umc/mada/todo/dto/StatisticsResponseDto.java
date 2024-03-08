@@ -41,7 +41,7 @@ public class StatisticsResponseDto {
                 .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
                 .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
                 .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
-                .todoStatistics(todoBarGraphStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getDate(), vo.getCount())).collect(Collectors.toList()))
+                .todoStatistics(todoBarGraphStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getTodoDate(), vo.getCount())).collect(Collectors.toList()))
                 .nowTotalCount(totalCount)
                 .nowCountCompleted(todoBarGraphStatisticsVOList.get(0).getCount())
                 .diffCount(todoBarGraphStatisticsVOList.get(0).getCount() - todoBarGraphStatisticsVOList.get(1).getCount())

@@ -26,14 +26,17 @@ public class ChartService {
 
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), date, date);
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, categoryStatisticsVOList.get(0).getCategoryId());
+        int check = categoryStatisticsVOList.get(0).getCategoryId();
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
 
         //todo 막대 그래프 통계
-        List<TodoBarGraphStatisticsVO> todoBarGraphStatisticsVOList = chartRepository.dayTodoBarGraphStatistics(user.getId(), date, date);
+        LocalDate startDate = date.minusDays(3);
+        List<TodoBarGraphStatisticsVO> todoBarGraphStatisticsVOList = chartRepository.dayTodoBarGraphStatistics(user.getId(), startDate, date);
         Integer totalCount = chartRepository.countAllByUserIdAndDate(user, date);
 
         //todo 달성률 통계
-        List<AchievementRateStatisticsVO> achievementRateStatisticsVOList = chartRepository.dayStatisticsOnAchievementRate(user.getId(), date, date);
+        startDate = date.minusDays(5);
+        List<AchievementRateStatisticsVO> achievementRateStatisticsVOList = chartRepository.dayStatisticsOnAchievementRate(user.getId(), startDate, date);
 
         return StatisticsResponseDto.ofDay(categoryStatisticsVOList, previousCategoryStatisticsVO, todoBarGraphStatisticsVOList, totalCount, achievementRateStatisticsVOList);
     }
