@@ -44,10 +44,10 @@ jobs:
           touch ./application-oauth2.properties
           touch ./application-s3.properties
           echo "${{secrets.APPLICATION_PROPERTIES}}" > ./application.properties
-          echo "&{{secrets.APPLICATION_DB_PROPERTIES}}" > ./application-DB.properties
-          echo "&{{secrets.APPLICATION_JWT_PROPERTIES}}" > ./application-jwt.properties
-          echo "&{{secrets.APPLICATION_S3_PROPERTIES}}" > ./application-s3.properties
-          echo "&{{secrets.APPLICATION_OAUTH2_PROPERTIES}}" > ./application-oauth2.properties
+          echo "${{secrets.APPLICATION_DB_PROPERTIES}}" > ./application-DB.properties
+          echo "${{secrets.APPLICATION_JWT_PROPERTIES}}" > ./application-jwt.properties
+          echo "${{secrets.APPLICATION_S3_PROPERTIES}}" > ./application-s3.properties
+          echo "${{secrets.APPLICATION_OAUTH2_PROPERTIES}}" > ./application-oauth2.properties
       # gradle wrapper 파일에 실행 권한을 부여
       # gradle wrapper = 개발자가 특정 버전의 Gradle을 미리 설치하지 않고도 Gradle 빌드를 실행할 수 있게 해주는 편리한 도구
       - name: Grant execute permission for gradlew
