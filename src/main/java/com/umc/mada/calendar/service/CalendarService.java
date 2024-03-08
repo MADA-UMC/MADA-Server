@@ -10,14 +10,15 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CalendarService {
     private final CalendarRepository calendarRepository;
-
     private final UserRepository userRepository;
 
 
@@ -26,11 +27,6 @@ public class CalendarService {
         this.calendarRepository = calendarRepository;
         this.userRepository = userRepository;
     }
-
-//
-//    public Map<String ,Object> getCalendar(Authentication authentication,CalendarRequestDto calendarRequestDto){
-//        calendarRepository.find
-//    }
 
 
     public Map<String, Object> readDday(Authentication authentication){
@@ -87,17 +83,6 @@ public class CalendarService {
     }
 
 
-//    public Map<String,Object> readRepeats(Authentication authentication) {
-//        User user = this.getUser(authentication);
-//        List<Calendar> calendarList = calendarRepository.findCalendarsByUserAndRepeatIsNotContaining(user,"No").stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());
-//        List<CalendarResponseDto> calendarResponseDtoList =  calendarList.stream().map(this::calendarToDto).collect(Collectors.toList());
-//        Map<String, Object> map = new LinkedHashMap<>();
-//        Map<String ,Object> data = new LinkedHashMap<>();
-//        data.put("startTodoAtMonday",user.isStartTodoAtMonday());
-//        data.put("calendars",calendarResponseDtoList);
-//        map.put("data",data);
-//        return map;
-//    }
     public Map<String, Object> readCalendars(Authentication authentication) {
         User user = this.getUser(authentication);
         List<Calendar> calendarList = calendarRepository.findAllByUser(user).stream().filter(calendar -> !calendar.isExpired()).collect(Collectors.toList());;
