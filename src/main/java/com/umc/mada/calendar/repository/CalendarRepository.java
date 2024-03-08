@@ -3,6 +3,7 @@ package com.umc.mada.calendar.repository;
 import com.umc.mada.calendar.domain.Calendar;
 import com.umc.mada.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -17,4 +18,13 @@ public interface CalendarRepository extends JpaRepository<Calendar,Long> {
     Optional<Calendar> findCalendarByUserAndId(User user, Long id);
     List<Calendar> findCalendarsByUserAndStartDateLessThanEqualAndEndDateGreaterThanEqual(User user, LocalDate start_date, LocalDate end_date);
 
+    @Query(
+            "select c " +
+            "from Calendar c " +
+            "where c.user = :user " +
+            "and c.isExpired = false "+
+            "and YEAR(c.startDate) <= :y and YEAR(c.endDate) >= :y " +
+            "and MONTH(c.startDate) <= :m and MONTH(c.endDate) >= :m "
+    )
+    List<Calendar> findCalendarMonth(User user , int y, int m);
 }

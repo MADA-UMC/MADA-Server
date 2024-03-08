@@ -23,16 +23,13 @@ public class CalendarController {
 
     @GetMapping("/")
     ResponseEntity<Map<String,Object>> calendarRead(Authentication authentication){
-
         return ResponseEntity.ok(calendarService.readCalendars(authentication));
     }
 
     @PostMapping("/add") //로그인 구현 이후 토큰으로 사용
     ResponseEntity<Map<String,Object>> calendarAdd(Authentication authentication, @RequestBody CalendarRequestDto calendarDto){
-        Map<String,Object> map ;
-        Map<String,Object> data = new LinkedHashMap<>();
+        Map<String,Object> map;
         map = calendarService.createCalendar(authentication,calendarDto);
-
         return ResponseEntity.ok(map);
     }
     @PatchMapping("/edit/{id}")

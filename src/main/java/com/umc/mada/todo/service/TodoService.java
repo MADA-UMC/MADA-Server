@@ -297,13 +297,6 @@ public class TodoService {
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String, Object> data = new LinkedHashMap<>();
         for (Todo todo : userTodos){
-//            if (todo.getStartRepeatDate() != null && todo.getEndRepeatDate() != null) {
-//                if (!date.isBefore(todo.getStartRepeatDate()) && !date.isAfter(todo.getEndRepeatDate())) {
-//                    filteredTodos.add(TodoResponseDto.of(todo));
-//                }
-//            } else if(todo.getDate().equals(date)) {
-//                filteredTodos.add(TodoResponseDto.of(todo));
-//            }
             if(todo.getDate()!= null && todo.getDate().equals(date) && todo.getRepeat().equals(Repeat.N)){
                 filteredTodos.add(TodoResponseDto.of(todo));
             }
