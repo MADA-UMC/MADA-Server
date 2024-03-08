@@ -5,7 +5,7 @@ import com.umc.mada.custom.domain.HaveItem;
 import com.umc.mada.custom.domain.ItemType;
 import com.umc.mada.custom.domain.WearingItem;
 import com.umc.mada.custom.dto.CustomItemsResponse;
-import com.umc.mada.custom.dto.ItemElementResponseDto;
+import com.umc.mada.custom.dto.ItemElementResponse;
 import com.umc.mada.custom.dto.UserCharacterResponse;
 import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
@@ -18,6 +18,7 @@ import com.umc.mada.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 
 @Service
@@ -27,8 +28,6 @@ public class CustomService {
     private final CustomRepository customRepository;
     private final HaveItemRepository haveItemRepository;
     private final WearingItemRepository wearingItemRepository;
-    private final String ATTENDANCE_MISSION_ITEM = "mission";
-    private final String INITIAL_ITEM = "initialValue";
 //    private final AmazonS3 amazonS3;
 //    @Value("${cloud.aws.s3.bucket}")
 //    private String bucket;
@@ -52,19 +51,8 @@ public class CustomService {
 
     public CustomItemsResponse getItemList(User user){
         List<CustomItem> itemList = customRepository.findAll();
-        //출석 아이템을 사용자가 소유하고 있는지 확인하기
-        CustomItemsResponse customItemsResponse = new CustomItemsResponse();
-        for(CustomItem item : itemList){
-            if(item.getUnlockCondition().name().equals(INITIAL_ITEM)) continue;
-            //출석 아이템이 아닌 기본 아이템은 넘어가기
-            if(item.getUnlockCondition().name().equals(ATTENDANCE_MISSION_ITEM)){
-                //출석 아이템을 소유하고 있지 않다면 목록에서 삭제하기
-                Optional<HaveItem> haveItemOptional = haveItemRepository.findByCustomItemAndUser(item, user);
-                if(!haveItemOptional.isPresent()) continue;
-            }
-            customItemsResponse.addItem(ItemElementResponseDto.of(item));
-        }
-        return customItemsResponse;
+        //사용자가 해당 아이템들을 소유하고 있는지 확인하기
+        return checkHaveItem(itemList, user);
     }
 
     public CustomItemsResponse findItemsByType(User user, String itemType) {
@@ -78,40 +66,42 @@ public class CustomService {
         //해당 타입의 아이템 목록 가져오기
         List<CustomItem> itemList = customRepository.findCustomItemByItemType(type);
 
-        //출석 아이템을 사용자가 소유하고 있는지 확인하기
-        CustomItemsResponse customItemsResponse = new CustomItemsResponse();
+        //사용자가 해당 아이템들을 소유하고 있는지 확인하기
+        return checkHaveItem(itemList, user);
+    }
+
+    public CustomItemsResponse checkHaveItem(List<CustomItem> itemList, User user){ //사용자가 아이템을 소유하고 있는지 확인하는 함수
+        CustomItemsResponse customItemsResponse = CustomItemsResponse.builder().build();
         for(CustomItem item : itemList){
-            //출석 아이템이 아닌 기본 아이템은 넘어가기
-            if(item.getCategory().equals(ATTENDANCE_MISSION_ITEM)){
-                //출석 아이템을 소유하고 있지 않다면 목록에서 삭제하기
-                Optional<HaveItem> haveItemOptional = haveItemRepository.findByCustomItemAndUser(item, user);
-                if(!haveItemOptional.isPresent()){
-                    itemList.remove(item);
-                }
-            }
+            //아이템을 소유하고 있는지 확인
+            boolean have = false;
+            boolean haveItemCheck = haveItemRepository.existsByCustomItemAndUser(item, user);
 
-            customItemsResponse.addItem(ItemElementResponseDto.of(item));
+            //출석 아이템인데 소유하고 있지 않다면 목록에 추가하지 않기
+            if(!haveItemCheck && item.getUnlockCondition().equals(CustomItem.ItemUnlockCondition.ATTENDANCE)) continue;
+
+            //해당 아이템을 소유하고 있다면 true;
+            if(haveItemCheck) have = true;
+
+            customItemsResponse.addItem(ItemElementResponse.of(item, have));
         }
-
         return customItemsResponse;
     }
 
-    public UserCharacterResponse changeUserItem(User user, List<String> items_id){//List<String>  String[] items_id
+    @Transactional
+    public UserCharacterResponse changeUserItem(User user, List<Integer> items_id){//List<String>  String[] items_id
         List<CustomItem> customItems  = new ArrayList<>();
         boolean colorCheck = false;
         Set<String> itemsCategory = new HashSet<>();
-        for(String item_id : items_id){
 
-            Optional<CustomItem> customItem = customRepository.findCustomItemById(Integer.valueOf(item_id));
-            CustomItem item = customItem.get();
+        //착용 아이템을 바꾸기 전에 착용 조건 체크
+        for(Integer item_id : items_id){
+            CustomItem item = customRepository.findCustomItemById(item_id).orElseThrow(()-> new RuntimeException("없는 아이템 ID입니다."));
 
-            //미션 아이템이라면 소유한 아이템인지 확인
-            if(item.getCategory().equals(ATTENDANCE_MISSION_ITEM)) {
-                Optional<HaveItem> newHaveItemOptional = haveItemRepository.findByCustomItemAndUser(item, user);
-                //소유한 아이템이 아니라면 예외발생
-                if (!newHaveItemOptional.isPresent()) {
-                    throw new NotAllowToWearingException(ErrorType.NOT_ALLOW_TO_WEARING.getMessage());
-                }
+            //소유한 아이템인지 확인
+            boolean haveCheck = haveItemRepository.existsByCustomItemAndUser(item, user);
+            if(!haveCheck){
+                throw new NotAllowToWearingException(ErrorType.NOT_ALLOW_TO_WEARING.getMessage());
             }
 
             //아이템의 카테고리가 겹치지 않도록 확인
@@ -124,57 +114,49 @@ public class CustomService {
             }
 
             //컬러를 지정했는지 확인
-            if(customItem.get().getItemType().equals(ItemType.I1)){
+            if(item.getItemType().equals(ItemType.I1)){
                 colorCheck = true;
             }
         }
 
         //이전에 입고 있던 아이템 없애기
         List<WearingItem> oldWearingItemList = wearingItemRepository.findByUser(user);
-        for(WearingItem oldItem: oldWearingItemList){
-            wearingItemRepository.delete(oldItem);
-        }
+        wearingItemRepository.deleteAll(oldWearingItemList); //TODO: 소프트 삭제로 바꾸기
 
         //새로운 아이템 입기
-        for(String item_id : items_id){
-            Optional<CustomItem> customItem = customRepository.findCustomItemById(Integer.valueOf(item_id));
-            if(customItem.isPresent()){
-                wearingItemRepository.save(new WearingItem(user, customItem.get()));
-                customItems.add(customItem.get());
-            }
+        for(Integer item_id : items_id){
+            CustomItem newItem = customRepository.findCustomItemById(item_id).orElseThrow(()-> new RuntimeException("없는 아이템 ID입니다."));
+            wearingItemRepository.save(WearingItem.builder().user(user).customItem(newItem).build());
+            customItems.add(newItem);
         }
 
         //color를 착용하지 않았을 경우 color 디폴트 설정하기
         if(!colorCheck){
-            wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(10).get()));
+            wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(10L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
         }
         return UserCharacterResponse.of(customItems);
     }
 
     public UserCharacterResponse resetCharcter(User user){
         List<CustomItem> customItems  = new ArrayList<>();
-        List<Integer> initialItems = new ArrayList<>(Arrays.asList(10,48,49,50));
+        List<Integer> initialItems = new ArrayList<>(Arrays.asList(10,48,49,50)); //디폴트 값(초기값)
         //이전 캐릭터 아이템 지우기
         List<WearingItem> oldSetItemList = wearingItemRepository.findByUser(user);
-        for(WearingItem oldSetItem : oldSetItemList){
-            wearingItemRepository.delete(oldSetItem);
-        }
+        wearingItemRepository.deleteAll(oldSetItemList);
         //초기 값으로 설정하기
         for(Integer itemId : initialItems){
-            CustomItem item = customRepository.findCustomItemById(itemId).get();
-            wearingItemRepository.save(new WearingItem(user, item));
+            CustomItem item = customRepository.findCustomItemById(itemId).orElseThrow(()-> new RuntimeException("없는 아이템입니다.")); //TODO: 예외처리 바꿔야 함
+            wearingItemRepository.save(WearingItem.builder().user(user).customItem(item).build());
             customItems.add(item);
         }
         return UserCharacterResponse.of(customItems);
     }
 
-    public void buyItem(User user, int item_id){
+    public void buyItem(User user, int item_id){ //TODO: 코드 리팩토링 필요
         Optional<CustomItem> customItemOptional = customRepository.findCustomItemById(item_id);
         CustomItem customItem = customItemOptional.get();
-        //haveItemRepository.findByCustomItemAndUser(customItem, user).orElseThrow(() -> new BuyOwnedItemException(ErrorType.BUY_OWNED_ITEM_ERROR.getMessage()));
-        haveItemRepository.findByCustomItemAndUser(customItem, user).ifPresent(item -> {
-            throw new BuyOwnedItemException(ErrorType.BUY_OWNED_ITEM_ERROR.getMessage());
-        });
+        haveItemRepository.findByCustomItemAndUser(customItem, user).orElseThrow(() -> new BuyOwnedItemException(ErrorType.BUY_OWNED_ITEM_ERROR.getMessage()));
+
 //        Optional<HaveItem> ha = haveItemRepository.findByCustomItemAndUser(customItem, user);
 //        if(haveItemRepository.findByCustomItemAndUser(customItem, user).isPresent()){
 //           //throw new IllegalArgumentException("이미 결제된, 가지고 있는 아이템입니다."); //TODO: 커스텀 예외처리
@@ -182,7 +164,7 @@ public class CustomService {
 //            throw new BuyOwnedItemException(ErrorType.BUY_OWNED_ITEM_ERROR.getMessage());
 //        }
         //TODO: 결제창으로 넘어가서 아이템 결제하는 부분 구현하기
-        haveItemRepository.save(new HaveItem(user, customItem));
+        haveItemRepository.save(HaveItem.builder().user(user).customItem(customItem).build());
     }
 
 }
