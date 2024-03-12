@@ -22,4 +22,14 @@ public class ChartController {
     public ResponseEntity<?> dailyStatistics(Authentication authentication, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         return ResponseEntity.ok().body(chartService.dailyStatistics(authentication, date));
     }
+
+    @GetMapping("/week")
+    public ResponseEntity<?> weeklyStatistics(Authentication authentication, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        return ResponseEntity.ok().body(chartService.weeklyStatistics(authentication, date));
+    }
+
+    @GetMapping("/month")
+    public ResponseEntity<?> monthlyStatistics(Authentication authentication, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        return ResponseEntity.ok().body(chartService.monthlyStatistics(authentication, date));
+    }
 }
