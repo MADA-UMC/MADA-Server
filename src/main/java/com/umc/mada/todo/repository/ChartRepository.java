@@ -1,10 +1,8 @@
 package com.umc.mada.todo.repository;
 
 import com.umc.mada.todo.domain.Todo;
-import com.umc.mada.todo.repository.statistics.AchievementRateStatisticsVO;
+import com.umc.mada.todo.repository.statistics.*;
 import com.umc.mada.todo.repository.statistics.CategoryStatisticsVO;
-import com.umc.mada.todo.repository.statistics.PreviousCategoryStatisticsVO;
-import com.umc.mada.todo.repository.statistics.TodoBarGraphStatisticsVO;
 import com.umc.mada.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,7 +37,7 @@ public interface ChartRepository extends JpaRepository<Todo, Integer> {
 //    @Query("select t.date, count(t) from Todo t where t.userId = :user and t.date between :startDate and :endDate and t.complete=true GROUP BY t.date order by t.date")
     List<TodoBarGraphStatisticsVO> dayTodoBarGraphStatistics(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
     Integer countAllByUserIdAndDate(User user, LocalDate date);
-
+    Integer countAllByUserIdAndDateBetween(User user, LocalDate start, LocalDate end);
 
     @Query(value = "select  A.date, COUNT(*) as count, ROUND(COUNT(*)/(select COUNT(*) as count from TODO T where T.user_id = :uid and T.date = A.date GROUP BY T.date)*100, 1) as rate\n" +
             "from TODO A\n" +
@@ -48,4 +46,21 @@ public interface ChartRepository extends JpaRepository<Todo, Integer> {
             "order by A.date desc;", nativeQuery = true)
     List<AchievementRateStatisticsVO> dayStatisticsOnAchievementRate(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
 
+    @Query(value = "select DATE_FORMAT(DATE_SUB(T.date, INTERVAL (DAYOFWEEK(T.date)-1) DAY), '%Y-%m-%d') as startDate,\n" +
+            "       DATE_FORMAT(DATE_SUB(T.date, INTERVAL (DAYOFWEEK(T.date)-7) DAY), '%Y-%m-%d') as endDate,\n" +
+            "       DATE_FORMAT(T.date, '%Y%U') AS weekDate,\n" +
+            "       COUNT(T.id) as count, ROUND(COUNT(*)/(select COUNT(*) as count from TODO A where A.user_id = 55 and DATE_FORMAT(A.date, '%Y%U') = weekDate GROUP BY DATE_FORMAT(A.date, '%Y%U'))*100, 1) as rate\n" +
+            "from TODO T\n" +
+            "where T.user_id = :uid and T.date between :startDate and :endDate and T.complete=1\n" +
+            "GROUP BY weekDate\n" +
+            "ORDER BY weekDate desc;", nativeQuery = true)
+    List<WeeklyBarGraphAndRateStatisticsVO> weeklyTodoBarGraphAndRateStatistics(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
+
+    @Query(value = "select  DATE_FORMAT(A.date, '%Y-%m') AS monthDate, COUNT(*) as count, \n" +
+            "        ROUND(COUNT(*)/(select COUNT(*) as count from TODO T where T.user_id = 55 and DATE_FORMAT(T.date, '%Y-%m') = monthDate GROUP BY DATE_FORMAT(T.date, '%Y-%m'))*100, 1) as rate\n" +
+            "from TODO A\n" +
+            "where user_id = 55 and (A.date between '2023-12-01' and '2024-01-31') and A.complete=1\n" +
+            "group by monthDate\n" +
+            "ORDER BY monthDate desc;", nativeQuery = true)
+    List<MonthlyBarGraphAndRateStatisticsVO> monthlyTodoBarGraphAndRateStatistics(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
 }
