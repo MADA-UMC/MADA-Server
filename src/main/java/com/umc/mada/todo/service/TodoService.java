@@ -314,12 +314,12 @@ public class TodoService {
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String, Object> data = new LinkedHashMap<>();
         for (Todo todo : userTodos){
-            if(todo.getDate()!= null && todo.getDate().equals(date) && todo.getRepeat().equals(Repeat.N)){
+            if(todo.getDate()!= null && todo.getDate().equals(date) && todo.getRepeat().equals(Repeat.N) && !todo.getCategory().getIsDeleted()){
                 filteredTodos.add(TodoResponseDto.of(todo));
             }
         }
         for (RepeatTodo repeatTodo : repeatTodos){
-            if(repeatTodo.getTodoId().getUserId() == userId){
+            if(repeatTodo.getTodoId().getUserId() == userId && !repeatTodo.getTodoId().getCategory().getIsDeleted()){
                 filteredRepeatTodos.add(RepeatTodoResponseDto.of(repeatTodo));
             }
         }
