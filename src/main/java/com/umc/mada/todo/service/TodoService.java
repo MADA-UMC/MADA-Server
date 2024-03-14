@@ -239,6 +239,23 @@ public class TodoService {
     }
 
     @Transactional
+    // 반복 투두 수정 로직
+    public RepeatTodoResponseDto updateRepeatTodo(User user, int repeatTodoId, RepeatTodoRequestDto repeatTodoRequestDto) {
+        validateUserId(user);
+        RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+        Todo todo = repeatTodo.getTodoId();
+        User todoUser = todo.getUserId();
+
+        // 반복 투두 완료 여부 변경 처리
+        if (repeatTodoRequestDto.getComplete() != null && todoUser.getId().equals(user.getId())){
+            repeatTodo.setComplete(repeatTodoRequestDto.getComplete());
+            repeatTodoRepository.save(repeatTodo);
+        }
+        return new RepeatTodoResponseDto(repeatTodo.getId(), repeatTodo.getTodoId().getId(), repeatTodo.getTodoId().getCategory().getId(), repeatTodo.getTodoId().getTodoName(), repeatTodo.getDate(), repeatTodo.getComplete());
+    }
+
+    @Transactional
     // 반복 투두 삭제 로직 (이 반복 투두)
     public void deleteRepeatTodo(User userId, int repeatTodoId) {
         RepeatTodo repeatTodo = repeatTodoRepository.findById(repeatTodoId)
