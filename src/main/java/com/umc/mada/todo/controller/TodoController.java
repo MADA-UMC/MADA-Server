@@ -1,6 +1,7 @@
 package com.umc.mada.todo.controller;
 
 import com.umc.mada.todo.domain.Todo;
+import com.umc.mada.todo.dto.RepeatTodoRequestDto;
 import com.umc.mada.todo.dto.RepeatTodoResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
@@ -75,6 +76,22 @@ public class TodoController {
         //result.put("status", 200);
         //result.put("success", true);
         result.put("message", "투두 삭제가 완료되었습니다.");
+        return ResponseEntity.ok().body(result);
+    }
+
+    @PatchMapping("/repeat/update/{repeatTodoId}")
+    public ResponseEntity<Map<String, Object>> updateRepeatTodo(Authentication authentication, @PathVariable int repeatTodoId, @RequestBody RepeatTodoRequestDto repeatTodoRequestDto) {
+        // 반복 투두 수정 API
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        RepeatTodoResponseDto updatedRepeatTodo = todoService.updateRepeatTodo(user, repeatTodoId, repeatTodoRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("RepeatTodo", updatedRepeatTodo);
+        Map<String, Object> result = new LinkedHashMap<>();
+        //result.put("status", 200);
+        //result.put("success", true);
+        //result.put("message", "투두 수정이 완료되었습니다.");
+        result.put("data", data);
         return ResponseEntity.ok().body(result);
     }
 
