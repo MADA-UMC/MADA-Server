@@ -78,7 +78,7 @@ public class CustomService {
             boolean haveItemCheck = haveItemRepository.existsByCustomItemAndUser(item, user);
 
             //출석 아이템인데 소유하고 있지 않다면 목록에 추가하지 않기
-            if(!haveItemCheck && item.getUnlockCondition().equals(CustomItem.ItemUnlockCondition.ATTENDANCE)) continue;
+//            if(!haveItemCheck && item.getUnlockCondition().equals(CustomItem.ItemUnlockCondition.ATTENDANCE)) continue;
 
             //해당 아이템을 소유하고 있다면 true;
             if(haveItemCheck) have = true;
