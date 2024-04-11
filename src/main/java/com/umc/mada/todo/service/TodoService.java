@@ -120,63 +120,22 @@ public class TodoService {
         List <RepeatTodo> repeatTodos = repeatTodoRepository.readRepeatTodosByTodoId(todo);
         validateCategoryId(todo.getCategory().getId());
 
-        // 반복 변경 처리
-        if (todoRequestDto.getRepeat() != null){
+        // 반복 내용 수정
+        if (todoRequestDto.getRepeat() != null || todoRequestDto.getRepeatInfo() != null || todoRequestDto.getStartRepeatDate() != null || todoRequestDto.getEndRepeatDate() != null) {
+            // 기존 반복 투두 삭제 처리
             for(RepeatTodo repeatTodo : repeatTodos){
                 repeatTodo.setIsDeleted(true);
             }
-            if (todoRequestDto.getRepeat() == Repeat.DAY){
-                todo.setRepeat(Repeat.DAY);
-                todo.setRepeatInfo(null);
-                todoRepository.save(todo);
-                createRepeatTodos(todo);
-            } else if (todoRequestDto.getRepeat() == Repeat.WEEK){
-                todo.setRepeat(Repeat.WEEK);
-                todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
-                todoRepository.save(todo);
-                createRepeatTodos(todo);
-            } else if (todoRequestDto.getRepeat() == Repeat.MONTH){
-                todo.setRepeat(Repeat.MONTH);
-                todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
-                todoRepository.save(todo);
-                createRepeatTodos(todo);
-            }
-        }
 
-        // 투두 반복 시작일 / 종료일 변경 처리
-        if (todoRequestDto.getStartRepeatDate() != null || todoRequestDto.getEndRepeatDate() != null){
-            for (RepeatTodo repeatTodo : repeatTodos) {
-                LocalDate repeatTodoDate = repeatTodo.getDate();
-                if (repeatTodoDate.isAfter(todoRequestDto.getEndRepeatDate()) || repeatTodoDate.isBefore(todoRequestDto.getStartRepeatDate())) {
-                    repeatTodo.setIsDeleted(true);
-                }
-            }
-            Set<LocalDate> existingRepeatDates = repeatTodos.stream()
-                    .filter(repeatTodo -> !repeatTodo.getIsDeleted())
-                    .map(RepeatTodo::getDate)
-                    .collect(Collectors.toSet());
-
-            for (LocalDate currentDate = todoRequestDto.getStartRepeatDate();
-                 !currentDate.isAfter(todoRequestDto.getEndRepeatDate());
-                 currentDate = currentDate.plusDays(1)) {
-                if (!existingRepeatDates.contains(currentDate)) {
-                    // 기존 반복 투두에 없는 날짜에 대해 새로운 반복 투두 생성
-                    RepeatTodo newRepeatTodo = RepeatTodo.builder()
-                            .todoId(todo)
-                            .date(currentDate)
-                            .complete(false)
-                            .isDeleted(false)
-                            .build();
-                    repeatTodoRepository.save(newRepeatTodo);
-                    repeatTodos.add(newRepeatTodo);
-                }
-            }
-
+            // 대표 투두 수정 처리
+            todo.setRepeat(todoRequestDto.getRepeat());
+            todo.setRepeatInfo(todoRequestDto.getRepeatInfo());
             todo.setStartRepeatDate(todoRequestDto.getStartRepeatDate());
             todo.setEndRepeatDate(todoRequestDto.getEndRepeatDate());
-            if(todo.getRepeat() == Repeat.N){
-                throw new IllegalArgumentException("반복 투두가 아닌 경우 반복 시작일을 설정할 수 없습니다.");
-            }
+            todoRepository.save(todo);
+
+            // 반복 투두 생성
+            createRepeatTodos(todo);
         }
 
         // 카테고리 ID 변경 처리
