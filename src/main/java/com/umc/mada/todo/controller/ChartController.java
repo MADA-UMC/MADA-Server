@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,5 +32,10 @@ public class ChartController {
     @GetMapping("/month")
     public ResponseEntity<?> monthlyStatistics(Authentication authentication, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         return ResponseEntity.ok().body(chartService.monthlyStatistics(authentication, date));
+    }
+
+    @GetMapping("/checkTodos")
+    public ResponseEntity<?> getTodoDatesByMonth(Authentication authentication, @RequestParam(value = "yearMonth") YearMonth yearMonth){
+        return ResponseEntity.ok().body(chartService.findDatesWithTodosByMonth(authentication, yearMonth));
     }
 }
