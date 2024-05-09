@@ -107,18 +107,16 @@ public class ChartService {
 
     public Map<String, Object> findDatesWithTodosByMonth(Authentication authentication, YearMonth yearMonth) {
         User user = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
-        Set<Integer> datesWithTodosSet = new HashSet<>();
 
         // 투두
-        List<Integer> todoDates = todoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString());
-        datesWithTodosSet.addAll(todoDates);
+        Set<Integer> datesWithTodosSet = new HashSet<>(todoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString()));
 
         // 반복 투두
-        List<Integer> recurringTodoDates = repeatTodoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString());
-        datesWithTodosSet.addAll(recurringTodoDates);
+        datesWithTodosSet.addAll(repeatTodoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString()));
 
         List<Integer> datesWithTodos = new ArrayList<>(datesWithTodosSet);
         Collections.sort(datesWithTodos);
+
         Map<String, Object> map = new LinkedHashMap<>();
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("datesWithTodos", datesWithTodos);
