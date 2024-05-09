@@ -1,7 +1,7 @@
 package com.umc.mada.todo.repository.statistics;
 
 public class DefaultPreviousCategoryStatisticsVO implements PreviousCategoryStatisticsVO{
-    private Integer count;
+    private final Integer count;
 
     public DefaultPreviousCategoryStatisticsVO() {
         this.count = 0;
