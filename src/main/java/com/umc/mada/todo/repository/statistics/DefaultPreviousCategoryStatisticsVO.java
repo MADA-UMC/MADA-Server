@@ -11,8 +11,4 @@ public class DefaultPreviousCategoryStatisticsVO implements PreviousCategoryStat
     public Integer getCount() {
         return count;
     }
-
-    public void setCount(Integer count) {
-        this.count = count;
-    }
 }
