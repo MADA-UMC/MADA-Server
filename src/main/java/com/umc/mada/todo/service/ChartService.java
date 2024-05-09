@@ -30,8 +30,14 @@ public class ChartService {
 
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), date, date);
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
+        } else {
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프 통계
         LocalDate startDate = date.minusDays(3);
@@ -55,8 +61,15 @@ public class ChartService {
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번주 생성한 투두 개수
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+        } else {
+            // categoryStatisticsVOList가 비어 있을 때
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusWeeks(6);
@@ -75,8 +88,15 @@ public class ChartService {
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번달 생성한 투두 개수
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+        } else {
+            // categoryStatisticsVOList가 비어 있을 때
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusMonths(6);
