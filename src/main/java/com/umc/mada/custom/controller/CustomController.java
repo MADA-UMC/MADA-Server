@@ -63,7 +63,7 @@ public class CustomController {
 
     @Operation(description = "사용자 캐릭터 착용 아이템 변경")
     @PatchMapping("/change") ///{item_id}
-    public ResponseEntity<Map<String, Object>> changeCharacter(Authentication authentication, @RequestParam(value="item_id") List<String> items_id){ // @RequestParam(value="items_id[]") List<String> items_id
+    public ResponseEntity<Map<String, Object>> changeCharacter(Authentication authentication, @RequestParam(value="item_id") List<Integer> items_id){ // @RequestParam(value="items_id[]") List<String> items_id
         User user = findUser(authentication);
         //String[] items_id = request.getParameterValues("item_id");
         UserCharacterResponse userCharacterResponse = customService.changeUserItem(user, items_id);

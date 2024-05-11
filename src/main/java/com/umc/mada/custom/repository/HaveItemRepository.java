@@ -17,7 +17,9 @@ public interface HaveItemRepository extends JpaRepository<HaveItem, Long> {
     Optional<HaveItem> findByCustomItemAndUser(CustomItem customItem, User user);
     List<HaveItem> findByUser(User user);
     List<HaveItem> findByUserAndWearing(User user, boolean wearing);
+    boolean existsByCustomItemAndUser(CustomItem customItem, User user);
 
+    Boolean deleteByUserAndCustomItem(User user, CustomItem customItem);
     @Query("select h.customItem from HaveItem h where h.user = :user and h.wearing = :wearing")
     List<CustomItem> findCustomItemByUserAndWearing(@Param("user") User user, @Param("wearing") boolean wearing);
 }

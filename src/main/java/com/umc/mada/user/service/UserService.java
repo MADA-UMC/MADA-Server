@@ -1,5 +1,9 @@
 package com.umc.mada.user.service;
 
+import com.umc.mada.custom.domain.CustomItem;
+import com.umc.mada.custom.domain.HaveItem;
+import com.umc.mada.custom.repository.CustomRepository;
+import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,10 +25,13 @@ import javax.transaction.Transactional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-
+    private final CustomRepository customRepository;
+    private final HaveItemRepository haveItemRepository;
     @Autowired
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository,CustomRepository customRepository, HaveItemRepository haveItemRepository){
+        this.haveItemRepository = haveItemRepository;
         this.userRepository = userRepository;
+        this.customRepository = customRepository;
     }
 
     public User update(Long id, UserRequestDto.UpdateNickname request){
@@ -49,11 +57,30 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
-
+    @Transactional
     public Boolean isSubscribe(Authentication authentication, Map<String,Boolean> is_subscribe) {
+        boolean condition = true;
         User user = this.getUser(authentication);
+        if(user.getSubscribe() != is_subscribe.get("is_subscribe"))
+            condition = false;
         user.updateSubscribe(is_subscribe.get("is_subscribe"));
         userRepository.save(user);
+        if(!condition){
+            if(user.getSubscribe()){
+                List<CustomItem> subscribeCustomItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.PREMINUM);
+                for (CustomItem customItem : subscribeCustomItems){
+                    haveItemRepository.save(HaveItem.builder().user(user).customItem(customItem).build());
+                }
+            }
+            else{
+                List<CustomItem> subscribeCustomItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.PREMINUM);
+                for (CustomItem customItem : subscribeCustomItems){
+                    haveItemRepository.deleteByUserAndCustomItem(user,customItem);
+                }
+            }
+        }
+
+
         return user.getSubscribe();
     }
 

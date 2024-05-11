@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity
+@Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,9 +24,4 @@ public class WearingItem {
     @JoinColumn(name = "item_id")
     private CustomItem customItem;
 
-    @Builder
-    public WearingItem(User user, CustomItem customItem) {
-        this.user = user;
-        this.customItem = customItem;
-    }
 }

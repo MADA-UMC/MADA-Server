@@ -10,14 +10,15 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class CalendarService {
     private final CalendarRepository calendarRepository;
-
     private final UserRepository userRepository;
 
 
@@ -26,6 +27,7 @@ public class CalendarService {
         this.calendarRepository = calendarRepository;
         this.userRepository = userRepository;
     }
+
 
     public Map<String, Object> readDday(Authentication authentication){
         User user = this.getUser(authentication);
