@@ -55,7 +55,7 @@ public class TimetableController {
         return ResponseEntity.ok().body(result);
     }
 
-    @PatchMapping("/comment/update/{date}")
+    @PatchMapping("/comment/{date}")
     public ResponseEntity<Map<String, Object>> updateTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestBody CommentRequestDto commentRequestDto){
         // comment 수정 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
@@ -68,11 +68,24 @@ public class TimetableController {
         return ResponseEntity.ok().body(result);
     }
 
-    @GetMapping("/comment/date/{date}")
-    public ResponseEntity<Map<String, Object>> getUserTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+    @PostMapping("/comment/{date}")
+    public ResponseEntity<Map<String, Object>> addTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestBody CommentRequestDto commentRequestDto){
+        // comment 수정 API
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
-        CommentResponseDto userComment = timetableService.getUserComment(user, date);
+        CommentResponseDto updatedComment = timetableService.updateComment(user, date, commentRequestDto);
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("Comment", updatedComment);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("data", data);
+        return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/comment/{date}")
+    public ResponseEntity<Map<String, Object>> readTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
+        CommentResponseDto userComment = timetableService.readComment(user, date);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("Comment", userComment);
         Map<String, Object> result = new LinkedHashMap<>();

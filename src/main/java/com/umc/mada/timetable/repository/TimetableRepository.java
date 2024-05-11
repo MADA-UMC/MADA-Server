@@ -17,5 +17,4 @@ public interface TimetableRepository extends JpaRepository<Timetable, Integer> {
     List<Timetable> findTimetablesByUserIdAndDayOfWeekIsNot(User userId, DayOfWeek dayOfWeek);
     List<Timetable> findTimetablesByUserIdAndDateIsAndDayOfWeek(User userId, LocalDate date, DayOfWeek dayOfWeek);
     List<Timetable> findTimetablesByUserIdAndDayOfWeekAndIsDeletedIsFalse(User userId, DayOfWeek dayOfWeek);
-
 }
