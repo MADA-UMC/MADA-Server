@@ -2,6 +2,8 @@ package com.umc.mada.todo.service;
 
 import com.umc.mada.todo.dto.StatisticsResponseDto;
 import com.umc.mada.todo.repository.ChartRepository;
+import com.umc.mada.todo.repository.RepeatTodoRepository;
+import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.todo.repository.statistics.*;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
@@ -11,22 +13,31 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ChartService {
     private final ChartRepository chartRepository;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
+    private final RepeatTodoRepository repeatTodoRepository;
 
     public StatisticsResponseDto dailyStatistics(Authentication authentication, LocalDate date){
         User user  = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), date, date);
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
+        } else {
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프 통계
         LocalDate startDate = date.minusDays(3);
@@ -50,8 +61,15 @@ public class ChartService {
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번주 생성한 투두 개수
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+        } else {
+            // categoryStatisticsVOList가 비어 있을 때
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusWeeks(6);
@@ -70,13 +88,39 @@ public class ChartService {
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번달 생성한 투두 개수
-        int check = categoryStatisticsVOList.get(0).getCategoryId();
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
+        if (!categoryStatisticsVOList.isEmpty()) {
+            int check = categoryStatisticsVOList.get(0).getCategoryId();
+            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
+        } else {
+            // categoryStatisticsVOList가 비어 있을 때
+            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        }
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusMonths(6);
         List<MonthlyBarGraphAndRateStatisticsVO> monthlyBarGraphAndRateStatisticsVOList = chartRepository.monthlyTodoBarGraphAndRateStatistics(user.getId(), startDate2, endDate);
 
         return StatisticsResponseDto.ofMonth(categoryStatisticsVOList, totalCount, previousCategoryStatisticsVO, monthlyBarGraphAndRateStatisticsVOList);
+    }
+
+    public Map<String, Object> findDatesWithTodosByMonth(Authentication authentication, YearMonth yearMonth) {
+        User user = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+
+        // 투두
+        Set<Integer> datesWithTodosSet = new HashSet<>(todoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString()));
+
+        // 반복 투두
+        datesWithTodosSet.addAll(repeatTodoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString()));
+
+        List<Integer> datesWithTodos = new ArrayList<>(datesWithTodosSet);
+        Collections.sort(datesWithTodos);
+
+        Map<String, Object> map = new LinkedHashMap<>();
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("datesWithTodos", datesWithTodos);
+        map.put("data", data);
+        return map;
     }
 }
