@@ -49,7 +49,7 @@ public interface ChartRepository extends JpaRepository<Todo, Integer> {
     @Query(value = "select DATE_FORMAT(DATE_SUB(T.date, INTERVAL (DAYOFWEEK(T.date)-1) DAY), '%Y-%m-%d') as startDate,\n" +
             "       DATE_FORMAT(DATE_SUB(T.date, INTERVAL (DAYOFWEEK(T.date)-7) DAY), '%Y-%m-%d') as endDate,\n" +
             "       DATE_FORMAT(T.date, '%Y%U') AS weekDate,\n" +
-            "       COUNT(T.id) as count, ROUND(COUNT(*)/(select COUNT(*) as count from TODO A where A.user_id = 55 and DATE_FORMAT(A.date, '%Y%U') = weekDate GROUP BY DATE_FORMAT(A.date, '%Y%U'))*100, 1) as rate\n" +
+            "       COUNT(T.id) as count, ROUND(COUNT(*)/(select COUNT(*) as count from TODO A where A.user_id = :uid and DATE_FORMAT(A.date, '%Y%U') = weekDate GROUP BY DATE_FORMAT(A.date, '%Y%U'))*100, 1) as rate\n" +
             "from TODO T\n" +
             "where T.user_id = :uid and T.date between :startDate and :endDate and T.complete=1\n" +
             "GROUP BY weekDate\n" +
@@ -57,9 +57,9 @@ public interface ChartRepository extends JpaRepository<Todo, Integer> {
     List<WeeklyBarGraphAndRateStatisticsVO> weeklyTodoBarGraphAndRateStatistics(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
 
     @Query(value = "select  DATE_FORMAT(A.date, '%Y-%m') AS monthDate, COUNT(*) as count, \n" +
-            "        ROUND(COUNT(*)/(select COUNT(*) as count from TODO T where T.user_id = 55 and DATE_FORMAT(T.date, '%Y-%m') = monthDate GROUP BY DATE_FORMAT(T.date, '%Y-%m'))*100, 1) as rate\n" +
+            "        ROUND(COUNT(*)/(select COUNT(*) as count from TODO T where T.user_id = :uid and DATE_FORMAT(T.date, '%Y-%m') = monthDate GROUP BY DATE_FORMAT(T.date, '%Y-%m'))*100, 1) as rate\n" +
             "from TODO A\n" +
-            "where user_id = 55 and (A.date between '2023-12-01' and '2024-01-31') and A.complete=1\n" +
+            "where user_id = :uid and (A.date between :startDate and :endDate) and A.complete=1\n" +
             "group by monthDate\n" +
             "ORDER BY monthDate desc;", nativeQuery = true)
     List<MonthlyBarGraphAndRateStatisticsVO> monthlyTodoBarGraphAndRateStatistics(@Param("uid") Long uid, @Param("startDate") LocalDate startDate , @Param("endDate") LocalDate endDate);
