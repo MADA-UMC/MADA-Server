@@ -1,6 +1,8 @@
 package com.umc.mada.auth.service;
 
 import com.umc.mada.auth.dto.OAuth2Attributes;
+import com.umc.mada.custom.domain.CustomItem;
+import com.umc.mada.custom.domain.HaveItem;
 import com.umc.mada.custom.domain.WearingItem;
 import com.umc.mada.custom.repository.CustomRepository;
 import com.umc.mada.custom.repository.HaveItemRepository;
@@ -103,30 +105,21 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
 
     private void setUserData(User user){
         //사용자 캐릭터 디폴트 설정하기
-        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(10).get()));
-        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(48).get()));
-        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(49).get()));
-        wearingItemRepository.save(new WearingItem(user, customRepository.findCustomItemById(50).get()));
+        List<CustomItem> defaultItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.DEFAULT);
 
+        for(CustomItem defaultItem: defaultItems){
+            wearingItemRepository.save(WearingItem.builder().user(user).customItem(defaultItem).build());
+        }
+
+//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(10L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
+//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(48L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
+//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(49L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
+//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(50L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
 
         //사용자 기본 제공 커스텀 아이템 세팅하기
-//        List<CustomItem> basicItemList = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C0);
-//        for(CustomItem basicItem : basicItemList){
-//            if(basicItem.getId() == 10){
-//                haveItemRepository.save(new HaveItem(user, basicItem, true));
-//                continue;
-//            }
-//            haveItemRepository.save(new HaveItem(user, basicItem));
-//        }
-////
-//        List<CustomItem> basicItemList2 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C1);
-//        for(CustomItem basicItem : basicItemList2){
-//            haveItemRepository.save(new HaveItem(user, basicItem));
-//        }
-//
-//        List<CustomItem> basicItemList3 = customRepository.findCustomItemByUnlockCondition(ItemUnlockCondition.C2);
-//        for(CustomItem basicItem : basicItemList3){
-//            haveItemRepository.save(new HaveItem(user, basicItem));
-//        }
+        List<CustomItem> basicItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.BASIC);
+        for(CustomItem basicItem : basicItems){
+            haveItemRepository.save(HaveItem.builder().user(user).customItem(basicItem).build());
+        }
     }
 }

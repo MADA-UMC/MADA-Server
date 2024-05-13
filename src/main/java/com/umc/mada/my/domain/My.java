@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(name="SAYING")
 public class My {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

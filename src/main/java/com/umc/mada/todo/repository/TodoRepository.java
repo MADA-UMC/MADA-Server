@@ -22,6 +22,9 @@ public interface TodoRepository extends JpaRepository<Todo, Integer>{//, TodoRep
     List<Todo> findTodosByUserIdAndIsDeletedIsFalse(User user);
     List<Todo> findTodosByUserIdAndCategoryIdAndIsDeletedIsFalse(User userId, int categoryId);
 
+    @Query("SELECT DISTINCT FUNCTION('DAY', t.date) FROM Todo t WHERE t.userId.id = :userId AND FUNCTION('DATE_FORMAT', t.date, '%Y-%m') = :yearMonth")
+    List<Integer> findDistinctDaysByUserIdAndYearMonth(@Param("userId") Long userId, @Param("yearMonth") String yearMonth);
+
     @Query(value = "select ROUND(IFNULL(AVG(A.complete) * 100, 0), 1) as completeTodoPercent, ROUND(COUNT(A.complete)/COUNT(*),1) as todosPercent\n" +
             "from (select T.user_id, T.date, T.complete\n" +
             "      from TODO T\n" +
