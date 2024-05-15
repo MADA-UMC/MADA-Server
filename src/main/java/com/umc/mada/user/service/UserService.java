@@ -4,18 +4,13 @@ import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
-import com.umc.mada.user.dto.user.UserResponseDto;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-
-import javax.transaction.Transactional;
 
 @Service
 public class UserService {
@@ -120,7 +115,7 @@ public class UserService {
     }
 
     private User getUser(Authentication authentication){
-        Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
-        return optionalUser.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        return user;
     }
 }

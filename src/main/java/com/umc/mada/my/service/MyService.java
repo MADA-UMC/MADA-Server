@@ -4,7 +4,6 @@ import com.umc.mada.my.domain.My;
 import com.umc.mada.my.dto.MyResponseDto;
 import com.umc.mada.my.repository.MyRepository;
 import com.umc.mada.user.domain.User;
-import com.umc.mada.user.service.UserService;
 import com.umc.mada.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -36,8 +35,8 @@ public class MyService {
     }
 
     private User getUser(Authentication authentication){
-        Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
-        return optionalUser.get();
+        User user= userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        return user;
     }
 
     public Map<String, Object> findMyProfileList(Authentication authentication) {

@@ -1,5 +1,6 @@
 package com.umc.mada.todo.service;
 
+import com.umc.mada.exception.NotFoundUserException;
 import com.umc.mada.todo.dto.StatisticsResponseDto;
 import com.umc.mada.todo.repository.ChartRepository;
 import com.umc.mada.todo.repository.RepeatTodoRepository;
@@ -26,7 +27,9 @@ public class ChartService {
     private final RepeatTodoRepository repeatTodoRepository;
 
     public StatisticsResponseDto dailyStatistics(Authentication authentication, LocalDate date){
-        User user  = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+//        User user  = userRepository.findByAuthIdAndAccountExpired(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+//        User user  = userRepository.findByAuthIdAndAccountExpiredAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user  = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new NotFoundUserException("유저를 찾을 수 없습니다"));
 
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), date, date);
@@ -52,7 +55,7 @@ public class ChartService {
     }
 
     public StatisticsResponseDto weeklyStatistics(Authentication authentication, LocalDate date){
-        User user  = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user  = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 
         //date에 해당하는 주의 시작 날짜와 마지막 날짜 구하기
         LocalDate startDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
@@ -79,7 +82,7 @@ public class ChartService {
     }
 
     public StatisticsResponseDto monthlyStatistics(Authentication authentication, LocalDate date){
-        User user = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 
         //date에 해당하는 주의 시작 날짜와 마지막 날짜 구하기
         LocalDate startDate = date.with(TemporalAdjusters.firstDayOfMonth());
@@ -106,7 +109,7 @@ public class ChartService {
     }
 
     public Map<String, Object> findDatesWithTodosByMonth(Authentication authentication, YearMonth yearMonth) {
-        User user = userRepository.findByAuthId(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 
         // 투두
         Set<Integer> datesWithTodosSet = new HashSet<>(todoRepository.findDistinctDaysByUserIdAndYearMonth(user.getId(), yearMonth.toString()));

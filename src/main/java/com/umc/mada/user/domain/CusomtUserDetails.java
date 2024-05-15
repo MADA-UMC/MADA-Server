@@ -83,6 +83,6 @@ public class CusomtUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isEnabled() { //계정이 사용가능한 계정인지, true면 사용가능한 계정
-        return user.isAccount_expired();
+        return user.isAccountExpired();
     }
 }

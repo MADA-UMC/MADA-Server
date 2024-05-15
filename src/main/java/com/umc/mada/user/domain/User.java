@@ -2,14 +2,11 @@ package com.umc.mada.user.domain;
 
 import javax.persistence.*;
 
-//import com.umc.mada.BaseTimeEntity;
 import com.umc.mada.custom.domain.HaveItem;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.umc.mada.user.dto.user.UserRequestDto;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -47,7 +44,8 @@ public class User {
     private boolean endTodoBackSetting;
     @Column(name = "new_todo_start_setting") //TODO: Cannot resolve column
     private boolean newTodoStartSetting;
-    private boolean account_expired;
+    @Column(name="account_expired")
+    private boolean accountExpired; //회원탈퇴 여부
     private String refreshToken;
     @Column(name = "google_access_token")
     private String googleAccessToken; //TODO: 테이블 분리하기
@@ -100,7 +98,7 @@ public class User {
     }
 
     public User expiredUserUpdate() {
-        this.account_expired = true;
+        this.accountExpired = true;
         return this;
     }
 
