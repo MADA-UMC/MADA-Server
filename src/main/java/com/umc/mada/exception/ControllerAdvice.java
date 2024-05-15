@@ -18,6 +18,12 @@ public class ControllerAdvice {
     public ResponseEntity<ErrorResponse> notAllowToWearingHandler(final NotAllowToWearingException e){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
+
+    @ExceptionHandler(NotFoundUserException.class)
+    public ResponseEntity<ErrorResponse> notFoundUserHandler(final NotFoundUserException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
+    }
+
     @ExceptionHandler(ServerInternalException.class)
     public ResponseEntity<ErrorResponse> testErrorHandler(final ServerInternalException e, HttpServletRequest httpServletRequest){
         ErrorResponse errorResponse = ErrorResponse.builder()

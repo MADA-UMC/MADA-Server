@@ -164,8 +164,7 @@ public class CalendarService {
 
     private User getUser(Authentication authentication) throws NoSuchElementException {
         try{
-            Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-            return userOptional.get();
+            return userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         }catch (RuntimeException e){
             throw new NoSuchElementException();
         }
