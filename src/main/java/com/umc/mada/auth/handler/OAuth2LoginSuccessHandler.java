@@ -1,6 +1,7 @@
 package com.umc.mada.auth.handler;
 
 import com.umc.mada.auth.handler.jwt.JwtTokenProvider;
+import com.umc.mada.exception.NotFoundUserException;
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
@@ -33,7 +34,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String refreshToken = jwtTokenProvider.createRefreshToken(oAuth2User);
 
         //refreshtoken을 DB에 저장해야함
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+//        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user = userRepository.findByAuthId(oAuth2User.getName()).orElseThrow(()-> new NotFoundUserException("유저를 찾을 수 없습니다."));
         user.setRefreshToken(refreshToken);
 
 //        tokenResponse(response, accessToken);
