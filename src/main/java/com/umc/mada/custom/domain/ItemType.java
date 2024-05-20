@@ -6,8 +6,8 @@ public enum ItemType {
     I1("color"),
     I2("set"),
     I3("item"),
-    I4("background");
-    //UNKNOWN("알수없음");
+    I4("background"),
+    I5("default");
 
     private final String itemType;
 
