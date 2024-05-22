@@ -1,6 +1,7 @@
 package com.umc.mada.auth.handler;
 
 import com.umc.mada.auth.handler.jwt.JwtTokenProvider;
+import com.umc.mada.exception.NotFoundUserException;
 import com.umc.mada.user.domain.CusomtUserDetails;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
@@ -15,7 +16,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -27,15 +27,15 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
 //        OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(provider, userNameAttributeName, oAuth2User.getAttributes());
-//        Optional<User> findUser = userRepository.findByAuthId()
+//        Optional<User> findUser = userRepository.findByAuthIdAndAccountExpired()
 
         //jwt 생성
         String accessToken = jwtTokenProvider.createAccessToken(oAuth2User);
         String refreshToken = jwtTokenProvider.createRefreshToken(oAuth2User);
 
         //refreshtoken을 DB에 저장해야함
-        Optional<User> userOptional = userRepository.findByAuthId(oAuth2User.getName());
-        User user = userOptional.get(); //TODO: null값 체크하기
+//        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        User user = userRepository.findByAuthId(oAuth2User.getName()).orElseThrow(()-> new NotFoundUserException("유저를 찾을 수 없습니다."));
         user.setRefreshToken(refreshToken);
 
 //        tokenResponse(response, accessToken);

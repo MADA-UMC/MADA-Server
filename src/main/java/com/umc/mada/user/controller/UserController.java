@@ -1,5 +1,6 @@
 package com.umc.mada.user.controller;
 
+import com.umc.mada.exception.NotFoundUserException;
 import com.umc.mada.timetable.domain.Timetable;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.dto.TodoStatisticsRequestDto;
@@ -52,8 +53,8 @@ public class UserController {
 //        System.out.println("oAuth2User = " + oAuth2User);
 //        authentication.getPrincipal()
 //        System.out.println(cusomtUserDetails.getUser());
-//        System.out.println(authentication.getName());
-//        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName());
+//        System.out.println(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+//        return ResponseEntity.status(HttpStatus.OK).body(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 
         //httpServletResponse 방법
         response.setHeader("Content-type", "text/plain");
@@ -87,8 +88,8 @@ public class UserController {
     @Operation(description = "회원가입한 유저가 닉네임 입력하는 곳")
     @PostMapping("/signup/nickName")
     public ResponseEntity<String> signupNickname(@RequestBody Map<String, String> nickname, Authentication authentication) {
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.setNickname(nickname, userOptional.get());
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        userService.setNickname(nickname, user);
 //        return ResponseEntity.status(HttpStatus.OK).body("닉네임 입력 성공했습니다.");
         return ResponseEntity.ok().build();
     }
@@ -105,8 +106,8 @@ public class UserController {
     @DeleteMapping("/withdrawal")
     public ResponseEntity<String> userRemove (Authentication authentication){ //@AuthenticationPrincipal CusomtUserDetails cusomtUserDetails
 //        User user = cusomtUserDetails.getUser();
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        userService.removeUser(userOptional.get());
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        userService.removeUser(user);
         return ResponseEntity.ok().build();
     }
 
@@ -126,8 +127,7 @@ public class UserController {
     @PatchMapping("/profile/change/nickname")
     public ResponseEntity<Map<String, Object>>nicknameModify(Authentication authentication,
                                                              @Validated @RequestBody NicknameRequestDto changeNicknameRequestDto) {
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         Map<String, Object> map = new HashMap<>();
         map.put("data", userService.modifyNickname(user, changeNicknameRequestDto));
 //        if(bindingResult.hasErrors()){
@@ -204,8 +204,7 @@ public class UserController {
      */
     @GetMapping("/statistics/day/{date}")
     public ResponseEntity<Map<String, Object>> findDailyTodoAndTimetableAvg(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user= userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         List<Todo> todos = todoRepository.findTodosByUserIdAndDateIs(user, date);
         List<Timetable> timetables = timetableRepository.findTimetablesByUserIdAndDateIs(user, date);
 
@@ -243,8 +242,7 @@ public class UserController {
      */
     @PostMapping("/statistics")
     public ResponseEntity<Map<String, Object>> userTodoAvg(Authentication authentication, @RequestBody TodoStatisticsRequestDto todoStatisticsRequestDto) {
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new NotFoundUserException("유저를 찾을 수 없습니다."));
         Map<String,Object> map = new LinkedHashMap<>();
 //        Map<String,Object> data = new LinkedHashMap<>();
 //        data.put("average", todoService.calcTodoAverage(user,todoAverageRequestDto));

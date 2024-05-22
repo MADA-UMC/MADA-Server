@@ -1,11 +1,9 @@
 package com.umc.mada.todo.controller;
 
-import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.dto.RepeatTodoRequestDto;
 import com.umc.mada.todo.dto.RepeatTodoResponseDto;
 import com.umc.mada.todo.dto.TodoRequestDto;
 import com.umc.mada.todo.dto.TodoResponseDto;
-import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.todo.service.TodoService;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
@@ -35,8 +32,7 @@ public class TodoController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> createTodo(Authentication authentication, @RequestBody TodoRequestDto todoRequestDto) {
         // 투두 생성 API
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         Map<String, Object> map = todoService.createTodo(user, todoRequestDto);
         //TodoResponseDto newTodo = todoService.createTodo(user, todoRequestDto);
         //Map<String, Object> data = new LinkedHashMap<>();
@@ -52,8 +48,7 @@ public class TodoController {
     @PatchMapping("/update/{todoId}")
     public ResponseEntity<Map<String, Object>> updateTodo(Authentication authentication, @PathVariable int todoId, @RequestBody TodoRequestDto todoRequestDto){
         // 투두 수정 API
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         Map<String, Object> map = todoService.updateTodo(user, todoId, todoRequestDto);
         //TodoResponseDto updatedTodo = todoService.updateTodo(user, todoId, todoRequestDto);
         //Map<String, Object> data = new LinkedHashMap<>();
@@ -69,8 +64,7 @@ public class TodoController {
     @PatchMapping("/delete/{todoId}")
     public ResponseEntity<Map<String, Object>> deleteTodo(Authentication authentication, @PathVariable int todoId) {
         // 투두 삭제 API
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         todoService.deleteTodo(user, todoId);
         Map<String, Object> result = new LinkedHashMap<>();
         //result.put("status", 200);
@@ -82,8 +76,7 @@ public class TodoController {
     @PatchMapping("/repeat/update/{repeatTodoId}")
     public ResponseEntity<Map<String, Object>> updateRepeatTodo(Authentication authentication, @PathVariable int repeatTodoId, @RequestBody RepeatTodoRequestDto repeatTodoRequestDto) {
         // 반복 투두 수정 API
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         RepeatTodoResponseDto updatedRepeatTodo = todoService.updateRepeatTodo(user, repeatTodoId, repeatTodoRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("RepeatTodo", updatedRepeatTodo);
@@ -98,8 +91,7 @@ public class TodoController {
     @PatchMapping("/repeat/delete/{repeatTodoId}")
     public ResponseEntity<Map<String, Object>> deleteRepeatTodo(Authentication authentication, @PathVariable int repeatTodoId) {
         // 반복 투두 삭제 API (이 반복 투두)
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         todoService.deleteRepeatTodo(user, repeatTodoId);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "반복 투두 삭제가 완료되었습니다.");
@@ -109,8 +101,7 @@ public class TodoController {
     @PatchMapping("/repeat/delete-all-future/{repeatTodoId}")
     public ResponseEntity<Map<String, Object>> deleteRepeatTodoAndFuture(Authentication authentication, @PathVariable int repeatTodoId) {
         // 반복 투두 삭제 API (이 반복 투두 및 향후 반복 투두)
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         todoService.deleteRepeatTodoAndFuture(user, repeatTodoId);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "해당 반복 투두 및 향후 반복 투두 삭제가 완료되었습니다.");
@@ -120,8 +111,7 @@ public class TodoController {
     @PatchMapping("/repeat/delete-all/{repeatTodoId}")
     public ResponseEntity<Map<String, Object>> deleteAllRepeatTodos(Authentication authentication, @PathVariable int repeatTodoId) {
         // 반복 투두 삭제 API (모든 반복 투두)
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         todoService.deleteAllRepeatTodos(user, repeatTodoId);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("message", "모든 반복 투두 삭제가 완료되었습니다.");
@@ -131,8 +121,7 @@ public class TodoController {
     @GetMapping("/date/{date}")
         // 특정 유저 투두 조회 API
     public ResponseEntity<Map<String, Object>> getUserTodo(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         Map<String, Object> map = todoService.getUserTodo(user, date);
         //List<TodoResponseDto> userTodos = todoService.getUserTodo(user, date);
         //Map<String, Object> data = new LinkedHashMap<>();
@@ -148,8 +137,7 @@ public class TodoController {
     @GetMapping("/repeat/all")
         // 반복 투두 조회 API
     public ResponseEntity<Map<String, Object>> getUserRepeatTodo(Authentication authentication){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
-        User user = userOptional.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         List<TodoResponseDto> repeatTodos = todoService.getUserRepeatTodo(user);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("RepeatTodoList", repeatTodos);
