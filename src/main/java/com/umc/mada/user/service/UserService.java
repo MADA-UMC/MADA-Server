@@ -73,10 +73,7 @@ public class UserService {
                 }
             }
             else{
-                List<CustomItem> subscribeCustomItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.PREMINUM);
-                for (CustomItem customItem : subscribeCustomItems){
-                    haveItemRepository.deleteByUserAndCustomItem(user,customItem);
-                }
+                haveItemRepository.deleteByUserAndUnlockCond(user, CustomItem.ItemUnlockCondition.PREMINUM);
             }
         }
 
