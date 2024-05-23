@@ -16,7 +16,6 @@ import com.umc.mada.todo.domain.RepeatTodo;
 import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.timetable.domain.DayOfWeek;
 import com.umc.mada.todo.dto.RepeatTodoResponseDto;
-import com.umc.mada.todo.dto.TodoResponseDto;
 import com.umc.mada.todo.repository.RepeatTodoRepository;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.user.domain.User;
@@ -50,49 +49,6 @@ public class TimetableService {
         this.repeatTodoRepository = repeatTodoRepository;
     }
 
-    // comment 생성 로직
-    public CommentResponseDto createComment(User user, CommentRequestDto commentRequestDto){
-        validateUserId(user);
-
-        Comment comment = new Comment(user, commentRequestDto.getDate(), commentRequestDto.getContent());
-        Comment savedComment = commentRepository.save(comment);
-
-        return new CommentResponseDto(savedComment.getId(), savedComment.getDate(), savedComment.getContent());
-    }
-
-    @Transactional
-    // comment 수정 로직
-    public CommentResponseDto updateComment (User user, LocalDate date, CommentRequestDto commentRequestDto){
-        validateUserId(user);
-
-        Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
-                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
-
-        // 날짜 변경 처리
-        if (commentRequestDto.getDate() != null){
-            comment.setDate(commentRequestDto.getDate());
-        }
-
-        // 내용 변경 처리
-        if (commentRequestDto.getContent() != null){
-            comment.setContent(commentRequestDto.getContent());
-        }
-
-        Comment updatedComment = commentRepository.save(comment);
-        return new CommentResponseDto(updatedComment.getId(), updatedComment.getDate(), updatedComment.getContent());
-    }
-
-
-    // 특정 유저 comment 조회 로직
-    public CommentResponseDto readComment(User user, LocalDate date) {
-        validateUserId(user);
-
-        Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
-                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
-
-        return new CommentResponseDto(comment.getId(), comment.getDate(), comment.getContent());
-    }
-
     // 시간표 일정 생성 로직
     public TimetableResponseDto createTimetable(User user, TimetableRequestDto timetableRequestDto){
         // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
@@ -116,7 +72,7 @@ public class TimetableService {
         validateUserId(user);
         List<Todo> userTodos = todoRepository.findTodosByUserIdAndIsDeletedIsFalse(user);
         List<RepeatTodo> repeatTodos = repeatTodoRepository.findRepeatTodosByDateIsAndIsDeletedIsFalse(date);
-        List<Calendar> calendars = calendarRepository.findCalendarDay(user,date);
+        List<Calendar> calendars = calendarRepository.findAllByUser(user);
         List<Map<String, Object>> todoList = new ArrayList<>();
         for (Todo todo : userTodos) {
             Map<String, Object> todoMap = new LinkedHashMap<>();
@@ -145,7 +101,7 @@ public class TimetableService {
         List<Map<String, Object>> calendarList = new ArrayList<>();
         for (Calendar calendar : calendars) {
             // 시작일과 종료일 사이에 date가 있는 경우만 추가
-
+            if (!date.isBefore(calendar.getStartDate()) && !date.isAfter(calendar.getEndDate())) {
                 Map<String, Object> calendarMap = new LinkedHashMap<>();
                 calendarMap.put("CalendarName", calendar.getCalendarName());
                 calendarMap.put("color", calendar.getColor());
@@ -153,7 +109,7 @@ public class TimetableService {
                 calendarMap.put("endTime", calendar.getEndTime());     // 종료 시간
                 calendarMap.put("d-day", calendar.getDday());
                 calendarList.add(calendarMap);
-
+            }
         }
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("calendarList", calendarList);
@@ -306,7 +262,48 @@ public class TimetableService {
         return result;
     }
 
+    // comment 생성 로직
+    public CommentResponseDto createComment(User user, CommentRequestDto commentRequestDto){
+        validateUserId(user);
 
+        Comment comment = new Comment(user, commentRequestDto.getDate(), commentRequestDto.getContent());
+        Comment savedComment = commentRepository.save(comment);
+
+        return new CommentResponseDto(savedComment.getId(), savedComment.getDate(), savedComment.getContent());
+    }
+
+    @Transactional
+    // comment 수정 로직
+    public CommentResponseDto updateComment (User user, LocalDate date, CommentRequestDto commentRequestDto){
+        validateUserId(user);
+
+        Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+
+        // 날짜 변경 처리
+        if (commentRequestDto.getDate() != null){
+            comment.setDate(commentRequestDto.getDate());
+        }
+
+        // 내용 변경 처리
+        if (commentRequestDto.getContent() != null){
+            comment.setContent(commentRequestDto.getContent());
+        }
+
+        Comment updatedComment = commentRepository.save(comment);
+        return new CommentResponseDto(updatedComment.getId(), updatedComment.getDate(), updatedComment.getContent());
+    }
+
+
+    // 특정 유저 comment 조회 로직
+    public CommentResponseDto getUserComment(User user, LocalDate date) {
+        validateUserId(user);
+
+        Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
+                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
+
+        return new CommentResponseDto(comment.getId(), comment.getDate(), comment.getContent());
+    }
 
     // 투두 이름 유효성 검사 메서드
     private void validateTimetableName(String timetableName) {
@@ -330,5 +327,4 @@ public class TimetableService {
                 dailyEntry.getColor().equals(weeklyEntry.getColor()) &&
                 Objects.equals(dailyEntry.getMemo(), weeklyEntry.getMemo());
     }
-
 }
