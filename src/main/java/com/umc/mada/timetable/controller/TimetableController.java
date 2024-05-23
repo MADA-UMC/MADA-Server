@@ -1,16 +1,20 @@
 package com.umc.mada.timetable.controller;
 
+import com.umc.mada.calendar.domain.Calendar;
 import com.umc.mada.calendar.repository.CalendarRepository;
+import com.umc.mada.timetable.domain.DayOfWeek;
 import com.umc.mada.timetable.dto.CommentRequestDto;
 import com.umc.mada.timetable.dto.CommentResponseDto;
 import com.umc.mada.timetable.dto.TimetableRequestDto;
 import com.umc.mada.timetable.dto.TimetableResponseDto;
 import com.umc.mada.timetable.service.TimetableService;
+import com.umc.mada.todo.domain.Todo;
 import com.umc.mada.todo.repository.TodoRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +45,8 @@ public class TimetableController {
     @PostMapping("/comment")
     public ResponseEntity<Map<String, Object>> createTimetableComment(Authentication authentication, @RequestBody CommentRequestDto commentRequestDto){
         // comment 생성 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         CommentResponseDto newComment = timetableService.createComment(user, commentRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("Comment", newComment);
@@ -53,7 +58,8 @@ public class TimetableController {
     @PatchMapping("/comment/update/{date}")
     public ResponseEntity<Map<String, Object>> updateTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date, @RequestBody CommentRequestDto commentRequestDto){
         // comment 수정 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         CommentResponseDto updatedComment = timetableService.updateComment(user, date, commentRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("Comment", updatedComment);
@@ -64,7 +70,8 @@ public class TimetableController {
 
     @GetMapping("/comment/date/{date}")
     public ResponseEntity<Map<String, Object>> getUserTimetableComment(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         CommentResponseDto userComment = timetableService.getUserComment(user, date);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("Comment", userComment);
@@ -81,7 +88,8 @@ public class TimetableController {
     @PostMapping("/daily")
     public ResponseEntity<Map<String, Object>> createDailyTimetable(Authentication authentication, @RequestBody TimetableRequestDto timetableRequestDto){
         // 일일 시간표 일정 생성 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         TimetableResponseDto newTimetable = timetableService.createTimetable(user, timetableRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("DailyTimetable", newTimetable);
@@ -96,7 +104,8 @@ public class TimetableController {
     @PostMapping("/daily/loadWeekly/{date}")
     public ResponseEntity<Map<String, Object>> loadDailyTimetableFromWeekly(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
         // 주간시간표 불러오기 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         Map<String, Object> map = timetableService.checkAndLoadDailyData(user, date);
         //result.put("status", 200);
         //result.put("success", true);
@@ -107,7 +116,8 @@ public class TimetableController {
     @PatchMapping("/daily/update/{scheduleId}")
     public ResponseEntity<Map<String, Object>> updateDailyTimetable(Authentication authentication, @PathVariable int scheduleId, @RequestBody TimetableRequestDto timetableRequestDto){
         // 일일 시간표 일정 수정 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         TimetableResponseDto updatedTimetable = timetableService.updateTimetable(user, scheduleId, timetableRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("DailyTimetable", updatedTimetable);
@@ -122,7 +132,8 @@ public class TimetableController {
     @PatchMapping("/daily/delete/{scheduleId}")
     public ResponseEntity<Map<String, Object>> deleteDailyTimetable(Authentication authentication, @PathVariable int scheduleId) {
         // 일일 시간표 일정 삭제 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         timetableService.deleteTimetable(user, scheduleId);
         Map<String, Object> result = new LinkedHashMap<>();
         //result.put("status", 200);
@@ -134,7 +145,8 @@ public class TimetableController {
     @GetMapping("/daily/date/{date}")
     // 일일 시간표 조회 API
     public ResponseEntity<Map<String, Object>> getUserDailyTimetable(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date){
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         List<TimetableResponseDto> userTimetables = timetableService.getDailyTimetable(user, date);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("DailyTimetableList", userTimetables);
@@ -153,7 +165,8 @@ public class TimetableController {
     @PostMapping("/weekly/create")
     public ResponseEntity<Map<String, Object>> createWeeklyTimetable(Authentication authentication, @RequestBody TimetableRequestDto timetableRequestDto){
         // 주간 시간표 일정 생성 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         TimetableResponseDto newTimetable = timetableService.createTimetable(user, timetableRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("WeeklyTimetable", newTimetable);
@@ -168,7 +181,8 @@ public class TimetableController {
     @PatchMapping("/weekly/update/{scheduleId}")
     public ResponseEntity<Map<String, Object>> updateWeeklyTimetable(Authentication authentication, @PathVariable int scheduleId, @RequestBody TimetableRequestDto timetableRequestDto){
         // 주간 시간표 일정 수정 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         TimetableResponseDto updatedTimetable = timetableService.updateTimetable(user, scheduleId, timetableRequestDto);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("WeeklyTimetable", updatedTimetable);
@@ -183,7 +197,8 @@ public class TimetableController {
     @PatchMapping("/weekly/delete/{scheduleId}")
     public ResponseEntity<Map<String, Object>> deleteWeeklyTimetable(Authentication authentication, @PathVariable int scheduleId) {
         // 주간 시간표 일정 삭제 API
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         timetableService.deleteTimetable(user, scheduleId);
         Map<String, Object> result = new LinkedHashMap<>();
         //result.put("status", 200);
@@ -195,7 +210,8 @@ public class TimetableController {
     @GetMapping("/weekly")
     // 주간 시간표 일정 조회 API
     public ResponseEntity<Map<String, Object>> getUserWeeklyTimetable(Authentication authentication){
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         List<TimetableResponseDto> userTimetables = timetableService.getWeeklyTimetable(user);
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("WeeklyTimetableList", userTimetables);
@@ -211,7 +227,8 @@ public class TimetableController {
     @GetMapping("search/date/{date}")
     // 시간표 추가 시, 특정 유저 일정(캘린더)과 투두 조회 API
     public ResponseEntity<Map<String, Object>> getTodoAndCalendar(Authentication authentication, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userOptional.get();
         Map<String, Object> map = timetableService.getTodoAndCalendar(user, date);
         return ResponseEntity.ok().body(map);
     }
