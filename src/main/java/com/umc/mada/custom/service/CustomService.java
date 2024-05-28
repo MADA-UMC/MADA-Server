@@ -107,7 +107,7 @@ public class CustomService {
             //아이템의 카테고리가 겹치지 않도록 확인
             String[] itemCategories = item.getCategory().split(",");
             for(String category: itemCategories){
-                if(itemsCategory.contains(category)){
+                if(!category.equals(ItemType.I5.getItemType())&&itemsCategory.contains(category)){
                     throw new DuplicationItemException(ErrorType.DUPLICATE_ITEM_CATEGORY.getMessage());
                 }
                 itemsCategory.add(category);

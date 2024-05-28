@@ -154,6 +154,7 @@ public class UserController {
     /**
      * 구독 설정 API
      */
+    @Operation(description = "유료 회원 관리")
     @PatchMapping("/subscribe")
     public ResponseEntity<Void> subscribeToggleSave(Authentication authentication,@RequestBody Map<String,Boolean> is_subscribe){
 //        Map<String,Object> map = new HashMap<>();
