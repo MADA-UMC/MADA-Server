@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,10 +69,7 @@ public class UserService {
                 }
             }
             else{
-                List<CustomItem> subscribeCustomItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.PREMINUM);
-                for (CustomItem customItem : subscribeCustomItems){
-                    haveItemRepository.deleteByUserAndCustomItem(user,customItem);
-                }
+                haveItemRepository.deleteByUserAndUnlockCond(user, CustomItem.ItemUnlockCondition.PREMINUM);
             }
         }
 
