@@ -51,6 +51,10 @@ public class ChartService {
         startDate = date.minusDays(5);
         List<AchievementRateStatisticsVO> achievementRateStatisticsVOList = chartRepository.dayStatisticsOnAchievementRate(user.getId(), startDate, date);
 
+        if(categoryStatisticsVOList.isEmpty() || previousCategoryStatisticsVO != null || todoBarGraphStatisticsVOList.isEmpty() || achievementRateStatisticsVOList.isEmpty()){
+            return null;
+        }
+
         return StatisticsResponseDto.ofDay(categoryStatisticsVOList, previousCategoryStatisticsVO, todoBarGraphStatisticsVOList, totalCount, achievementRateStatisticsVOList);
     }
 
