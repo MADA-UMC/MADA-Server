@@ -114,7 +114,7 @@ public class SecurityConfig{
 
                 .and()
                 .logout()
-                .logoutSuccessUrl("http://localhost:8080/oauth2/authorization/naver")
+                .logoutSuccessUrl("http://localhost:8080/oauth2/authorization/naver") //TODO: 이거 우리 서버 url로 바꿔야 함
 
                 .and()
                 .oauth2Login(oauth2 -> oauth2
