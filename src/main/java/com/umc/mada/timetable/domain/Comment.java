@@ -31,7 +31,7 @@ public class Comment {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "content")
+    @Column(name = "content", nullable = false)
     private String content;
 
     @CreationTimestamp
