@@ -27,4 +27,7 @@ public interface CalendarRepository extends JpaRepository<Calendar,Long> {
             "and MONTH(c.startDate) <= :m and MONTH(c.endDate) >= :m "
     )
     List<Calendar> findCalendarMonth(User user , int y, int m);
+
+    @Query("select c from Calendar c where c.user = :user and c.startDate <= :date and c.endDate >= :date")
+    List<Calendar> findCalendarDay(User user, LocalDate date);
 }

@@ -94,8 +94,8 @@ public class CustomController {
 
 
     private User findUser(Authentication authentication){
-        Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
 //        User user = userOptional.get(); //TODO: get값이 NULL인 경우를 체크해줘야함
-        return userOptional.get();
+        return user;
     }
 }

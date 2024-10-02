@@ -50,6 +50,7 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
         OAuth2Attributes oAuth2Attributes = OAuth2Attributes.of(provider, userNameAttributeName, oAuth2User.getAttributes());
 
         Optional<User> userOptional = userRepository.findByAuthId(oAuth2Attributes.getAuthId());
+//        Optional<User> userOptional = userRepository.findByAuthIdAndAccountExpired(oAuth2Attributes.getAuthId(), false);
 
         User user;
         boolean newUser=false;

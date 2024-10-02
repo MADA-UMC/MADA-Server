@@ -78,7 +78,7 @@ public class CustomService {
             boolean haveItemCheck = haveItemRepository.existsByCustomItemAndUser(item, user);
 
             //출석 아이템인데 소유하고 있지 않다면 목록에 추가하지 않기
-            if(!haveItemCheck && item.getUnlockCondition().equals(CustomItem.ItemUnlockCondition.ATTENDANCE)) continue;
+//            if(!haveItemCheck && item.getUnlockCondition().equals(CustomItem.ItemUnlockCondition.ATTENDANCE)) continue;
 
             //해당 아이템을 소유하고 있다면 true;
             if(haveItemCheck) have = true;
@@ -107,7 +107,7 @@ public class CustomService {
             //아이템의 카테고리가 겹치지 않도록 확인
             String[] itemCategories = item.getCategory().split(",");
             for(String category: itemCategories){
-                if(itemsCategory.contains(category)){
+                if(!category.equals(ItemType.I5.getItemType())&&itemsCategory.contains(category)){
                     throw new DuplicationItemException(ErrorType.DUPLICATE_ITEM_CATEGORY.getMessage());
                 }
                 itemsCategory.add(category);

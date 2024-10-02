@@ -1,29 +1,33 @@
 package com.umc.mada.user.service;
 
+import com.umc.mada.custom.domain.CustomItem;
+import com.umc.mada.custom.domain.HaveItem;
+import com.umc.mada.custom.repository.CustomRepository;
+import com.umc.mada.custom.repository.HaveItemRepository;
 import com.umc.mada.user.domain.User;
 import com.umc.mada.user.dto.nickname.NicknameRequestDto;
 import com.umc.mada.user.dto.nickname.NicknameResponseDto;
 import com.umc.mada.user.dto.user.UserRequestDto;
-import com.umc.mada.user.dto.user.UserResponseDto;
 import com.umc.mada.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
-
+    private final CustomRepository customRepository;
+    private final HaveItemRepository haveItemRepository;
     @Autowired
-    public UserService(UserRepository userRepository){
+    public UserService(UserRepository userRepository,CustomRepository customRepository, HaveItemRepository haveItemRepository){
+        this.haveItemRepository = haveItemRepository;
         this.userRepository = userRepository;
+        this.customRepository = customRepository;
     }
 
     public User update(Long id, UserRequestDto.UpdateNickname request){
@@ -49,11 +53,27 @@ public class UserService {
         userRepository.save(user);
         return NicknameResponseDto.of(changeNicknameRequestDto.getNickname());
     }
-
+    @Transactional
     public Boolean isSubscribe(Authentication authentication, Map<String,Boolean> is_subscribe) {
+        boolean condition = true;
         User user = this.getUser(authentication);
+        if(user.getSubscribe() != is_subscribe.get("is_subscribe"))
+            condition = false;
         user.updateSubscribe(is_subscribe.get("is_subscribe"));
         userRepository.save(user);
+        if(!condition){
+            if(user.getSubscribe()){
+                List<CustomItem> subscribeCustomItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.PREMINUM);
+                for (CustomItem customItem : subscribeCustomItems){
+                    haveItemRepository.save(HaveItem.builder().user(user).customItem(customItem).build());
+                }
+            }
+            else{
+                haveItemRepository.deleteByUserAndUnlockCond(user, CustomItem.ItemUnlockCondition.PREMINUM);
+            }
+        }
+
+
         return user.getSubscribe();
     }
 
@@ -120,7 +140,7 @@ public class UserService {
     }
 
     private User getUser(Authentication authentication){
-        Optional<User> optionalUser = userRepository.findByAuthId(authentication.getName());
-        return optionalUser.get();
+        User user = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
+        return user;
     }
 }
