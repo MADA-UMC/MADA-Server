@@ -38,6 +38,12 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.projectlombok:lombok:1.18.26'
 
+	//ssh tunneling
+	// jsch 라이브러리, for ssh tunneling
+	implementation 'com.github.mwiede:jsch:0.2.16'
+	// application.yml의 환경 변수를 class에서 사용하기 위한 라이브러리
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
 	//jwt
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
