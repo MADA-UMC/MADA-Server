@@ -48,7 +48,7 @@ public class TimetableService {
         this.calendarRepository = calendarRepository;
         this.repeatTodoRepository = repeatTodoRepository;
     }
-
+    @Transactional
     // 시간표 일정 생성 로직
     public TimetableResponseDto createTimetable(User user, TimetableRequestDto timetableRequestDto){
         // 유효성 검사 메서드를 호출하여 해당 ID가 데이터베이스에 존재하는지 확인
@@ -211,7 +211,7 @@ public class TimetableService {
 //            checkAndLoadDailyData(user, today);
 //        }
 //    }
-
+    @Transactional
     // 주간 시간표의 일정을 기반으로 한 일일 시간표 생성 메서드
     public Map<String, Object> checkAndLoadDailyData(User user, LocalDate date) {
         java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
@@ -261,7 +261,7 @@ public class TimetableService {
         result.put("data",data);
         return result;
     }
-
+    @Transactional
     // comment 생성 로직
     public CommentResponseDto createComment(User user, CommentRequestDto commentRequestDto){
         validateUserId(user);
@@ -298,10 +298,9 @@ public class TimetableService {
     // 특정 유저 comment 조회 로직
     public CommentResponseDto getUserComment(User user, LocalDate date) {
         validateUserId(user);
-
         Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
-                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
-
+                .orElse(null);
+        if (comment == null) {return null;}
         return new CommentResponseDto(comment.getId(), comment.getDate(), comment.getContent());
     }
 
