@@ -73,10 +73,16 @@ public class TimetableController {
         Optional<User> userOptional = userRepository.findByAuthId(authentication.getName());
         User user = userOptional.get();
         CommentResponseDto userComment = timetableService.getUserComment(user, date);
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("Comment", userComment);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("data", data);
+
+        if (userComment != null) {
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("Comment", userComment);
+            result.put("data", data);  // comment가 있으면 data를 추가
+        } else {
+            result.put("data", null);  // comment가 없으면 data를 null로 설정
+        }
+
         return ResponseEntity.ok().body(result);
     }
 
