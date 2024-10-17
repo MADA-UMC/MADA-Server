@@ -298,10 +298,9 @@ public class TimetableService {
     // 특정 유저 comment 조회 로직
     public CommentResponseDto getUserComment(User user, LocalDate date) {
         validateUserId(user);
-
         Comment comment = commentRepository.findCommentByUserIdAndDateIs(user, date)
-                .orElseThrow(() -> new IllegalArgumentException("NOT_FOUND_ERROR"));
-
+                .orElse(null);
+        if (comment == null) {return null;}
         return new CommentResponseDto(comment.getId(), comment.getDate(), comment.getContent());
     }
 
