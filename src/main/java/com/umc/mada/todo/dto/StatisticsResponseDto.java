@@ -7,7 +7,6 @@ import lombok.Getter;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.Collections;
 
 @Builder
 @Getter
@@ -29,99 +28,100 @@ public class StatisticsResponseDto {
 
     public static StatisticsResponseDto ofDay(List<CategoryStatisticsVO> categoryStatisticsVOList, PreviousCategoryStatisticsVO previousCategoryStatisticsVO,
                                            List<TodoBarGraphStatisticsVO> todoBarGraphStatisticsVOList, int totalCount, List<AchievementRateStatisticsVO> achievementRateStatisticsVOList){
-        if (!categoryStatisticsVOList.isEmpty()) {
-            //각 list의 index 0은 오늘, 1은 어제이다.
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
-                    .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
-                    .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
-                    .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
-                    .todoStatistics(todoBarGraphStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getTodoDate(), vo.getCount())).collect(Collectors.toList()))
-                    .nowTotalCount(totalCount)
-                    .nowCountCompleted(todoBarGraphStatisticsVOList.get(0).getCount())
-                    .diffCount(todoBarGraphStatisticsVOList.get(0).getCount() - todoBarGraphStatisticsVOList.get(1).getCount())
-                    .achievementStatistics(achievementRateStatisticsVOList.stream().map(vo -> AchievementStatisticsDto.of(vo.getDate(), vo.getRate())).collect(Collectors.toList()))
-                    .nowAchievementRate(achievementRateStatisticsVOList.get(0).getRate() - achievementRateStatisticsVOList.get(1).getRate())
-                    .nowCountCompletedA(achievementRateStatisticsVOList.get(0).getCount())
-                    .build();
-        } else{
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(Collections.emptyList())
-                    .mostCategory("기본 카테고리")
-                    .nowCategoryCount(0)
-                    .beforeCategoryCount(0)
-                    .todoStatistics(Collections.emptyList())
-                    .nowTotalCount(0)
-                    .nowCountCompleted(0)
-                    .diffCount(0)
-                    .achievementStatistics(Collections.emptyList())
-                    .nowAchievementRate(0.0f)
-                    .nowCountCompletedA(0.0f)
-                    .build();
-        }
+        float diffCount = calculateDiffCount(todoBarGraphStatisticsVOList);
+        float nowAchievementRate = calculateNowAchievementRate(achievementRateStatisticsVOList);
+
+        return StatisticsResponseDto.builder()
+                .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
+                .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
+                .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
+                .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
+                .todoStatistics(todoBarGraphStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getTodoDate(), vo.getCount())).collect(Collectors.toList()))
+                .nowTotalCount(totalCount)
+                .nowCountCompleted(todoBarGraphStatisticsVOList.get(0).getCount())
+                .diffCount(diffCount)
+                .achievementStatistics(achievementRateStatisticsVOList.stream().map(vo -> AchievementStatisticsDto.of(vo.getDate(), vo.getRate())).collect(Collectors.toList()))
+                .nowAchievementRate(nowAchievementRate)
+                .nowCountCompletedA(achievementRateStatisticsVOList.get(0).getCount())
+                .build();
     }
 
     public static StatisticsResponseDto ofWeek(List<CategoryStatisticsVO> categoryStatisticsVOList, int totalCount,  PreviousCategoryStatisticsVO previousCategoryStatisticsVO,
                                                List<WeeklyBarGraphAndRateStatisticsVO> weeklyBarGraphAndRateStatisticsVOList){
-        if (!categoryStatisticsVOList.isEmpty()) {
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
-                    .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
-                    .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
-                    .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
-                    .todoStatistics(weeklyBarGraphAndRateStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getStartDate(), vo.getEndDate(), vo.getCount())).collect(Collectors.toList()))
-                    .nowTotalCount(totalCount)
-                    .nowCountCompleted(weeklyBarGraphAndRateStatisticsVOList.get(0).getCount())
-                    .diffCount(weeklyBarGraphAndRateStatisticsVOList.get(0).getCount() - weeklyBarGraphAndRateStatisticsVOList.get(1).getCount())
-                    .achievementStatistics(weeklyBarGraphAndRateStatisticsVOList.stream().map(vo -> AchievementStatisticsDto.of(vo.getStartDate(), vo.getEndDate(), vo.getRate())).collect(Collectors.toList()))
-                    .nowAchievementRate(weeklyBarGraphAndRateStatisticsVOList.get(0).getRate() - weeklyBarGraphAndRateStatisticsVOList.get(1).getRate())
-                    .nowCountCompletedA(weeklyBarGraphAndRateStatisticsVOList.get(0).getCount())
-                    .build();
-        } else{
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(Collections.emptyList())
-                    .mostCategory("기본 카테고리")
-                    .nowCategoryCount(0)
-                    .beforeCategoryCount(0)
-                    .todoStatistics(Collections.emptyList())
-                    .nowTotalCount(0)
-                    .nowCountCompleted(0)
-                    .diffCount(0)
-                    .achievementStatistics(Collections.emptyList())
-                    .nowAchievementRate(0.0f)
-                    .nowCountCompletedA(0.0f)
-                    .build();
-        }
+        float diffCount = calculateDiffCount(weeklyBarGraphAndRateStatisticsVOList);
+        float nowAchievementRate = calculateNowAchievementRate(weeklyBarGraphAndRateStatisticsVOList);
+
+        return StatisticsResponseDto.builder()
+                .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
+                .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
+                .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
+                .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
+                .todoStatistics(weeklyBarGraphAndRateStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getStartDate(), vo.getEndDate(), vo.getCount())).collect(Collectors.toList()))
+                .nowTotalCount(totalCount)
+                .nowCountCompleted(weeklyBarGraphAndRateStatisticsVOList.get(0).getCount())
+                .diffCount(diffCount)
+                .achievementStatistics(weeklyBarGraphAndRateStatisticsVOList.stream().map(vo -> AchievementStatisticsDto.of(vo.getStartDate(), vo.getEndDate(), vo.getRate())).collect(Collectors.toList()))
+                .nowAchievementRate(nowAchievementRate)
+                .nowCountCompletedA(weeklyBarGraphAndRateStatisticsVOList.get(0).getCount())
+                .build();
     }
 
     public static StatisticsResponseDto ofMonth(List<CategoryStatisticsVO> categoryStatisticsVOList, int totalCount,  PreviousCategoryStatisticsVO previousCategoryStatisticsVO,
                                                 List<MonthlyBarGraphAndRateStatisticsVO> monthlyBarGraphAndRateStatisticsVOList){
-        if (!categoryStatisticsVOList.isEmpty()){
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
-                    .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
-                    .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
-                    .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
-                    .todoStatistics(monthlyBarGraphAndRateStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getMonthDate(), vo.getCount())).collect(Collectors.toList()))
-                    .nowTotalCount(totalCount)
-                    .nowCountCompleted(monthlyBarGraphAndRateStatisticsVOList.get(0).getCount())
-                    .diffCount(monthlyBarGraphAndRateStatisticsVOList.get(0).getCount() - monthlyBarGraphAndRateStatisticsVOList.get(1).getCount())
-                    .achievementStatistics(monthlyBarGraphAndRateStatisticsVOList.stream().map(vo-> AchievementStatisticsDto.of(vo.getMonthDate(), vo.getRate())).collect(Collectors.toList()))
-                    .nowAchievementRate(monthlyBarGraphAndRateStatisticsVOList.get(0).getRate() - monthlyBarGraphAndRateStatisticsVOList.get(1).getRate())
-                    .build();
-        } else{
-            return StatisticsResponseDto.builder()
-                    .categoryStatistics(Collections.emptyList())
-                    .mostCategory("기본 카테고리")
-                    .nowCategoryCount(0)
-                    .beforeCategoryCount(0)
-                    .todoStatistics(Collections.emptyList())
-                    .nowTotalCount(0)
-                    .nowCountCompleted(0)
-                    .diffCount(0)
-                    .achievementStatistics(Collections.emptyList())
-                    .nowAchievementRate(0.0f)
-                    .build();
+        float diffCount = calculateDiffCount(monthlyBarGraphAndRateStatisticsVOList);
+        float nowAchievementRate = calculateNowAchievementRate(monthlyBarGraphAndRateStatisticsVOList);
+
+        return StatisticsResponseDto.builder()
+                .categoryStatistics(categoryStatisticsVOList.stream().map(vo -> CategoryStatisticsDto.of(vo.getCategoryName(), vo.getColor(), vo.getRate())).collect(Collectors.toList()))
+                .mostCategory(categoryStatisticsVOList.get(0).getCategoryName())
+                .nowCategoryCount(categoryStatisticsVOList.get(0).getCount())
+                .beforeCategoryCount(previousCategoryStatisticsVO.getCount())
+                .todoStatistics(monthlyBarGraphAndRateStatisticsVOList.stream().map(vo -> TodoStatisticsDto.of(vo.getMonthDate(), vo.getCount())).collect(Collectors.toList()))
+                .nowTotalCount(totalCount)
+                .nowCountCompleted(monthlyBarGraphAndRateStatisticsVOList.get(0).getCount())
+                .diffCount(diffCount)
+                .achievementStatistics(monthlyBarGraphAndRateStatisticsVOList.stream().map(vo-> AchievementStatisticsDto.of(vo.getMonthDate(), vo.getRate())).collect(Collectors.toList()))
+                .nowAchievementRate(nowAchievementRate)
+                .build();
+    }
+
+    private static <T> float calculateNowAchievementRate(List<T> statisticsVOList) {
+        if (statisticsVOList.size() > 1) {
+            if (statisticsVOList.get(0) instanceof AchievementRateStatisticsVO) {
+                return ((AchievementRateStatisticsVO) statisticsVOList.get(0)).getRate() - ((AchievementRateStatisticsVO) statisticsVOList.get(1)).getRate();
+            } else if (statisticsVOList.get(0) instanceof WeeklyBarGraphAndRateStatisticsVO) {
+                return ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getRate() - ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(1)).getRate();
+            } else if (statisticsVOList.get(0) instanceof MonthlyBarGraphAndRateStatisticsVO) {
+                return ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getRate() - ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(1)).getRate();
+            }
         }
+        if (statisticsVOList.get(0) instanceof AchievementRateStatisticsVO) {
+            return ((AchievementRateStatisticsVO) statisticsVOList.get(0)).getRate();
+        } else if (statisticsVOList.get(0) instanceof WeeklyBarGraphAndRateStatisticsVO) {
+            return ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getRate();
+        } else if (statisticsVOList.get(0) instanceof MonthlyBarGraphAndRateStatisticsVO) {
+            return ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getRate();
+        }
+        return 0;
+    }
+
+    private static <T> float calculateDiffCount(List<T> statisticsVOList) {
+        if (statisticsVOList.size() > 1) {
+            if (statisticsVOList.get(0) instanceof TodoBarGraphStatisticsVO) {
+                return ((TodoBarGraphStatisticsVO) statisticsVOList.get(0)).getCount() - ((TodoBarGraphStatisticsVO) statisticsVOList.get(1)).getCount();
+            } else if (statisticsVOList.get(0) instanceof WeeklyBarGraphAndRateStatisticsVO) {
+                return ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getCount() - ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(1)).getCount();
+            } else if (statisticsVOList.get(0) instanceof MonthlyBarGraphAndRateStatisticsVO) {
+                return ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getCount() - ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(1)).getCount();
+            }
+        }
+        if (statisticsVOList.get(0) instanceof TodoBarGraphStatisticsVO) {
+            return ((TodoBarGraphStatisticsVO) statisticsVOList.get(0)).getCount();
+        } else if (statisticsVOList.get(0) instanceof WeeklyBarGraphAndRateStatisticsVO) {
+            return ((WeeklyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getCount();
+        } else if (statisticsVOList.get(0) instanceof MonthlyBarGraphAndRateStatisticsVO) {
+            return ((MonthlyBarGraphAndRateStatisticsVO) statisticsVOList.get(0)).getCount();
+        }
+        return 0;
     }
 }

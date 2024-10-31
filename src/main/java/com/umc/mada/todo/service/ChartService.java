@@ -27,20 +27,17 @@ public class ChartService {
     private final RepeatTodoRepository repeatTodoRepository;
 
     public StatisticsResponseDto dailyStatistics(Authentication authentication, LocalDate date){
-//        User user  = userRepository.findByAuthIdAndAccountExpired(authentication.getName()).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
-//        User user  = userRepository.findByAuthIdAndAccountExpiredAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new RuntimeException("올바른 유저 ID가 아닙니다."));
         User user  = userRepository.findByAuthIdAndAccountExpired(authentication.getName(), false).orElseThrow(()-> new NotFoundUserException("유저를 찾을 수 없습니다"));
 
         //카테고리 통계
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), date, date);
 
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
-        if (!categoryStatisticsVOList.isEmpty()) {
-            int check = categoryStatisticsVOList.get(0).getCategoryId();
-            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
-        } else {
-            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        if (categoryStatisticsVOList.isEmpty()) {
+            return null;
         }
+
+        int check = categoryStatisticsVOList.get(0).getCategoryId();
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), date, date, check);
 
         //막대 그래프 통계
         LocalDate startDate = date.minusDays(3);
@@ -50,6 +47,10 @@ public class ChartService {
         //달성률 통계
         startDate = date.minusDays(5);
         List<AchievementRateStatisticsVO> achievementRateStatisticsVOList = chartRepository.dayStatisticsOnAchievementRate(user.getId(), startDate, date);
+
+//        if(categoryStatisticsVOList.isEmpty() || previousCategoryStatisticsVO != null || todoBarGraphStatisticsVOList.isEmpty() || achievementRateStatisticsVOList.isEmpty()){
+//            return null;
+//        }
 
         return StatisticsResponseDto.ofDay(categoryStatisticsVOList, previousCategoryStatisticsVO, todoBarGraphStatisticsVOList, totalCount, achievementRateStatisticsVOList);
     }
@@ -65,14 +66,12 @@ public class ChartService {
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번주 생성한 투두 개수
 
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
-        if (!categoryStatisticsVOList.isEmpty()) {
-            int check = categoryStatisticsVOList.get(0).getCategoryId();
-            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
-        } else {
-            // categoryStatisticsVOList가 비어 있을 때
-            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        if (categoryStatisticsVOList.isEmpty()) {
+            return null;
         }
+
+        int check = categoryStatisticsVOList.get(0).getCategoryId();
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusWeeks(6);
@@ -92,14 +91,12 @@ public class ChartService {
         List<CategoryStatisticsVO> categoryStatisticsVOList = chartRepository.statisticsOnCategories(user.getId(), startDate, endDate);
         int totalCount = chartRepository.countAllByUserIdAndDateBetween(user, startDate, endDate); //이번달 생성한 투두 개수
 
-        PreviousCategoryStatisticsVO previousCategoryStatisticsVO;
-        if (!categoryStatisticsVOList.isEmpty()) {
-            int check = categoryStatisticsVOList.get(0).getCategoryId();
-            previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
-        } else {
-            // categoryStatisticsVOList가 비어 있을 때
-            previousCategoryStatisticsVO = new DefaultPreviousCategoryStatisticsVO();
+        if (categoryStatisticsVOList.isEmpty()) {
+            return null;
         }
+
+        int check = categoryStatisticsVOList.get(0).getCategoryId();
+        PreviousCategoryStatisticsVO previousCategoryStatisticsVO = chartRepository.statisticsOnPreviousCategories(user.getId(), startDate, endDate, check);
 
         //막대 그래프&달성률 통계
         LocalDate startDate2 = date.minusMonths(6);
