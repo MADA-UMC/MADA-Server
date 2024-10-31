@@ -105,17 +105,17 @@ public class CustomUserDetailService extends DefaultOAuth2UserService{ // implem
     }
 
     private void setUserData(User user){
+        List<CustomItem> customItems = customRepository.findAll();
+        customItems.forEach(item->wearingItemRepository.save(WearingItem.builder().user(user).customItem(item).build()));
+    }
+
+    private void setUserDataDefault(User user){
         //사용자 캐릭터 디폴트 설정하기
         List<CustomItem> defaultItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.DEFAULT);
 
         for(CustomItem defaultItem: defaultItems){
             wearingItemRepository.save(WearingItem.builder().user(user).customItem(defaultItem).build());
         }
-
-//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(10L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
-//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(48L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
-//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(49L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
-//        wearingItemRepository.save(WearingItem.builder().user(user).customItem(customRepository.findById(50L).orElseThrow(()-> new RuntimeException("기본 색상 ID가 없습니다."))).build());
 
         //사용자 기본 제공 커스텀 아이템 세팅하기
         List<CustomItem> basicItems = customRepository.findByUnlockCondition(CustomItem.ItemUnlockCondition.BASIC);
